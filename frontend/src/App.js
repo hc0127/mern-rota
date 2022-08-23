@@ -14,7 +14,7 @@ import { createBrowserHistory  } from 'history';
 
 function getToken(){
   const tokenString = sessionStorage.getItem('token');
-  if(!tokenString){
+  if(!tokenString || tokenString == null || tokenString == undefined){
     return false;
   }
   const userToken = JSON.parse(tokenString);
