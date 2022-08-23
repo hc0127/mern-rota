@@ -4,8 +4,8 @@ import styled from 'styled-components';
 
 import React, { Component } from 'react';
 import {connect} from 'react-redux'
-import {getAllDatas} from './../../../store/Actions/BasicAction';
-import axios from './../../../config/server.config'
+import {getAllDatas} from '../../store/Actions/BasicAction';
+import axios from '../../config/server.config'
 import {
 	MDBNavbar,MDBContainer,MDBNavbarBrand,MDBNavbarToggler,MDBIcon,MDBCollapse,showNavColor,MDBNavbarNav,MDBNavbarItem,MDBNavbarLink
 } from 'mdb-react-ui-kit';
@@ -53,7 +53,7 @@ class Navbar extends Component{
 		return (
 			<MDBNavbar  expand='lg'  fixed='top' bgColor='primary'>
 				<MDBContainer fluid>
-					<NavBrand href='/'>
+					<NavBrand href='/' style={{marginLeft:'25px'}}>
 						ROTA
 					</NavBrand>
 					<MDBNavbarToggler

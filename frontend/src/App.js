@@ -3,7 +3,7 @@ import './App.css';
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-import Navbar from './pages/components/Navbar';
+import Navbar from './pages/components';
 import Basic from './pages/basic';
 import Assign from './pages/assign';
 import Total from './pages/total';
@@ -14,14 +14,11 @@ import { createBrowserHistory  } from 'history';
 
 function getToken(){
   const tokenString = sessionStorage.getItem('token');
-  console.log( typeof(tokenString) )
   if(tokenString == 'undefined'){
     return false;
   }else{
-    // alert(tokenString);
     const userToken = JSON.parse(tokenString);
     return userToken;
-
   }
 }
 
