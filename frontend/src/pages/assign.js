@@ -10,8 +10,8 @@ import {
   npUpd
 } from '../store/Actions/BasicAction';
 
-import toastr from 'toastr'
-import 'toastr/build/toastr.min.css'
+// import toastr from 'toastr'
+// import 'toastr/build/toastr.min.css'
 
 
 class Assign extends Component {
@@ -57,8 +57,8 @@ class Assign extends Component {
       let assigns = [];
       let newAssign = [];
       let month = selYear+'-'+(selMonth<10?+'0'+String(selMonth):selMonth);
-      let daysInMonth = new Date(selYear, selMonth, 0). getDate();
-      if(selPatient != 0){
+      let daysInMonth = new Date(selYear, selMonth, 0).getDate();
+      if(selPatient !== 0){
         for(let i = 0; i < daysInMonth;i++){
           newAssign.day = (i+1);
           newAssign.date = month+'-'+(i<9?+'0'+String(i+1):i+1);
@@ -73,14 +73,14 @@ class Assign extends Component {
           assigns = [...assigns,{...newAssign}];
         }
         
-        basic.patients.map((patient) =>{
-          if(patient._id == selPatient){
-            patient.rota.map((rota) =>{
+        basic.patients.map(patient =>{
+          if(patient._id === selPatient){
+            patient.rota.map(rota =>{
               if(rota.date.includes(month)){
-                basic.nurses.map((nurse) =>{
+                basic.nurses.map(nurse =>{
                   if(rota.nurse_id == nurse._id){
-                    nurse.rota.map((nurseRota) =>{
-                      if(nurseRota.date == rota.date){
+                    nurse.rota.map(nurseRota =>{
+                      if(nurseRota.date === rota.date){
                         let day = rota.date.replace(month+'-','')
                         assigns[day-1] = {
                           day:day*1,

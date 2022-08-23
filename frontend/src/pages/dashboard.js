@@ -1,12 +1,11 @@
 import React, { Component } from 'react';
 import './../App.css';
-import {Form} from 'react-bootstrap';
 import {connect} from 'react-redux'
 import DataTable from 'react-data-table-component';
 import {
-    MDBContainer,MDBRow,MDBCol,MDBCard,MDBCardHeader,MDBCardTitle,MDBCardBody,MDBCardText
+    MDBContainer,MDBRow
 } from 'mdb-react-ui-kit'
-import basic from './basic';
+// import basic from './basic';
 
 class DashBoard extends Component {
   constructor(props) {

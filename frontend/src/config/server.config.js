@@ -1,6 +1,7 @@
 
 import axios from 'axios'
 
-axios.defaults.baseURL = process.env.NODE_ENV == 'development'?process.env.DEVELOPMENT_URL:process.env.PRODUCTION_URL;
+console.log(process.env);
+axios.defaults.baseURL = process.env.REACT_APP_API_URL;
 
 export default axios;

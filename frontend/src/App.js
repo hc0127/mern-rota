@@ -21,9 +21,9 @@ function getToken(){
   return userToken;
 }
 
-function setToken(userToken){
-  sessionStorage.setItem('token', JSON.stringify(userToken));
-}
+// function setToken(userToken){
+//   sessionStorage.setItem('token', JSON.stringify(userToken));
+// }
 
 function App() {
   const token = getToken();

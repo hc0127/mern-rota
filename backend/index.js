@@ -3,12 +3,14 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const mongoose = require('mongoose');
+require('dotenv').config()
 const PORT = 4000;
 
 app.use(cors({ origin: true }));
 app.use(bodyParser.json());
 
-mongoose.connect(process.env.NODE_ENV == "development"?process.env.DEVELOPMENT_URL:process.env.PRODUCTION_URL, { useNewUrlParser: true });
+console.log(process.env)
+mongoose.connect('mongodb://127.0.0.1:27017', { useNewUrlParser: true });
 const connection = mongoose.connection;
 
 connection.once('open', function() {

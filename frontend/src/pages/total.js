@@ -33,7 +33,7 @@ class Total extends Component {
     let hour = [];
     let totalhour = [];
 
-    basic.nurses.map((nurse) =>{
+    basic.nurses.map(nurse =>{
       totalhour[nurse._id] = 0;
       nurse.rota.map((rota) =>{
         if (from === '' || new Date(from) <= new Date(rota.date)) {
