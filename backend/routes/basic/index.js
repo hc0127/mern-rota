@@ -27,32 +27,43 @@ router.route("/list").get(function(req,res){
     });
 });
 router.route('/login').post(function(req,res){
-    User.findOne({password:req.body.password},function(err,data){
-        console.log(data.user);
-        if(data.user == null){
-            res.send({state:'wrong'});
-        }else{
-            Nurse.find({},function(err,nurseData){
-                if(!err){
-                    Patient.find({},function(err,patientData){
-                        if(!err){
-                            Level.find({},function(err,levelData){
-                                if(!err){
-                                    res.send({
-                                        state:'success',
-                                        token:data.token,
-                                        nurse:nurseData,
-                                        patient:patientData,
-                                        level:levelData
-                                    });
-                                }
-                            });
-                        }
-                    });
-                }
+
+    User.findOne({user:"admin@gmail.com"},function(err,data){
+        if(data == null){
+            User.create({user:"admin@gmial.com",password:'admin'},function(err,data){
+                loginCheck(req,res);
             });
+        }else{
+            loginCheck(req,res);     
         }
     });
+    function loginCheck(req,res){
+        User.findOne({user:req.body.email,password:req.body.password},function(err,data){
+            if(data == null){
+                res.send({state:'wrong'});
+            }else{
+                Nurse.find({},function(err,nurseData){
+                    if(!err){
+                        Patient.find({},function(err,patientData){
+                            if(!err){
+                                Level.find({},function(err,levelData){
+                                    if(!err){
+                                        res.send({
+                                            state:'success',
+                                            token:data.token,
+                                            nurse:nurseData,
+                                            patient:patientData,
+                                            level:levelData
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
 });
 
 module.exports = router;
