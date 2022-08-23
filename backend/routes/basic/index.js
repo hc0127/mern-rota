@@ -29,19 +29,31 @@ router.route("/list").get(function(req,res){
 router.route('/login').post(function(req,res){
 
     User.findOne({user:"admin@gmail.com"},function(err,data){
+        console.log(data);
         if(data == null){
-            User.create({user:"admin@gmial.com",password:'admin'},function(err,data){
-                loginCheck(req,res);
+            User.create({user:"admin@gmail.com",password:'admin'},function(err,data){
+                if(data.password == req.body.password){
+                    Patient.find({},function(err,patientData){
+                        if(!err){
+                            Level.find({},function(err,levelData){
+                                if(!err){
+                                    res.send({
+                                        state:'success',
+                                        token:data.token,
+                                        nurse:nurseData,
+                                        patient:patientData,
+                                        level:levelData
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }else{
+                    res.send({state:'wrong'});
+                }
             });
         }else{
-            loginCheck(req,res);     
-        }
-    });
-    function loginCheck(req,res){
-        User.findOne({user:req.body.email,password:req.body.password},function(err,data){
-            if(data == null){
-                res.send({state:'wrong'});
-            }else{
+            if(data.password == req.body.password){
                 Nurse.find({},function(err,nurseData){
                     if(!err){
                         Patient.find({},function(err,patientData){
@@ -61,9 +73,11 @@ router.route('/login').post(function(req,res){
                         });
                     }
                 });
-            }
-        });
-    }
+            }else{
+                res.send({state:'wrong'});
+            }    
+        }
+    });
 });
 
 module.exports = router;
