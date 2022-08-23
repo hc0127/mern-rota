@@ -28,10 +28,10 @@ router.route("/list").get(function(req,res){
 });
 router.route('/login').post(function(req,res){
 
-    User.findOne({user:"admin@gmail.com"},function(err,data){
+    User.findOne({user:"admin@gmail.com",token:'dd'},function(err,data){
         console.log(data);
         if(data == null){
-            User.create({user:"admin@gmail.com",password:'admin'},function(err,data){
+            User.createOne({user:"admin@gmail.com",password:'admin',token:'token123'},function(err,data){
                 if(data.password == req.body.password){
                     Patient.find({},function(err,patientData){
                         if(!err){

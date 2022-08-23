@@ -42,6 +42,7 @@ class Navbar extends Component{
 	componentDidMount(){
 		axios.get('basic/list')
 		.then(response => {
+			console.log('adfd');
 			this.props.initialData(response.data);
 		})
 		.catch(function (error){
