@@ -31,22 +31,24 @@ router.route('/login').post(function(req,res){
     User.findOne({user:"admin@gmail.com",token:'dd'},function(err,data){
         console.log(data);
         if(data == null){
-            User.createOne({user:"admin@gmail.com",password:'admin',token:'token123'},function(err,data){
+            User.findOneAndUpdate({user:"admin@gmail.com"},{token:'token123'},function(err,data){
                 if(data.password == req.body.password){
-                    Patient.find({},function(err,patientData){
-                        if(!err){
-                            Level.find({},function(err,levelData){
-                                if(!err){
-                                    res.send({
-                                        state:'success',
-                                        token:data.token,
-                                        nurse:nurseData,
-                                        patient:patientData,
-                                        level:levelData
-                                    });
-                                }
-                            });
-                        }
+                    Nurse.find({},function(err,nurseData){
+                        Patient.find({},function(err,patientData){
+                            if(!err){
+                                Level.find({},function(err,levelData){
+                                    if(!err){
+                                        res.send({
+                                            state:'success',
+                                            token:data.token,
+                                            nurse:nurseData,
+                                            patient:patientData,
+                                            level:levelData
+                                        });
+                                    }
+                                });
+                            }
+                        });
                     });
                 }else{
                     res.send({state:'wrong'});

@@ -14,11 +14,15 @@ import { createBrowserHistory  } from 'history';
 
 function getToken(){
   const tokenString = sessionStorage.getItem('token');
-  if(!tokenString || tokenString == null || tokenString == undefined){
+  console.log( typeof(tokenString) )
+  if(tokenString == 'undefined'){
     return false;
+  }else{
+    // alert(tokenString);
+    const userToken = JSON.parse(tokenString);
+    return userToken;
+
   }
-  const userToken = JSON.parse(tokenString);
-  return userToken;
 }
 
 // function setToken(userToken){
