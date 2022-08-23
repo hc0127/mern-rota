@@ -52,6 +52,7 @@ router.route("/assign").post(function(req,res){
         }
     }
     run().catch();
+    
     Nurse.find({},function(err,nurses){
         Patient.findById(assign.patient_id,function(err,patient){
             res.send({NurseDatas:nurses,PatientData:patient});

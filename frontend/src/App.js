@@ -1,9 +1,10 @@
 import './App.css';
+import './sidebar.css';
 
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
 
-import Navbar from './pages/components';
+import {Navbar,Sidebar} from './pages/components';
 import Basic from './pages/basic';
 import Assign from './pages/assign';
 import Total from './pages/total';
@@ -40,6 +41,7 @@ function App() {
     <div className="App">
       <header className="App-header">
         <Navbar />
+        <Sidebar />
         <Routes history={history}>
           {
             token && <Route path='/login' element={<Login />} />
