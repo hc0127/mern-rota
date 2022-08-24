@@ -55,8 +55,10 @@ class DashBoard extends Component {
     ];
 
     let nurseDatas =[];
+    let levels=[];
 
     basic.levels.map((level) =>{
+      levels = [...levels,level.level]
       let nurseData = {
           type:level.level,
           members:0,
@@ -65,8 +67,9 @@ class DashBoard extends Component {
           overtime:0,
           utilization:0
       }
-      nurseDatas[level.level] = nurseData;
+      nurseDatas.push(nurseData);
     });
+    let levelCount = levels.length;
 
     let totalNurse = {
       type:'Total',
@@ -76,21 +79,27 @@ class DashBoard extends Component {
       overtime:0,
       utilization:0
     }
-    nurseDatas['total'] = totalNurse;
+
+    nurseDatas.push(totalNurse);
+
+    console.log(nurseDatas);
 
     basic.nurses.map((nurse) =>{
-        nurseDatas[nurse.level].members++;
-        nurseDatas['total'].members++;
+      let nurseLevel = levels.indexOf(nurse.level);
+        nurseDatas[nurseLevel].members++;
+        nurseDatas[levelCount].members++;
         nurse.rota.map((rota) =>{
-            nurseDatas[nurse.level].available += rota.hour*1;
-            nurseDatas['total'].available += rota.hour*1;
-            nurseDatas[nurse.level].assigned += rota.hour*1;
-            nurseDatas['total'].assigned += rota.hour*1;
+            nurseDatas[nurseLevel].available += rota.hour*1;
+            nurseDatas[levelCount].available += rota.hour*1;
+            nurseDatas[nurseLevel].assigned += rota.hour*1;
+            nurseDatas[levelCount].assigned += rota.hour*1;
         });
     });
-    console.log(nurseDatas);
+
+    for(var i of nurseDatas){
+      console.log(i);
+    }
     nurseDatas.map((nurseData) =>{
-        console.log(nurseData)
         nurseData.overtime = nurseData.assigned*1 - nurseData.available*1;
         nurseData.utilization = (nurseData.assigned*1 / nurseData.available*1) * 100 + '%';
     });

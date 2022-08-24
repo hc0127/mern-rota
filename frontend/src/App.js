@@ -30,7 +30,6 @@ function getToken(){
 function App() {
   const token = getToken();
   const history = createBrowserHistory();
-  console.log(token);
 
   if(!token) {
     history.push('login');
