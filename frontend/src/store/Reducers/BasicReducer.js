@@ -80,13 +80,7 @@ export default function BasicReducer(state = initialState, action) {
         patients:[...state.patients],
       };
     case NPUPDATE: 
-      console.log(action);
-      state.patients.map((patient,index)=>{
-        if(patient._id == action.patient._id){
-          key = index;
-        }
-      });
-      state.patients[key] = {...action.patient};
+      state.patients = action.patients;
       state.nurses = action.nurses;
       return {
         ...state,

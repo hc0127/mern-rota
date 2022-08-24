@@ -59,7 +59,7 @@ export const npUpd = (data) =>{
   return({
     type:NPUPDATE,
     nurses:data.NurseDatas,
-    patient:data.PatientData,
+    patients:data.PatientDatas,
   });
 }
 
