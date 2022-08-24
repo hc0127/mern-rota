@@ -5,7 +5,6 @@ import {
   LINSERT,LUPDATE,PDELETE,TOKENCHECK
 } from '../Types';
 import { createBrowserHistory  } from 'history';
-import { bindActionCreators } from 'redux';
 
 export const getAllDatas = (data) => {
   return ({
@@ -90,5 +89,14 @@ export const setToken = (data) =>{
   return ({
     type:TOKENCHECK,
     data:data,
+  });
+};
+export const logOut = () =>{
+  console.log('aaa');
+  const history = createBrowserHistory();
+  history.push('/login');
+  history.go('/login');
+  sessionStorage.removeItem('token');
+  return ({
   });
 };

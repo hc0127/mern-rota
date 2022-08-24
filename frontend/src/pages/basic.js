@@ -7,6 +7,9 @@ import {
 } from 'react-bootstrap';
 import {MDBContainer,MDBIcon,MDBBtn,MDBTabs,MDBRow,MDBCol} from 'mdb-react-ui-kit'
 import DataTable from 'react-data-table-component';
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
+
 import {
   nIns,nUpd,nDel,pIns,pUpd,pDel,lIns,lUpd,lDel,
 } from './../store/Actions/BasicAction';
@@ -281,29 +284,45 @@ class Basic extends Component {
   }
   levelConfirm = () =>{
     const _self = this;
-    this.setState({
-      ...this.state,
-      level:{
-        ...this.state.level,
-        open:false,
+    console.log(this.state.level.modal)
+    if(this.state.level.modal == {} ||
+      this.state.level.modal.level == undefined ||
+      this.state.level.modal.rate == undefined ||
+      this.state.level.modal.level == "" ||
+      this.state.level.modal.rate == "" ){
+      toastr.options = {
+        positionClass : 'toast-top-full-width',
+        hideDuration: 300,
+        timeOut: 3000
       }
-    });
-    
-    axios.post('level/add',{
-      ...this.state.level.modal,id:this.state.level.action_id
-    })
-    .then(function (response) {
-      const res = response.data;
-      const data = res.data;
-      if(res.state === 'insert'){
-        _self.props.levelInsert(data);
-      }else{
-        _self.props.levelUpdate(data);
-      }
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+      toastr.clear()
+      setTimeout(() => toastr.info('please input correct!'), 300)
+
+    }else{
+      this.setState({
+        ...this.state,
+        level:{
+          ...this.state.level,
+          open:false,
+        }
+      });
+      
+      axios.post('level/add',{
+        ...this.state.level.modal,id:this.state.level.action_id
+      })
+      .then(function (response) {
+        const res = response.data;
+        const data = res.data;
+        if(res.state === 'insert'){
+          _self.props.levelInsert(data);
+        }else{
+          _self.props.levelUpdate(data);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    }
   }
   levelModalChange = (target,e) =>{
     this.setState({
@@ -467,7 +486,7 @@ class Basic extends Component {
               </div>
               <Row>
                 <Col>
-                    <Tabs id="basic_tab" defaultActiveKey="nurse">
+                    <Tabs id="basic_tab">
                         <Tab eventKey="nurse" key={1} title="nurse" className='p-2'>
                           <Button variant="primary" onClick={() => this.nurseModal(true,null)}>Add Nurse</Button>
                           <div className='p-2'>

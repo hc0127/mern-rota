@@ -1,6 +1,6 @@
 
 //import useState hook to create menu collapse state
-import React, { useState } from "react";
+import React, { Component, useState } from "react";
 
 //import react pro sidebar components
 import {
@@ -13,9 +13,13 @@ import {
 } from "react-pro-sidebar";
 
 //import icons from react icons
-import { FaAddressBook, FaCalculator, FaCalendar, FaCalendarDay, FaList } from "react-icons/fa";
+import { FaAddressBook, FaCalculator, FaCalendar, FaCalendarDay, FaDashcube, FaList } from "react-icons/fa";
 import { FiHome, FiLogOut, FiArrowLeftCircle, FiArrowRightCircle } from "react-icons/fi";
 import { NavLink as Link } from 'react-router-dom';
+import {connect} from 'react-redux'
+import {
+  logOut
+} from './../../store/Actions/BasicAction';
 
 //import sidebar css from react-pro-sidebar module and our custom css 
 import "react-pro-sidebar/dist/css/styles.css";
@@ -37,50 +41,58 @@ cursor: pointer;
 }
 `;
 
-const Sidebar = () => {
-  
-    //create initial menuCollapse state using useState hook
-    const [menuCollapse, setMenuCollapse] = useState(true)
-
-    //create a custom function that will change menucollapse state from false to true and true to false
-  const menuIconClick = () => {
-    //condition checking to change state from true to false and vice versa
-    menuCollapse ? setMenuCollapse(false) : setMenuCollapse(true);
+class Sidebar extends Component{
+  constructor(props){
+    super(props);
+    this.state ={
+      menuCollapse:true,
+    };
+  }
+  menuIconClick = () => {
+    this.setState({
+      menuCollapse:!this.state.FaDashcubemenuCollapse
+    });
   };
 
-  return (
-    <>
-      <div id="sidebar">
-          {/* collapsed props to change menu size using menucollapse state */}
-        <div className="closemenu" onClick={menuIconClick}>
-            {menuCollapse ? (
-            <FiArrowRightCircle/>
-            ) : (
-            <FiArrowLeftCircle/>
-            )}
-        </div>
-        <ProSidebar collapsed={menuCollapse}>
-          <SidebarHeader>
-          <div className="logotext mt-5">
-                
+  render(){
+      return (
+        <>
+          <div id="sidebar">
+            <div className="closemenu" onClick={this.menuIconClick}>
+                {this.state.menuCollapse ? (
+                <FiArrowRightCircle/>
+                ) : (
+                <FiArrowLeftCircle/>
+                )}
             </div>
-          </SidebarHeader>
-          <SidebarContent>
-            <Menu iconShape="square">
-              <MenuItem icon={<FaAddressBook className="text-primary" />}><NavLink to='basic'>Basic</NavLink></MenuItem>
-              <MenuItem icon={<FaCalendarDay className="text-primary"  />}><NavLink to='assign'>Assign</NavLink></MenuItem>
-              <MenuItem icon={<FaCalculator className="text-primary" />}><NavLink to='total'>Total</NavLink></MenuItem>
-            </Menu>
-          </SidebarContent>
-          <SidebarFooter>
-            <Menu iconShape="square">
-              <MenuItem icon={<FiLogOut />}>Logout</MenuItem>
-            </Menu>
-          </SidebarFooter>
-        </ProSidebar>
-      </div>
-    </>
-  );
+            <ProSidebar collapsed={this.state.menuCollapse}>
+              <SidebarHeader>
+              <div className="logotext mt-5">
+                    
+                </div>
+              </SidebarHeader>
+              <SidebarContent>
+                <Menu iconShape="square">
+                  <MenuItem icon={<FaDashcube className="text-primary" />}><NavLink to=''>DashBoard</NavLink></MenuItem>
+                  <MenuItem icon={<FaAddressBook className="text-primary" />}><NavLink to='basic'>Basic</NavLink></MenuItem>
+                  <MenuItem icon={<FaCalendarDay className="text-primary"  />}><NavLink to='assign'>Assign</NavLink></MenuItem>
+                  <MenuItem icon={<FaCalculator className="text-primary" />}><NavLink to='total'>Total</NavLink></MenuItem>
+                </Menu>
+              </SidebarContent>
+              <SidebarFooter>
+                <Menu iconShape="square">
+                  <MenuItem icon={<FiLogOut />} onClick = {() =>this.props.logOut()}>Logout</MenuItem>
+                </Menu>
+              </SidebarFooter>
+            </ProSidebar>
+          </div>
+        </>
+      );
+  }
 };
 
-export default Sidebar;
+const mapDispatchToProps = (dispatch) => ({
+  logOut:() =>dispatch(logOut())
+});
+
+export default connect(null,mapDispatchToProps)(Sidebar)
