@@ -28,7 +28,7 @@ router.route("/list").get(function(req,res){
 });
 router.route('/login').post(function(req,res){
 
-    User.findOne({user:"admin@gmail.com",token:'dd'},function(err,data){
+    User.findOne({user:"admin@gmail.com",token:'token123'},function(err,data){
         console.log(data);
         if(data == null){
             User.findOneAndUpdate({user:"admin@gmail.com"},{token:'token123'},function(err,data){
