@@ -462,8 +462,8 @@ class Basic extends Component {
 
       return (
           <MDBContainer>
-              <div class="pt-5 text-center text-dark">
-                <h1 class="mt-3">BASIC DATA</h1>
+              <div className="pt-5 text-center text-dark">
+                <h1 className="mt-3">BASIC DATA</h1>
               </div>
               <Row>
                 <Col>

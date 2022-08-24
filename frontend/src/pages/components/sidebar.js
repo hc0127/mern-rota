@@ -67,9 +67,9 @@ const Sidebar = () => {
           </SidebarHeader>
           <SidebarContent>
             <Menu iconShape="square">
-              <MenuItem icon={<FaAddressBook size='sm' className="text-primary" />}><NavLink to='basic'>Basic</NavLink></MenuItem>
-              <MenuItem icon={<FaCalendarDay size='sm' className="text-primary"  />}><NavLink to='assign'>Assign</NavLink></MenuItem>
-              <MenuItem icon={<FaCalculator size='sm' className="text-primary" />}><NavLink to='total'>Total</NavLink></MenuItem>
+              <MenuItem icon={<FaAddressBook className="text-primary" />}><NavLink to='basic'>Basic</NavLink></MenuItem>
+              <MenuItem icon={<FaCalendarDay className="text-primary"  />}><NavLink to='assign'>Assign</NavLink></MenuItem>
+              <MenuItem icon={<FaCalculator className="text-primary" />}><NavLink to='total'>Total</NavLink></MenuItem>
             </Menu>
           </SidebarContent>
           <SidebarFooter>

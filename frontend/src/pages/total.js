@@ -39,7 +39,6 @@ class Total extends Component {
         if (from === '' || new Date(from) <= new Date(rota.date)) {
           if(to === '' || new Date(to) >= new Date(rota.date)){
             hour[nurse._id+rota.date] = rota.hour;
-            console.log(hour[nurse._id+rota.date]);
             if(rota.hour !== null && rota.hour !== undefined){
               totalhour[nurse._id] += rota.hour*1;
             }
@@ -47,7 +46,6 @@ class Total extends Component {
             list = [...list,{...selRota}]
           }
         }
-
       });
     });
 
@@ -67,8 +65,8 @@ class Total extends Component {
     
     return (
       <MDBContainer>
-        <div class="pt-5 text-center text-dark">
-          <h1 class="mt-3">TOTAL</h1>
+        <div className="pt-5 text-center text-dark">
+          <h1 className="mt-3">TOTAL</h1>
         </div>
         <div className='row'>
           <div className='col'>
@@ -91,25 +89,25 @@ class Total extends Component {
               </div>
             </div>
             <div className='p-2'>
-              <table className='table table-striped table-sm table-responsive' variant="light" responsive striped>
+              <table className='table table-striped table-sm table-responsive' variant="light">
                 <thead>
                   <tr>
-                    <th>Date</th>
+                    <th key={0}>Date</th>
                     {
-                      nurselist.map((value) =>
-                        <th>{value}</th>
+                      nurselist.map((value,index) =>
+                        <th key={index}>{value}</th>
                       )
                     }
                   </tr>
                 </thead>
                 <tbody>
                   {
-                    datelist.map((date) =>
-                      <tr>
+                    datelist.map((date,index) =>
+                      <tr key={index}>
                         <td>{date}</td>
                         {
-                          idlist.map((id) =>
-                            <th>{hour[id+date]}</th>
+                          idlist.map((id,index) =>
+                            <th key={index}>{hour[id+date]}</th>
                           )
                         }
                       </tr>
@@ -118,8 +116,8 @@ class Total extends Component {
                     <tr>
                       <td>Total</td>
                         {
-                          idlist.map((id) =>
-                            <th>{totalhour[id]}</th>
+                          idlist.map((id,index) =>
+                            <th key={index}>{totalhour[id]}</th>
                           )
                         }
                     </tr>
