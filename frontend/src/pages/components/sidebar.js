@@ -50,7 +50,7 @@ class Sidebar extends Component{
   }
   menuIconClick = () => {
     this.setState({
-      menuCollapse:!this.state.FaDashcubemenuCollapse
+      menuCollapse:!this.state.menuCollapse
     });
   };
 
