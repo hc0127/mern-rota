@@ -88,7 +88,7 @@ class DashBoard extends Component {
             nurseDatas['total'].assigned += rota.hour*1;
         });
     });
-
+    console.log(nurseDatas);
     nurseDatas.map((nurseData) =>{
         console.log(nurseData)
         nurseData.overtime = nurseData.assigned*1 - nurseData.available*1;

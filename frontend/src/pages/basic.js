@@ -93,30 +93,45 @@ class Basic extends Component {
   }
   nurseConfirm = () =>{
     const _self = this;
-    this.setState({
-      ...this.state,
-      nurse:{
-        ...this.state.nurse,
-        open:false,
+    const {nurse} = this.state;
+    console.log(nurse.modal);
+    const values =  Object.values(nurse.modal).filter(e =>  e).length;
+    console.log(values);
+    if(values < 9){
+      toastr.options = {
+        positionClass : 'toast-top-full-width',
+        hideDuration: 300,
+        timeOut: 3000
       }
-    });
-    
-    axios.post('nurse/add',{
-      ...this.state.nurse.modal,id:this.state.nurse.action_id
-    })
-    .then(function (response) {
-      const res = response.data;
-      const data = res.data;
-      if(res.state === 'insert'){
-        _self.props.nurseInsert(data);
-      }else{
-        console.log('aa',data._id)
-        _self.props.nurseUpdate(data);
-      }
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+      toastr.clear()
+      setTimeout(() => toastr.info('please input correct!'), 300)
+    }else{
+      this.setState({
+        ...this.state,
+        nurse:{
+          ...this.state.nurse,
+          open:false,
+          modal:{}
+        }
+      });
+      
+      axios.post('nurse/add',{
+        ...this.state.nurse.modal,id:this.state.nurse.action_id
+      })
+      .then(function (response) {
+        const res = response.data;
+        const data = res.data;
+        if(res.state === 'insert'){
+          _self.props.nurseInsert(data);
+        }else{
+          console.log('aa',data._id)
+          _self.props.nurseUpdate(data);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    }
   }
   onNurseImageChange = (e,_self) =>{
     var file = e.target.files[0];
@@ -189,29 +204,42 @@ class Basic extends Component {
   }
   patientConfirm = () =>{
     const _self = this;
-    this.setState({
-      ...this.state,
-      patient:{
-        ...this.state.patient,
-        open:false,
+    const {patient} = this.state;
+    const values =  Object.values(patient.modal).filter(e =>  e).length;
+    if(values < 4){
+      toastr.options = {
+        positionClass : 'toast-top-full-width',
+        hideDuration: 300,
+        timeOut: 3000
       }
-    });
-    
-    axios.post('patient/add',{
-      ...this.state.patient.modal,id:this.state.patient.action_id
-    })
-    .then(function (response) {
-      const res = response.data;
-      const data = res.data;
-      if(res.state === 'insert'){
-        _self.props.patientInsert(data);
-      }else{
-        _self.props.patientUpdate(data);
-      }
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
+      toastr.clear()
+      setTimeout(() => toastr.info('please input correct!'), 300)
+    }else{
+      this.setState({
+        ...this.state,
+        patient:{
+          ...this.state.patient,
+          open:false,
+          modal:{}
+        }
+      });
+      
+      axios.post('patient/add',{
+        ...this.state.patient.modal,id:this.state.patient.action_id
+      })
+      .then(function (response) {
+        const res = response.data;
+        const data = res.data;
+        if(res.state === 'insert'){
+          _self.props.patientInsert(data);
+        }else{
+          _self.props.patientUpdate(data);
+        }
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
+    }
   }
   onPatientImageChange = (e,_self) =>{
     var file = e.target.files[0];
@@ -284,12 +312,9 @@ class Basic extends Component {
   }
   levelConfirm = () =>{
     const _self = this;
-    console.log(this.state.level.modal)
-    if(this.state.level.modal == {} ||
-      this.state.level.modal.level == undefined ||
-      this.state.level.modal.rate == undefined ||
-      this.state.level.modal.level == "" ||
-      this.state.level.modal.rate == "" ){
+    const {level} = this.state;
+    const values =  Object.values(level.modal).filter(e =>  e).length;
+    if(values < 2){
       toastr.options = {
         positionClass : 'toast-top-full-width',
         hideDuration: 300,
@@ -304,6 +329,7 @@ class Basic extends Component {
         level:{
           ...this.state.level,
           open:false,
+          level:{}
         }
       });
       
@@ -342,7 +368,6 @@ class Basic extends Component {
   render() {
       const {basic} = this.props;
       const {nurse,patient,level} = this.state;
-      console.log('render',basic);
 
       const nurseColumns = [
         {
