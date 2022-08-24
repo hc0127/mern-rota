@@ -15,7 +15,7 @@ class DashBoard extends Component {
   }
   
   render() {
-    const {basic} =this.props;
+    const {basic,level} =this.props;
     
     const nurseColumns = [
       {
@@ -54,45 +54,43 @@ class DashBoard extends Component {
       },
     ];
 
-    let nurseDatas = [
-        {
-            type:'Registered Nurse',
-            members:0,
-            available:0,
-            assigned:0,
-            overtime:0,
-            utilization:0
-        },
-        {
-            type:'Assistant Nurse',
-            members:0,
-            available:0,
-            assigned:0,
-            overtime:0,
-            utilization:0
-        },
-        {
-            type:'Total',
-            members:0,
-            available:0,
-            assigned:0,
-            overtime:0,
-            utilization:0
-        }
-    ];
+    let nurseDatas =[];
+
+    basic.levels.map((level) =>{
+      let nurseData = {
+          type:level.level,
+          members:0,
+          available:0,
+          assigned:0,
+          overtime:0,
+          utilization:0
+      }
+      nurseDatas[level.level] = nurseData;
+    });
+
+    let totalNurse = {
+      type:'Total',
+      members:0,
+      available:0,
+      assigned:0,
+      overtime:0,
+      utilization:0
+    }
+    nurseDatas['total'] = totalNurse;
 
     basic.nurses.map((nurse) =>{
-        nurseDatas[nurse.level-1].members++;
-        nurseDatas[2].members++;
+        nurseDatas[nurse.level].members++;
+        nurseDatas['total'].members++;
         nurse.rota.map((rota) =>{
-            nurseDatas[nurse.level-1].available += rota.hour*1;
-            nurseDatas[2].available += rota.hour*1;
-            nurseDatas[nurse.level-1].assigned += rota.hour*1;
-            nurseDatas[2].assigned += rota.hour*1;
+            nurseDatas[nurse.level].available += rota.hour*1;
+            nurseDatas['total'].available += rota.hour*1;
+            nurseDatas[nurse.level].assigned += rota.hour*1;
+            nurseDatas['total'].assigned += rota.hour*1;
         });
     });
 
     nurseDatas.map((nurseData) =>{
+        console.log(nurseData)
         nurseData.overtime = nurseData.assigned*1 - nurseData.available*1;
         nurseData.utilization = (nurseData.assigned*1 / nurseData.available*1) * 100 + '%';
     });
