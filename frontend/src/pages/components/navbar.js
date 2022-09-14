@@ -73,8 +73,8 @@ class Navbar extends Component{
 								</NavLink>
 							</NavItem>
 							<NavItem>
-								<NavLink aria-current='page' to='assign'>
-								Assign
+								<NavLink aria-current='page' to='roaster'>
+								Roaster
 								</NavLink>
 							</NavItem>
 							<NavItem>
