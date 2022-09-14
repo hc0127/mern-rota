@@ -7,6 +7,7 @@ import { Route, Routes } from 'react-router-dom';
 import {Navbar,Sidebar} from './pages/components';
 import Basic from './pages/basic';
 import Assign from './pages/assign';
+import Roaster from './pages/roaster';
 import Total from './pages/total';
 import DashBoard from './pages/dashboard';
 import Login from './pages/login';
@@ -42,12 +43,13 @@ function App() {
         <Navbar />
         <Sidebar />
         <Routes history={history}>
-          {
+          {/* {
             token && <Route path='/login' element={<Login />} />
-          }
+          } */}
           <Route path='/' element={<DashBoard />} />
           <Route path='basic' element={<Basic />} />
           <Route path='assign' element={<Assign />} />
+          <Route path='roaster' element={<Roaster />} />
           <Route path='total' element={<Total />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -641,12 +641,8 @@ class Basic extends Component {
                     </Col>
                     <Col>
                       <Form.Select aria-label="patient select" value={nurse.modal.level} onChange = {(e) =>this.nurseModalChange('level',e)}>
-                        <option value="0" >Select Level</option>
-                        {
-                          basic.levels.map((level,index) =>{
-                            return <option key = {index} value={level.level} selected ={level.level == nurse.modal.level ?"selected":''}>{level.level}</option>
-                          })
-                        }
+                        <option value="0" >Registered Nurse</option>
+                        <option value="1" selected = {nurse.modal.level ==1?"":"selected"}>Assistant Nurse</option>
                       </Form.Select>
                     </Col>
                   </div>

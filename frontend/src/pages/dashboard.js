@@ -15,7 +15,7 @@ class DashBoard extends Component {
   }
   
   render() {
-    const {basic,level} =this.props;
+    const {basic} =this.props;
     
     const nurseColumns = [
       {
@@ -54,51 +54,44 @@ class DashBoard extends Component {
       },
     ];
 
-    let nurseDatas =[];
-    let levels=[];
-
-    basic.levels.map((level) =>{
-      levels = [...levels,level.level]
-      let nurseData = {
-          type:level.level,
-          members:0,
-          available:0,
-          assigned:0,
-          overtime:0,
-          utilization:0
-      }
-      nurseDatas.push(nurseData);
-    });
-    let levelCount = levels.length;
-
-    let totalNurse = {
+    let nurseDatas = [{
+      type:'Registered Nurse',
+      members:0,
+      available:0,
+      assigned:0,
+      overtime:0,
+      utilization:0
+    },
+    {
+      type:'Assistant Nurse',
+      members:0,
+      available:0,
+      assigned:0,
+      overtime:0,
+      utilization:0
+    },
+    {
       type:'Total',
       members:0,
       available:0,
       assigned:0,
       overtime:0,
       utilization:0
-    }
-
-    nurseDatas.push(totalNurse);
+    }];
 
     console.log(nurseDatas);
 
     basic.nurses.map((nurse) =>{
-      let nurseLevel = levels.indexOf(nurse.level);
+      let nurseLevel = nurse.level;
         nurseDatas[nurseLevel].members++;
-        nurseDatas[levelCount].members++;
+        nurseDatas[2].members++;
         nurse.rota.map((rota) =>{
             nurseDatas[nurseLevel].available += rota.hour*1;
-            nurseDatas[levelCount].available += rota.hour*1;
+            nurseDatas[2].available += rota.hour*1;
             nurseDatas[nurseLevel].assigned += rota.hour*1;
-            nurseDatas[levelCount].assigned += rota.hour*1;
+            nurseDatas[2].assigned += rota.hour*1;
         });
     });
-
-    for(var i of nurseDatas){
-      console.log(i);
-    }
     nurseDatas.map((nurseData) =>{
         nurseData.overtime = nurseData.assigned*1 - nurseData.available*1;
         nurseData.utilization = (nurseData.assigned*1 / nurseData.available*1) * 100 + '%';

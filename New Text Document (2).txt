@@ -1,0 +1,6 @@
+1. Remove the the Class Position
+2. View Report Card for only one student
+3. Grade column has errors
+4. Aggregates has errors
+5. View Exam marks has errors. class 3 and 4 should display ordinary level exams only
+class 5 and 6 should display Advanced level subjects only

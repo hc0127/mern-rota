@@ -25,6 +25,12 @@ class Login extends Component {
             [target]:e.target.value
         });      
     }
+    keypress = (e) =>{
+        console.log(e);
+        if(e.key == "Enter"){
+            this.onLogin();
+        }
+    }
     onLogin = () =>{
         const _self = this;
         axios.post('basic/login',{...this.state})
@@ -61,7 +67,7 @@ class Login extends Component {
                         </Form.Group>
                 
                         <Form.Group className="m-3" controlId="formBasicPassword">
-                            <Form.Control type="password" placeholder="Password" value={this.state.password} onChange={(e) => this.onChangeValue('password',e)} />
+                            <Form.Control type="password" placeholder="Password" value={this.state.password} onKeyUpCapture={(e) =>this.keypress(e)} onChange={(e) => this.onChangeValue('password',e)} />
                         </Form.Group>
 
                         <Button className="m-3" variant="primary" onClick={() =>this.onLogin()} style={{textAlign:'center'}}>
