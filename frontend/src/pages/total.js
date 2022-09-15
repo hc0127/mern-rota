@@ -96,7 +96,6 @@ class Total extends Component {
           row[j] = hour;
         }
       }
-      console.log(row);
       totalDatas.push(row);
     }
 
