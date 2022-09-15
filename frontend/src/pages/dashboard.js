@@ -79,22 +79,31 @@ class DashBoard extends Component {
       utilization:0
     }];
 
-    console.log(nurseDatas);
+    let date = new Date();
+    let year = date.getFullYear();
+    let month = date.getMonth()+1 > 9 ? date.getMonth()+1 : '0'+(date.getMonth()+1);
+    let beforemonth = date.getMonth() > 9 ? date.getMonth() : '0'+date.getMonth();
+    let day = date.getDate() > 9 ? date.getDate() : '0'+date.getDate();
+    let afterday = date.getDate()+1 > 9 ? date.getDate()+1 : '0'+(date.getDate()+1);
+
+    let from = year+'-'+beforemonth+'-'+afterday;
+    let to = year+'-'+month+'-'+day;
 
     basic.nurses.map((nurse) =>{
       let nurseLevel = nurse.level;
         nurseDatas[nurseLevel].members++;
         nurseDatas[2].members++;
         nurse.rota.map((rota) =>{
-            nurseDatas[nurseLevel].available += rota.hour*1;
-            nurseDatas[2].available += rota.hour*1;
+          if(rota.date >= from && rota.date <= to){
             nurseDatas[nurseLevel].assigned += rota.hour*1;
             nurseDatas[2].assigned += rota.hour*1;
+          }
         });
     });
     nurseDatas.map((nurseData) =>{
+        nurseData.available = nurseData.members * 208;
         nurseData.overtime = nurseData.assigned*1 - nurseData.available*1;
-        nurseData.utilization = (nurseData.assigned*1 / nurseData.available*1) * 100 + '%';
+        nurseData.utilization = parseFloat(nurseData.assigned*1 / nurseData.available*1 * 100).toFixed(2) + '%';
     });
 
     return (

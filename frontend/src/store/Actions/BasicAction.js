@@ -55,11 +55,9 @@ export const pDel = (_id) => {
 };
 
 export const npUpd = (data) =>{
-  console.log(data.NurseDatas);
   return({
     type:NPUPDATE,
     nurses:data.NurseDatas,
-    patients:data.PatientDatas,
   });
 }
 

@@ -3,14 +3,21 @@ import './../App.css';
 import {Form} from 'react-bootstrap';
 import { MDBContainer } from 'mdb-react-ui-kit';
 import {connect} from 'react-redux'
+import DataTable from 'react-data-table-component';
 
 class Total extends Component {
   constructor(props) {
       super(props);
+      let date = new Date();
+      let year = date.getFullYear();
+      let month = date.getMonth()+1 > 9 ? date.getMonth()+1 : '0'+(date.getMonth()+1);
+      let beforemonth = date.getMonth() > 9 ? date.getMonth() : '0'+date.getMonth();
+      let day = date.getDate() > 9 ? date.getDate() : '0'+date.getDate();
+      let afterday = date.getDate()+1 > 9 ? date.getDate()+1 : '0'+(date.getDate()+1);
       this.state = {
         type:0,
-        from:'',
-        to:'',
+        from:year+'-'+beforemonth+'-'+afterday,
+        to:year+'-'+month+'-'+day,
       };
   }
   setDate = (target,e) =>{
@@ -25,44 +32,75 @@ class Total extends Component {
   render() {
     const {basic} = this.props;
     const {from,to} = this.state;
-    console.log(basic);
-    let list =[];
-    let nurses =[];
-    let nurse_ids =[];
-    let dates = [];
-    let hour = [];
-    let totalhour = [];
 
-    basic.nurses.map(nurse =>{
-      totalhour[nurse._id] = 0;
+    let totalColumns = [];
+    let totalDatas = [];
+    let details = [];
+
+    totalColumns.push({
+        name: "Date",
+        center:true,
+        wrap:true,
+        selector: (row) => row.date,
+    })
+
+    details['date'] = [];
+    for (var d = new Date(from); d <= new Date(to); d.setDate(d.getDate() + 1)) {
+      let year = d.getFullYear();
+      let month = d.getMonth()+1 > 9 ? d.getMonth()+1 : '0'+(d.getMonth()+1);
+      let day = d.getDate() > 9 ? d.getDate() : '0'+d.getDate();
+      let dateFormat = year+'-'+month+'-'+day;
+      details['date'].push(dateFormat);
+    }
+    basic.nurses.map((nurse,nurseIndex) =>{
+      totalColumns.push({
+        name: nurse.name,
+        center:true,
+        wrap:true,
+        selector: (row) => row[nurseIndex],
+      });
+
+      if(details[nurseIndex] == undefined){
+        details[nurseIndex] = [];
+      }
+
       nurse.rota.map((rota) =>{
-        if (from === '' || new Date(from) <= new Date(rota.date)) {
-          if(to === '' || new Date(to) >= new Date(rota.date)){
-            hour[nurse._id+rota.date] = rota.hour;
-            if(rota.hour !== null && rota.hour !== undefined){
-              totalhour[nurse._id] += rota.hour*1;
-            }
-            let selRota = {_id:nurse._id ,date:rota.date,nurse:nurse.name,hour:rota.hour};
-            list = [...list,{...selRota}]
+        if(from<rota.date && rota.date<= to){
+          let date = rota.date;
+          if(details[nurseIndex][date] == undefined){
+            details[nurseIndex][date] = rota.hour;
+          }else{
+            details[nurseIndex][date] += rota.hour;
           }
         }
       });
+      for (var d = new Date(from); d <= new Date(to); d.setDate(d.getDate() + 1)) {
+        let year = d.getFullYear();
+        let month = d.getMonth()+1 > 9 ? d.getMonth()+1 : '0'+(d.getMonth()+1);
+        let day = d.getDate() > 9 ? d.getDate() : '0'+d.getDate();
+        let dateFormat = year+'-'+month+'-'+day;
+        if(details[nurseIndex][dateFormat] == undefined){
+          details[nurseIndex][dateFormat] = 0;
+        }
+        // details[nurseIndex].sort((a,b) => (a.date > b.date) ? 1 : (a.date < b.date ? -1 : 0));
+      }
     });
 
-    list.map((value)=>{
-      nurses = [...nurses,value.nurse];
-      nurse_ids = [...nurse_ids,value._id];
-      dates = [...dates,value.date];
-    });
+    let dates = details['date'];
+    for(var i of dates){
+      let row = [];
+      row.date = i;
+      for(var j in details){
+        if(j != "date"){
+          let hour = details[j][i];
+          row[j] = hour;
+        }
+      }
+      console.log(row);
+      totalDatas.push(row);
+    }
 
-    const setNurses = new Set(nurses);
-    let nurselist = Array.from(setNurses);
-    const setIds = new Set(nurse_ids);
-    let idlist = Array.from(setIds);
-    const setDates = new Set(dates);
-    let datelist = Array.from(setDates);
-    datelist.sort();
-    
+
     return (
       <MDBContainer>
         <div className="pt-5 text-center text-dark">
@@ -76,7 +114,7 @@ class Total extends Component {
               <div className='col-md-3'>
                 <Form.Group className="mb-3">
                   <Form.Label>From</Form.Label>
-                  <Form.Control type="date" onChange = {(e) =>this.setDate('from',e)} />
+                  <Form.Control type="date" value={from}  onChange = {(e) =>this.setDate('from',e)} />
                 </Form.Group>
               </div>
               <div className='col-md-3'>
@@ -89,40 +127,13 @@ class Total extends Component {
               </div>
             </div>
             <div className='p-2'>
-              <table className='table table-striped table-sm table-responsive' variant="light">
-                <thead>
-                  <tr>
-                    <th key={0}>Date</th>
-                    {
-                      nurselist.map((value,index) =>
-                        <th key={index}>{value}</th>
-                      )
-                    }
-                  </tr>
-                </thead>
-                <tbody>
-                  {
-                    datelist.map((date,index) =>
-                      <tr key={index}>
-                        <td>{date}</td>
-                        {
-                          idlist.map((id,index) =>
-                            <th key={index}>{hour[id+date]}</th>
-                          )
-                        }
-                      </tr>
-                    )
-                  }
-                    <tr>
-                      <td>Total</td>
-                        {
-                          idlist.map((id,index) =>
-                            <th key={index}>{totalhour[id]}</th>
-                          )
-                        }
-                    </tr>
-                </tbody>
-              </table>
+              <DataTable 
+                columns={totalColumns} 
+                data={totalDatas}
+                fixedHeader
+                striped
+                fixedHeaderScrollHeight={'60vh'}
+                pagination />
             </div>
           </div>
         </div>

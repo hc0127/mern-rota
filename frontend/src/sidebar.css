@@ -1,33 +1,33 @@
 #sidebar {
     position: absolute;
-  }
-  #sidebar .pro-sidebar {
-    height: 100vh;
-  }
-  #sidebar .closemenu {
-    color: #fff;
-    position: absolute;
-    left: 0;
-    z-index: 9999;
-    line-height: 20px;
-    border-radius: 50%;
-    font-weight: bold;
-    font-size: 30px;
-    top: 15px;
-    cursor: pointer;
-  }
-  #sidebar .pro-sidebar {
-    width: 100%;
-    min-width: 100%;
-  }
-  #sidebar .pro-sidebar.collapsed {
-    width: 80px;
-    min-width: 80px;
-  }
-  #sidebar .pro-sidebar-inner {
-    background-color: #2d5efd;
-    box-shadow: 0.5px 0.866px 2px 0px rgba(0, 0, 0, 0.15);
-  }
+}
+
+#sidebar .closemenu {
+  color: #fff;
+  position: fixed;
+  left: 0;
+  z-index: 9999;
+  line-height: 20px;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 30px;
+  top: 15px;
+  cursor: pointer;
+}
+#sidebar .pro-sidebar {
+  width: 220px;
+  min-width: 220px;
+  height: 100vh;
+  position: fixed;
+}
+#sidebar .pro-sidebar.collapsed {
+  width: 80px;
+  min-width: 80px;
+}
+#sidebar .pro-sidebar-inner {
+  background-color: #2d5efd;
+  box-shadow: 0.5px 0.866px 2px 0px rgba(0, 0, 0, 0.15);
+}
   #sidebar .pro-sidebar-inner .pro-sidebar-layout {
     overflow-y: hidden;
   }

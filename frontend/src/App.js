@@ -48,7 +48,6 @@ function App() {
           } */}
           <Route path='/' element={<DashBoard />} />
           <Route path='basic' element={<Basic />} />
-          <Route path='assign' element={<Assign />} />
           <Route path='roaster' element={<Roaster />} />
           <Route path='total' element={<Total />} />
           <Route path="*" element={<NotFound />} />

@@ -1,18 +1,21 @@
 import React, { Component } from 'react';
 import './../App.css';
+import './../react-confirm-alert.css';
+
 import axios from 'axios'
 import {Form} from 'react-bootstrap';
 import { MDBContainer } from 'mdb-react-ui-kit';
 import DataTable from 'react-data-table-component';
 import {connect} from 'react-redux'
+import {confirmAlert} from 'react-confirm-alert'
+import TimePicker from 'react-bootstrap-time-picker';
 
 import {
   npUpd
 } from '../store/Actions/BasicAction';
-import assign from './assign';
 
-// import toastr from 'toastr'
-// import 'toastr/build/toastr.min.css'
+import toastr from 'toastr'
+import 'toastr/build/toastr.min.css'
 
 
 class Roaster extends Component {
@@ -37,7 +40,6 @@ class Roaster extends Component {
     const {basic} = this.props;
     const {isEditable,selPatient,selYear,selMonth,assigns} = this.state;
     if(isEditable){
-      console.log(assigns);
       const _self = this;
       this.setState({
         ...this.state,
@@ -54,7 +56,6 @@ class Roaster extends Component {
         _self.props.assign(response.data);
       })
       .catch(function (error) {
-        console.log(error);
       });
 
     }else{
@@ -63,28 +64,58 @@ class Roaster extends Component {
       let newAssign = [];
       let month = selYear+'-'+(selMonth<10?+'0'+String(selMonth):selMonth);
       let daysInMonth = new Date(selYear, selMonth, 0).getDate();
+
       if(selPatient !== 0){
-        assignPerDay[0] = 0;
         for(let i = 0; i < daysInMonth;i++){
-          assignPerDay[i+1] = 1;
-          newAssign.date = month+'-'+(i<9?+'0'+String(i+1):i+1);
-          newAssign.day = (i+1);
-          newAssign.rotation = 1;
-          newAssign.nurse_name = 'NA';
-          newAssign.nurse_short_id = 'NA';
-          newAssign.nurse_id = 'NA';
-          newAssign.designation = 'NA';
-          newAssign.duty_start = 'NA';
-          newAssign.duty_end = 'NA';
-          newAssign.hour = 'NA';
-  
-          assigns = [...assigns,{...newAssign}];
+          assignPerDay[i+1] = 0;
         }
+
+        basic.nurses.map((nurse,nurseIndex)=>{
+          nurse.rota.map((rota,rotaIndex)=>{
+            if(rota.patient_id == selPatient && rota.date.includes(month)){
+              let day = rota.date.slice(8)*1;
+              assignPerDay[day]++;
+              assigns.push({
+                date : rota.date,
+                day:day,
+                nurse_name : nurse.name,
+                nurse_short_id : nurse._id.slice(20),
+                nurse_id : nurse._id,
+                designation : nurse.level == 0 ? "Assistant" : "Registered",
+                duty_start : rota.duty_start,
+                duty_end : rota.duty_end,
+                hour : rota.hour,
+              })
+            }
+          });
+        });
         
-        // basic.nurses.map(nurse =>{
-        
-        // });
-      
+        for(let i = 0; i < daysInMonth;i++){
+          if(assignPerDay[(i+1)*1] == 0){
+            assignPerDay[(i+1)*1] = 1;
+            newAssign.date = month+'-'+(i<9?+'0'+String(i+1):i+1);
+            newAssign.day = (i+1)*1;
+            newAssign.nurse_name = 'NA';
+            newAssign.nurse_short_id = 'NA';
+            newAssign.nurse_id = 'NA';
+            newAssign.designation = 'NA';
+            newAssign.duty_start = 'NA';
+            newAssign.duty_end = 'NA';
+            newAssign.hour = 'NA';
+            
+            assigns = [...assigns,{...newAssign}];
+          }
+        }
+        assigns.sort((a,b) => (a.date > b.date) ? 1 : ((b.date > a.date) ? -1 : ((a.duty_start > b.duty_start) ? 1 : ((b.duty_start > a.duty_start) ? -1 : 0))));
+
+        let total = 0;
+        for(var i in assignPerDay){
+          for(var j=1;j<=assignPerDay[i];j++){
+            assigns[total].rotation = j;
+            total++;
+          }
+        }
+
       this.setState({
         ...this.state,
         isEditable:true,
@@ -175,47 +206,179 @@ class Roaster extends Component {
     });
   }
   onChangeDutyStart = (e,row) =>{
+    
     const {basic} = this.props;
-    let {assigns} = this.state; 
+    let {assigns,selPatient} = this.state;
+    var _self = this;
+    var hour = parseInt(e/3600)>9?parseInt(e/3600):'0'+parseInt(e/3600);
+    var min = (e%3600) == 0 ?"00":"30";
+    var _start = hour+":"+min;
+    var rotas;
+    var isduplicate = false;
 
-    console.log(row);
-    assigns.map((assign,assignIndex) =>{
-      if(assign.day == row.day && assign.rotation == row.rotation){
-        basic.nurses.map((nurse,index) =>{
-          if(nurse._id == row.nurse_id){
-            assigns[assignIndex].duty_start = e.target.value;
-            if(assigns[assignIndex].duty_end != 'NA'){
-              assigns[assignIndex].hour = Math.abs(assigns[assignIndex].duty_end.split(':')[0]-assigns[assignIndex].duty_start.split(':')[0]);
-            }
+    var assignCount = assigns.length;
+    var isAssign = false;
+    
+    let step = function(){
+      return new Promise(function(resolve){   
+        assigns.map((assign,index)=>{
+          console.log(assign.duty_start,assign.duty_end,_start)
+          if(assign.rotation !== row.rotation && assign.date == row.date && assign.duty_start != "NA" && assign.duty_end != "NA" &&  assign.duty_start<_start && assign.duty_end>_start){
+            isAssign = true;
+            toastr.info("Already Assign Hour!");
           }
-        })
-      }
-    });
-
-    this.setState({
-      ...this.state,
-      assigns:[...assigns]
-    });
+          if(index == assignCount-1 && isAssign == false){
+            resolve();
+          }
+        });
+      }).then(function(){
+        return new Promise(function(resolve){
+          basic.nurses.map((nurse)=>{
+            if(nurse._id == row.nurse_id){
+              rotas = nurse.rota.length;
+              if(rotas == 0){
+                resolve();
+              }
+              nurse.rota.map((rota,rotaIndex)=>{
+                if(rota.date == row.date && rota.duty_start<_start && rota.duty_end>_start){
+                  isduplicate = true;
+                  basic.patients.map((patient)=>{
+                    if(rota.patient_id != selPatient && rota.patient_id == patient._id){
+                      confirmAlert({
+                        title: 'Duplicate Time',
+                        message: 'Nurse is allocated for '+rota.duty_start+' to '+rota.duty_end+' to '+patient.name+'. You want to overwrite?',
+                        buttons: [
+                          {
+                            label: 'Yes',
+                            onClick: () => {  
+                              resolve();   
+                            }
+                          },
+                          {
+                            label: 'No',
+                            onClick: () => {
+                            }
+                          }
+                        ]
+                      });
+                    }
+                  });
+                }
+                if(rotaIndex == rotas-1 && isduplicate == false){
+                  resolve();
+                }
+              });
+            }
+          });
+        }).then(function(){
+          assigns.map((assign,assignIndex) =>{
+            if(assign.day == row.day && assign.rotation == row.rotation){
+              basic.nurses.map((nurse) =>{
+              if(nurse._id == row.nurse_id){
+                assigns[assignIndex].duty_start = _start;
+                  if(assigns[assignIndex].duty_end != 'NA'){
+                    assigns[assignIndex].hour = Math.abs(assigns[assignIndex].duty_end.split(':')[0]-assigns[assignIndex].duty_start.split(':')[0]);
+                  }
+                }
+              })
+            }
+          });
+      
+          _self.setState({
+            ..._self.state,
+            assigns:[...assigns]
+          });
+        });
+      });
+    }
+    step();
   }
   onChangeDutyEnd = (e,row) =>{
     const {basic} = this.props;
-    let {assigns} = this.state; 
+    let {assigns,selPatient} = this.state; 
+    var _self = this;
+    var hour = parseInt(e/3600)>9?parseInt(e/3600):'0'+parseInt(e/3600);
+    var min = (e%3600) == 0 ?"00":"30";
+    var _end = hour+":"+min;
+    var rotas;
+    var isduplicate = false;
+    
+    var assignCount = assigns.length;
+    var isAssign = false;
 
-    assigns.map((assign,assignIndex) =>{
-      if(assign.day == row.day && assign.rotation == row.rotation){
-        basic.nurses.map((nurse,index) =>{
-          if(nurse._id == row.nurse_id){
-            assigns[assignIndex].duty_end = e.target.value;
-            assigns[assignIndex].hour = Math.abs(assigns[assignIndex].duty_end.split(':')[0]-assigns[assignIndex].duty_start.split(':')[0]);
+    let step = function(){
+      return new Promise(function(resolve){   
+        assigns.map((assign,index)=>{
+          console.log(assign.duty_start,assign.duty_end,row.duty_start,_end)
+          if(assign.rotation !== row.rotation && assign.date == row.date && assign.duty_start != "NA" && assign.duty_end != "NA" &&  assign.duty_end<row.duty_start && assign.duty_start>_end){
+            isAssign = true;
+            toastr.info("Already Assign Hour!");
           }
-        })
-      }
-    });
-
-    this.setState({
-      ...this.state,
-      assigns:[...assigns]
-    });
+          if(index == assignCount-1 && isAssign == false){
+            resolve();
+          }
+        });
+      }).then(function(){
+        return new Promise(function(resolve){
+          basic.nurses.map((nurse)=>{
+            if(nurse._id == row.nurse_id){
+              rotas = nurse.rota.length;
+              if(rotas == 0){
+                resolve();
+              }
+              nurse.rota.map((rota,rotaIndex)=>{
+                if(rota.date == row.date && rota.duty_end>row.duty_start && rota.duty_start<_end){
+                  basic.patients.map((patient)=>{
+                    if(rota.patient_id != selPatient && rota.patient_id == patient._id){
+                      isduplicate = true;
+                      confirmAlert({
+                        title: 'Duplicate Time',
+                        message: 'Nurse is allocated for '+rota.duty_start+' to '+rota.duty_end+' to '+patient.name+'. You want to overwrite?',
+                        buttons: [
+                          {
+                            label: 'Yes',
+                            onClick: () => {  
+                              resolve();   
+                            }
+                          },
+                          {
+                            label: 'No',
+                            onClick: () => {
+                            }
+                          }
+                        ]
+                      });
+                    }
+                  });
+                }
+                if(rotaIndex == rotas-1 && isduplicate == false){
+                  resolve();
+                }
+              });
+            }
+          });
+        }).then(function(){
+          assigns.map((assign,assignIndex) =>{
+            if(assign.day == row.day && assign.rotation == row.rotation){
+              basic.nurses.map((nurse) =>{
+              if(nurse._id == row.nurse_id){
+                assigns[assignIndex].duty_end = _end;
+                  if(assigns[assignIndex].duty_end != 'NA'){
+                    assigns[assignIndex].hour = Math.abs(assigns[assignIndex].duty_end.split(':')[0]-assigns[assignIndex].duty_start.split(':')[0]);
+                  }
+                }
+              })
+            }
+          });
+      
+          _self.setState({
+            ..._self.state,
+            assigns:[...assigns]
+          });
+        });
+      });
+    }
+    step();
   }
 
 
@@ -226,6 +389,7 @@ class Roaster extends Component {
     let assignDatas =[];
     let assignPerDayDatas =[];
     let newAssign = [];
+    let assignHour;
     let month = selYear+'-'+(selMonth<10?+'0'+String(selMonth):selMonth);
     let daysInMonth = new Date(selYear, selMonth, 0). getDate();
 
@@ -251,8 +415,26 @@ class Roaster extends Component {
             <Form.Select aria-label="patient select" value={row._nurse_id} onChange = {(e) =>this.onChangeNurse(e,row)}>
               <option value="0" >Select Nurse</option>
               {
+                
                 basic.nurses.map((nurse,index) =>{
-                  return <option key = {index} value={nurse._id} selected ={nurse._id == row.nurse_id?"selected":''}>{nurse.name}</option>
+                  assignHour = 208;
+                  
+                  basic.nurses.map((_nurse,index) =>{
+                    if(_nurse._id == nurse._id){
+                      _nurse.rota.map(rota =>{
+                        if(rota.date.includes(month) && rota.patient_id != selPatient){
+                          assignHour -= rota.hour;
+                        }
+                      });
+                    }
+                  });
+
+                  assigns.map((assign)=>{
+                    if(assign.nurse_id == nurse._id && assign.hour != "NA"){
+                      assignHour -= assign.hour;
+                    }
+                  });
+                  return <option key = {index} value={nurse._id} className="assign" selected ={nurse._id == row.nurse_id?"selected":''}>{nurse.name}{"("+assignHour+")"}</option>
                 })
               }
             </Form.Select>,
@@ -274,23 +456,17 @@ class Roaster extends Component {
           name: "Duty Start",
           center:true,
           wrap:true,
-          width:'160px',
-          cell: (row) => [
-            <Form.Group>
-              <Form.Control type="time" value={row.duty_start} disabled={row.nurse_id=="NA"?'disabled':''} onChange = {(e) =>this.onChangeDutyStart(e,row)}/>
-            </Form.Group>
-          ]
+          width:'140px',
+          cell: (row) => 
+            <TimePicker start="08:00" end="20:00" step={30} value={row.duty_start == "NA"?"12:00":row.duty_start} disabled={row.nurse_id=="NA"?'disabled':''} onChange = {(e) =>this.onChangeDutyStart(e,row)} />
         },
         {
           name: "Duty End",
           center:true,
           wrap:true,
-          width:'160px',
-          selector: (row) => [
-            <Form.Group>
-              <Form.Control type="time" value={row.duty_end} disabled={row.duty_start=="NA" ? 'disabled':''}  onChange = {(e) =>this.onChangeDutyEnd(e,row)}/>
-            </Form.Group>
-          ]
+          width:'140px',
+          selector: (row) => 
+          <TimePicker start={row.duty_start == "NA"?"08:00":row.duty_start} end="20:00" step={30}  value={row.duty_end == "NA"?"12:00":row.duty_end} disabled={row.duty_start=="NA"?'disabled':''} onChange = {(e) =>this.onChangeDutyEnd(e,row)} />
         },
         {
           name: "Hour",
@@ -353,31 +529,76 @@ class Roaster extends Component {
           selector: (row) => row.hour,
         },
       ];
-      
-  
+
       if(selPatient != 0){
+
         for(let i = 0; i < daysInMonth;i++){
-          assignPerDayDatas[(i+1)*1] = 1;
-          newAssign.date = month+'-'+(i<9?+'0'+String(i+1):i+1);
-          newAssign.day = (i+1)*1;
-          newAssign.rotation = 1;
-          newAssign.nurse_name = 'NA';
-          newAssign.nurse_short_id = 'NA';
-          newAssign.nurse_id = 'NA';
-          newAssign.designation = 'NA';
-          newAssign.duty_start = 'NA';
-          newAssign.duty_end = 'NA';
-          newAssign.hour = 'NA';
-    
-          assignDatas = [...assignDatas,{...newAssign}];
+          assignPerDayDatas[i+1] = 0;
         }
+
+        basic.nurses.map((nurse,nurseIndex)=>{
+          nurse.rota.map((rota,rotaIndex)=>{
+            if(rota.patient_id == selPatient && rota.date.includes(month)){
+              let day = rota.date.slice(8)*1;
+              assignPerDayDatas[day]++;
+              assignDatas.push({
+                date : rota.date,
+                day : day,
+                nurse_name : nurse.name,
+                nurse_short_id : nurse._id.slice(20),
+                nurse_id : nurse._id,
+                designation : nurse.level == 0 ? "Assistant" : "Registered",
+                duty_start : rota.duty_start,
+                duty_end : rota.duty_end,
+                hour : rota.hour,
+              })
+            }
+          });
+        });
+        
+        for(let i = 0; i < daysInMonth;i++){
+          if(assignPerDayDatas[(i+1)*1] == 0){
+            assignPerDayDatas[(i+1)*1] = 1;
+            newAssign.date = month+'-'+(i<9?+'0'+String(i+1):i+1);
+            newAssign.day = (i+1)*1;
+            newAssign.nurse_name = 'NA';
+            newAssign.nurse_short_id = 'NA';
+            newAssign.nurse_id = 'NA';
+            newAssign.designation = 'NA';
+            newAssign.duty_start = 'NA';
+            newAssign.duty_end = 'NA';
+            newAssign.hour = 'NA';
+            
+            assignDatas = [...assignDatas,{...newAssign}];
+          }
+        }
+
+        assignDatas.sort((a,b) => (a.date > b.date) ? 1 : ((b.date > a.date) ? -1 : ((a.duty_start > b.duty_start) ? 1 : ((b.duty_start > a.duty_start) ? -1 : 0))));
+        
+        let total = 0;
+        for(var i in assignPerDayDatas){
+          for(var j=1;j<=assignPerDayDatas[i];j++){
+            assignDatas[total].rotation = j;
+            total++;
+          }
+        }
+    
       }
     }
+
+    const conditionalRowStyles = [
+      {
+        when: (row) => row.day%2 === 1,
+        style: {
+          backgroundColor: "rgba(225,225,225)"
+        }
+      }
+    ];
 
     return (
       <MDBContainer>
         <div className="pt-5 text-center text-dark">
-          <h1 className="mt-3">Duty Roaster</h1>
+          <h1 className="mt-3">DUTY ROASTER</h1>
         </div>
         <div className="row lex align-items-center justify-content-center">
           <div className="col-md-3 col-xs-5">
@@ -419,7 +640,9 @@ class Roaster extends Component {
             columns={assignColumns} 
             data={assignDatas}
             fixedHeader
+            striped
             fixedHeaderScrollHeight={'60vh'}
+            conditionalRowStyles={conditionalRowStyles}
             pagination />
         </div>
       </MDBContainer>

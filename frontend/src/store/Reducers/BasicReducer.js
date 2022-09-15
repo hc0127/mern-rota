@@ -80,12 +80,10 @@ export default function BasicReducer(state = initialState, action) {
         patients:[...state.patients],
       };
     case NPUPDATE: 
-      state.patients = action.patients;
       state.nurses = action.nurses;
       return {
         ...state,
         nurses:[...state.nurses],
-        patients:[...state.patients],
       };
     case LINSERT:
       return {

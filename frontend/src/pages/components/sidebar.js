@@ -75,7 +75,7 @@ class Sidebar extends Component{
                 <Menu iconShape="square">
                   <MenuItem icon={<FaDashcube className="text-primary" />}><NavLink to=''>DashBoard</NavLink></MenuItem>
                   <MenuItem icon={<FaAddressBook className="text-primary" />}><NavLink to='basic'>Basic</NavLink></MenuItem>
-                  <MenuItem icon={<FaCalendarDay className="text-primary"  />}><NavLink to='assign'>Assign</NavLink></MenuItem>
+                  <MenuItem icon={<FaCalendarDay className="text-primary"  />}><NavLink to='roaster'>Assign</NavLink></MenuItem>
                   <MenuItem icon={<FaCalculator className="text-primary" />}><NavLink to='total'>Total</NavLink></MenuItem>
                 </Menu>
               </SidebarContent>

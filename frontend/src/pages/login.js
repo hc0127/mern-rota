@@ -58,9 +58,9 @@ class Login extends Component {
     render(){
         return(
           <div className="login-wrapper" style={{width:'500px',marginLeft:'auto',marginRight:'auto'}}>
-            <h1 className='m-5'>Please Login</h1>
+            <h1 className='m-5 text-center'>Please Login</h1>
             <Row>
-                <Col>
+                <Col className='flex'>
                     <Form className="m-3">
                         <Form.Group className="m-3" controlId="formBasicEmail">
                             <Form.Control type="email" placeholder="Enter email" value={this.state.email} onChange={(e) => this.onChangeValue('email',e)} />
@@ -70,9 +70,11 @@ class Login extends Component {
                             <Form.Control type="password" placeholder="Password" value={this.state.password} onKeyUpCapture={(e) =>this.keypress(e)} onChange={(e) => this.onChangeValue('password',e)} />
                         </Form.Group>
 
-                        <Button className="m-3" variant="primary" onClick={() =>this.onLogin()} style={{textAlign:'center'}}>
-                            Login
-                        </Button>
+                        <Col className="align-item text-center">
+                            <Button className="m-3" variant="primary" onClick={() =>this.onLogin()}>
+                                Login
+                            </Button>
+                        </Col>
                     </Form>
                 </Col>
             </Row>
