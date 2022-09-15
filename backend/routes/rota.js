@@ -52,28 +52,29 @@ router.route("/assign").post(async function(req,res){
             let firstDay = month+'-01';
             let lastDay = month+'-'+daysInMonth;
            
+            Nurse.updateMany({}, {$unset: {"rota": 1}});
 
-            Nurse.updateMany({},
-                {$pull:{"rota":{patient_id:assign.patient_id ,date:{$gte:firstDay,$lte:lastDay}}}}
-            ).then(function(){
-                let flag = 0;
-                let length = Object.keys(updateAssignAllNurse).length;
-                if(length == 0){
-                    resolve();
-                }
-                for(let index in updateAssignAllNurse){
-                    let nurse = updateAssignAllNurse[index];
-                    Nurse.findByIdAndUpdate(nurse._id,
-                    {$pull:{"rota": {date:nurse.date,duty_start:{$lte:nurse.duty_end},duty_end:{$gte:nurse.duty_start}}}}
-                    ).then(function(data){
-                        console.log(nurse.duty_start,nurse.duty_end,data);
-                        flag++;
-                        if(flag == length){
-                            resolve();
-                        }
-                    });
-                }
-            });
+            // Nurse.updateMany({},
+            //     {$pull:{"rota":{patient_id:assign.patient_id ,date:{$gte:firstDay,$lte:lastDay}}}}
+            // ).then(function(){
+            //     let flag = 0;
+            //     let length = Object.keys(updateAssignAllNurse).length;
+            //     if(length == 0){
+            //         resolve();
+            //     }
+            //     for(let index in updateAssignAllNurse){
+            //         let nurse = updateAssignAllNurse[index];
+            //         Nurse.findByIdAndUpdate(nurse._id,
+            //         {$pull:{"rota": {date:nurse.date,duty_start:{$lte:nurse.duty_end},duty_end:{$gte:nurse.duty_start}}}}
+            //         ).then(function(data){
+            //             console.log(nurse.duty_start,nurse.duty_end,data);
+            //             flag++;
+            //             if(flag == length){
+            //                 resolve();
+            //             }
+            //         });
+            //     }
+            // });
         }).then(function(){
             return new Promise(function(resolve){
                 // let flag = 0;
