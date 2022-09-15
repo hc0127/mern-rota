@@ -12,6 +12,7 @@ router.route("/assign").post(async function(req,res){
     assign.assignData.map((value,index) =>{
         if(value.nurse_id != 'NA' && value.hour != 'NA'){
             updateAssignAllNurse.push({
+                _id:value.nurse_id,
                 date:value.date,
                 rotation:value.rotation,
                 patient_id:assign.patient_id,
@@ -47,51 +48,55 @@ router.route("/assign").post(async function(req,res){
             let flag = 0;
 
             let month = assign.year+'-'+(assign.month<10?+'0'+String(assign.month):assign.month);
-            var regexp = new RegExp(month+"/s+");
-            console.log(assign.patient_id,month);
+            let daysInMonth = new Date(assign.year, assign.month, 0). getDate();
+            let firstDay = month+'-01';
+            let lastDay = month+'-'+daysInMonth;
            
-            Nurse.updateMany({"rota.patient_id":assign.patient_id},
-                {"$pull":{rota:{patient_id:assign.patient_id ,date:{$regex:"/^s"+month+"/"}}}}
-                ,function(err,data){
-                    console.log(err,data);
+
+            Nurse.updateMany({},
+                {$pull:{"rota":{patient_id:assign.patient_id ,date:{$gte:firstDay,$lte:lastDay}}}}
+            ).then(function(){
+                let flag = 0;
+                let length = Object.keys(updateAssignAllNurse).length;
+                if(length == 0){
                     resolve();
-            });
-            
-            // let length = Object.keys(updateAssignAllNurse).length;
-            // for(let _id in updateAssignNurse){
-            //     for(let rotaData of updateAssignNurse[_id]){
-            //         Nurse.updateOne({_id:_id},
-            //             {"$pull":{"rota":{date:rotaData.date}}},{new:true,upsert:true}
-            //             ,function(err,data){
-            //                 console.log(err,data);
-            //                 console.log('c',flag,length);
-            //                 flag++;
-            //                 if(flag == length){
-            //                     resolve();
-            //                 }
-            //         });
-            //     }
-            // }
-        }).then(function(){
-                return new Promise(function(resolve){
-                    let flag = 0;
-        
-                let length = Object.keys(updateAssignNurse).length;
-                for(let _id in updateAssignNurse){
-                        Nurse.findByIdAndUpdate(_id,
-                    {"$push":{"rota": {$each:updateAssignNurse[_id]}}},{new:true,upsert:true}
-                    ,function(err,data){
-                        console.log('d');
+                }
+                for(let index in updateAssignAllNurse){
+                    let nurse = updateAssignAllNurse[index];
+                    Nurse.findByIdAndUpdate(nurse._id,
+                    {$pull:{"rota": {date:nurse.date,duty_start:{$lte:nurse.duty_end},duty_end:{$gte:nurse.duty_start}}}}
+                    ).then(function(data){
+                        console.log(nurse.duty_start,nurse.duty_end,data);
                         flag++;
                         if(flag == length){
                             resolve();
                         }
                     });
                 }
+            });
+        }).then(function(){
+            return new Promise(function(resolve){
+                // let flag = 0;
+                // let length = Object.keys(updateAssignNurse).length;
+                // if(length == 0){
+                //     resolve();
+                // }
+                // for(let _id in updateAssignNurse){
+                //         Nurse.findByIdAndUpdate(_id,
+                //     {"$push":{"rota": {$each:updateAssignNurse[_id]}}},{new:true,upsert:true}
+                //     ,function(err,data){
+                //         console.log('b');
+                //         flag++;
+                //         if(flag == length){
+                //             resolve();
+                //         }
+                //     });
+                // }
+                resolve();
             }).then(function(){
                 Nurse.find({},function(err,nurses){
                     res.send({NurseDatas:nurses});
-                    console.log('e');
+                    console.log('c');
                 });
             });
         });
