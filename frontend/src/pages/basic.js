@@ -521,8 +521,10 @@ class Basic extends Component {
                               data={basic.nurses} 
                               fixedHeader
                               fixedHeaderScrollHeight={'300px'}
-                              herader={'300px'}
-                              pagination/>
+                              defaultPageSize={100}
+                              herader={'300px'}                            
+                              pagination
+                            />
                           </div>
                         </Tab>
                         <Tab eventKey="patient" key={2} title="patient" className='p-2'>
@@ -641,8 +643,9 @@ class Basic extends Component {
                     </Col>
                     <Col>
                       <Form.Select aria-label="patient select" value={nurse.modal.level} onChange = {(e) =>this.nurseModalChange('level',e)}>
+                        <option value="" >Select Here</option>
                         <option value="0" >Registered Nurse</option>
-                        <option value="1" selected = {nurse.modal.level ==1?"":"selected"}>Assistant Nurse</option>
+                        <option value="1">Assistant Nurse</option>
                       </Form.Select>
                     </Col>
                   </div>

@@ -68,7 +68,7 @@ class Navbar extends Component{
 						<MDBNavbarNav className='me-auto mb-2 mb-lg-0'>
 							<NavItem>
 								<NavLink aria-current='page' to='basic'>
-								Basic
+								Staff
 								</NavLink>
 							</NavItem>
 							<NavItem>
@@ -78,7 +78,7 @@ class Navbar extends Component{
 							</NavItem>
 							<NavItem>
 								<NavLink aria-current='page' to='total'>
-								Total
+								Report
 								</NavLink>
 							</NavItem>
 						</MDBNavbarNav>

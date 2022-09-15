@@ -639,11 +639,10 @@ class Roaster extends Component {
           <DataTable 
             columns={assignColumns} 
             data={assignDatas}
-            fixedHeader
-            striped
-            fixedHeaderScrollHeight={'60vh'}
+            // fixedHeader
+            // fixedHeaderScrollHeight={'60vh'}
             conditionalRowStyles={conditionalRowStyles}
-            pagination />
+             />
         </div>
       </MDBContainer>
     );

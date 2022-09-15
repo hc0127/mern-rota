@@ -129,10 +129,11 @@ class Total extends Component {
               <DataTable 
                 columns={totalColumns} 
                 data={totalDatas}
-                fixedHeader
                 striped
-                fixedHeaderScrollHeight={'60vh'}
-                pagination />
+                // fixedHeader
+                // fixedHeaderScrollHeight={'60vh'}
+                // pagination 
+                />
             </div>
           </div>
         </div>
