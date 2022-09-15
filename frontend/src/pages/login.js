@@ -8,6 +8,7 @@ import {
 import {connect} from 'react-redux'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
+import { MDBContainer } from 'mdb-react-ui-kit';
 
 
 class Login extends Component {
@@ -57,28 +58,32 @@ class Login extends Component {
 
     render(){
         return(
-          <div className="login-wrapper" style={{width:'500px',marginLeft:'auto',marginRight:'auto'}}>
-            <h1 className='m-5 text-center'>Please Login</h1>
-            <Row>
-                <Col className='flex'>
-                    <Form className="m-3">
-                        <Form.Group className="m-3" controlId="formBasicEmail">
-                            <Form.Control type="email" placeholder="Enter email" value={this.state.email} onChange={(e) => this.onChangeValue('email',e)} />
-                        </Form.Group>
-                
-                        <Form.Group className="m-3" controlId="formBasicPassword">
-                            <Form.Control type="password" placeholder="Password" value={this.state.password} onKeyUpCapture={(e) =>this.keypress(e)} onChange={(e) => this.onChangeValue('password',e)} />
-                        </Form.Group>
-
-                        <Col className="align-item text-center">
-                            <Button className="m-3" variant="primary" onClick={() =>this.onLogin()}>
-                                Login
-                            </Button>
-                        </Col>
-                    </Form>
-                </Col>
-            </Row>
-          </div>
+            <div className="login-wrapper">
+                <MDBContainer>
+                        <h1 className='m-5 text-center'>Please Login</h1>
+                        <Row className=" align-items-center justify-content-center">
+                            <Col md="4">
+                                <Form.Group className="m-3" controlId="formBasicEmail">
+                                    <Form.Control type="email" placeholder="Enter email" value={this.state.email} onChange={(e) => this.onChangeValue('email',e)} />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row className=" align-items-center justify-content-center">
+                            <Col md="4">
+                                <Form.Group className="m-3" controlId="formBasicPassword">
+                                    <Form.Control type="password" placeholder="Password" value={this.state.password} onKeyUpCapture={(e) =>this.keypress(e)} onChange={(e) => this.onChangeValue('password',e)} />
+                                </Form.Group>
+                            </Col>
+                        </Row>
+                        <Row className=" align-items-center justify-content-center">
+                            <Col className="align-item text-center" md="4">
+                                <Button className="m-3" variant="primary" onClick={() =>this.onLogin()}>
+                                    Login
+                                </Button>
+                            </Col>
+                        </Row>
+                </MDBContainer>
+            </div>
         )
     }
   }
