@@ -68,7 +68,6 @@ router.route("/assign").post(async function(req,res){
                     Nurse.findByIdAndUpdate(nurse._id,
                     {$pull:{"rota": {date:nurse.date,duty_start:{$lte:nurse.duty_end},duty_end:{$gte:nurse.duty_start}}}}
                     ).then(function(data){
-                        console.log(nurse.duty_start,nurse.duty_end,data);
                         flag++;
                         if(flag == length){
                             resolve();
@@ -87,7 +86,6 @@ router.route("/assign").post(async function(req,res){
                         Nurse.findByIdAndUpdate(_id,
                     {"$push":{"rota": {$each:updateAssignNurse[_id]}}},{new:true,upsert:true}
                     ,function(err,data){
-                        console.log('b');
                         flag++;
                         if(flag == length){
                             resolve();
@@ -98,7 +96,6 @@ router.route("/assign").post(async function(req,res){
             }).then(function(){
                 Nurse.find({},function(err,nurses){
                     res.send({NurseDatas:nurses});
-                    console.log('c');
                 });
             });
         });
