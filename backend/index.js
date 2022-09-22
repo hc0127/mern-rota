@@ -21,6 +21,7 @@ app.use("/nurse", require("./routes/basic/nurse"));
 app.use("/patient", require("./routes/basic/patient"));
 app.use("/level", require("./routes/basic/level"));
 app.use("/rota", require("./routes/rota"));
+app.use("/leave", require("./routes/leave"));
 
 app.listen(PORT, function() {
     console.log("Server is running on Port: " + PORT);

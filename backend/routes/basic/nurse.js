@@ -17,14 +17,12 @@ router.route("/add").post(function(req,res){
             ...sendData
         },function(err,data){
             if(!err){
-                console.log('insert'+data._id);
                 res.send({state:'insert',data:data});
             }
         });
     }else{
         Nurse.findOneAndUpdate({_id:sendData.id},sendData,{new:true,upsert:true},function(err,data){
             if(!err){
-                console.log('up'+data);
                 res.send({state:'update',data:data});
             }else{
                 console.log(err);
@@ -34,7 +32,6 @@ router.route("/add").post(function(req,res){
 });
 
 router.route('/remove').post(function(req,res){
-    console.log(req.body);
     const _id = req.body;
     Nurse.findOneAndRemove({_id:_id},function(err,result){
         if(!err){

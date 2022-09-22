@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
-
 const Nurse = require('../models/nurse.model');
-const Patient = require('../models/patient.model');
 
 router.route("/assign").post(async function(req,res){
     const assign = req.body;

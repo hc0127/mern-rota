@@ -5,9 +5,6 @@ let Nurse = new Schema({
     name: {
         type: String
     },
-    rota:{
-        type:Array,
-    },
     address: {
         type: String
     },
@@ -15,7 +12,7 @@ let Nurse = new Schema({
         type: String
     },
     cell: {
-        type: String
+        type: Number
     },
     country: {
         type: String
@@ -29,12 +26,27 @@ let Nurse = new Schema({
     workexp: {
         type: String
     },
+    leave:{
+        type:Array,
+    },
+    rota:{
+        type:Array,
+    },
     level:{
         type:String
     },
     rate:{
         type:String
-    }
+    },
+    basic_allowances: {
+        type: Number
+    },
+    housing_allowances: {
+        type: Number
+    },
+    other_allowances: {
+        type: Number
+    },
 });
 
 module.exports = mongoose.model('Nurse', Nurse);
