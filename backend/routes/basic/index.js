@@ -15,12 +15,19 @@ router.route("/list").get(function(req,res){
                     Level.find({},function(err,levelData){
                         if(!err){
                             Holiday.find({},function(err,holidayData){
+                                let holidays;
+                                console.log(holidayData);
+                                if(holidayData == null || holidayData.length == 0){
+                                    holidays = [];
+                                }else{
+                                    holidays = holidayData[0].holiday
+                                }
                                 res.send({
                                     state:'success',
                                     nurse:nurseData,
                                     patient:patientData,
                                     level:levelData,
-                                    holiday:holidayData[0].holiday
+                                    holiday:holidays
                                 });
                             });
                         }
@@ -88,7 +95,7 @@ router.route('/holiday/get').post(function(req,res){
     const holiday = req.body;
     console.log(holiday);
     Holiday.find({},function(err,data){
-        if(data == null){
+        if(data == null || data.length == 0){
             Holiday.create({
                 holiday:[holiday.date]
             },function(err,data){
@@ -102,7 +109,11 @@ router.route('/holiday/get').post(function(req,res){
                     {$push:{"holiday":holiday.date}}
                 ).then(function(data){
                     Holiday.find({},function(err,data){
-                        res.send({holiday:data[0].holiday});
+                        if(data == null){
+                            res.send({holiday:[]});
+                        }else{
+                            res.send({holiday:data[0].holiday});
+                        }
                     });
                 });
             }else{
@@ -110,7 +121,11 @@ router.route('/holiday/get').post(function(req,res){
                     {$pull:{"holiday":holiday.date}}
                 ).then(function(data){
                     Holiday.find({},function(err,data){
-                        res.send({holiday:data[0].holiday});
+                        if(data == null){
+                            res.send({holiday:[]});
+                        }else{
+                            res.send({holiday:data[0].holiday});
+                        }
                     });
                 });
             }
