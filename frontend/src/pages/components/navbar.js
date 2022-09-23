@@ -72,6 +72,16 @@ class Navbar extends Component{
 								</NavLink>
 							</NavItem>
 							<NavItem>
+								<NavLink aria-current='page' to='working'>
+								Working Days
+								</NavLink>
+							</NavItem>
+							<NavItem>
+								<NavLink aria-current='page' to='leave'>
+								Leave Days
+								</NavLink>
+							</NavItem>
+							<NavItem>
 								<NavLink aria-current='page' to='roaster'>
 								Roaster
 								</NavLink>
@@ -79,6 +89,21 @@ class Navbar extends Component{
 							<NavItem>
 								<NavLink aria-current='page' to='total'>
 								Report
+								</NavLink>
+							</NavItem>
+							<NavItem>
+								<NavLink aria-current='page' to='payroll'>
+								PayRoll
+								</NavLink>
+							</NavItem>
+							<NavItem>
+								<NavLink aria-current='page' to='revenue'>
+								Revenue
+								</NavLink>
+							</NavItem>
+							<NavItem>
+								<NavLink aria-current='page' to='pnl'>
+								PNL
 								</NavLink>
 							</NavItem>
 						</MDBNavbarNav>

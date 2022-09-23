@@ -32,6 +32,49 @@ router.route("/add").post(function(req,res){
     }
 });
 
+router.route('/import').post(function(req,res){
+    const datas = req.body.importData;
+    let count = datas.length;
+    let flag = 0;
+    let step = function(){
+        let notFoundPatient = [];
+        return new Promise(function(resolve){
+            for(let data of datas){
+                let Revenue = data.Revenue;
+                if(Revenue != 'Total'){
+                    delete data.Revenue;
+                    delete data.Total;
+                    Patient.findOneAndUpdate({name:Revenue},[{"$set":{
+                        "revenue":{
+                        "$mergeObjects":[
+                            "$revenue",
+                            data
+                        ]
+                        }
+                    }}],function(err,result){
+                        if(!err){
+                            if(result == null){
+                                notFoundPatient.push(Revenue);
+                            }
+                            console.log(Revenue,flag,count);
+                            flag++;
+                            if(flag == count-1){
+                                resolve();
+                            }
+                        }
+                    });
+                }
+            }
+        }).then(function(){
+            Patient.find({},function(err,data){
+                if(!err){
+                    res.send({patients:data,notFound:notFoundPatient});
+                }
+            });
+        });
+    }
+    step();
+});
 router.route('/remove').post(function(req,res){
     console.log(req.body);
     const _id = req.body;

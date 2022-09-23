@@ -29,7 +29,8 @@
     "redux-thunk": "^2.4.1",
     "styled-components": "^5.3.5",
     "toastr": "^2.1.4",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
     "start": "env-cmd -f .env.development  react-scripts start",

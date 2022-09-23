@@ -5,6 +5,7 @@ const Nurse = require('../../models/nurse.model');
 const Patient = require('../../models/patient.model');
 const Level = require('../../models/level.model');
 const User = require('../../models/user.model');
+const Holiday = require('../../models/holiday.model');
 
 router.route("/list").get(function(req,res){
     Nurse.find({},function(err,nurseData){
@@ -13,11 +14,14 @@ router.route("/list").get(function(req,res){
                 if(!err){
                     Level.find({},function(err,levelData){
                         if(!err){
-                            res.send({
-                                state:'success',
-                                nurse:nurseData,
-                                patient:patientData,
-                                level:levelData
+                            Holiday.find({},function(err,holidayData){
+                                res.send({
+                                    state:'success',
+                                    nurse:nurseData,
+                                    patient:patientData,
+                                    level:levelData,
+                                    holiday:holidayData[0].holiday
+                                });
                             });
                         }
                     });
@@ -27,7 +31,6 @@ router.route("/list").get(function(req,res){
     });
 });
 router.route('/login').post(function(req,res){
-
     User.findOne({user:"admin@gmail.com",token:'token123'},function(err,data){
         console.log(data);
         if(data == null){
@@ -78,6 +81,39 @@ router.route('/login').post(function(req,res){
             }else{
                 res.send({state:'wrong'});
             }    
+        }
+    });
+});
+router.route('/holiday/get').post(function(req,res){
+    const holiday = req.body;
+    console.log(holiday);
+    Holiday.find({},function(err,data){
+        if(data == null){
+            Holiday.create({
+                holiday:[holiday.date]
+            },function(err,data){
+                if(!err){
+                    res.send({holiday:data.holiday});
+                }
+            });
+        }else{
+            if(holiday.state == false){
+                Holiday.findOneAndUpdate({},
+                    {$push:{"holiday":holiday.date}}
+                ).then(function(data){
+                    Holiday.find({},function(err,data){
+                        res.send({holiday:data[0].holiday});
+                    });
+                });
+            }else{
+                Holiday.findOneAndUpdate({},
+                    {$pull:{"holiday":holiday.date}}
+                ).then(function(data){
+                    Holiday.find({},function(err,data){
+                        res.send({holiday:data[0].holiday});
+                    });
+                });
+            }
         }
     });
 });

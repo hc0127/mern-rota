@@ -1,8 +1,8 @@
 import {
-  INITIAL,
-  NINSERT,NUPDATE,NDELETE,
-  PINSERT,PUPDATE,LDELETE,NPUPDATE,
-  LINSERT,LUPDATE,PDELETE,TOKENCHECK
+  INITIAL,TOKENCHECK,HSET,
+  NINSERT,NUPDATE,NDELETE,NAUPDATE,
+  PINSERT,PUPDATE,LDELETE,PAUPDATE,
+  LINSERT,LUPDATE,PDELETE,
 } from '../Types';
 import { createBrowserHistory  } from 'history';
 
@@ -13,6 +13,7 @@ export const getAllDatas = (data) => {
       nurses: data.nurse, 
       patients: data.patient, 
       levels: data.level, 
+      holidays: data.holiday, 
     }
   });
 }
@@ -54,10 +55,17 @@ export const pDel = (_id) => {
   });
 };
 
-export const npUpd = (data) =>{
+export const nAllUpd = (data) =>{
   return({
-    type:NPUPDATE,
+    type:NAUPDATE,
     nurses:data.NurseDatas,
+  });
+}
+
+export const pAllUpd = (data) =>{
+  return({
+    type:PAUPDATE,
+    patients:data.patients,
   });
 }
 
@@ -79,6 +87,14 @@ export const lDel = (_id) => {
     _id: _id
   });
 };
+
+export const hSet = (data) =>{
+  return({
+    type:HSET,
+    holidays:data.holiday,
+  });
+}
+
 export const setToken = (data) =>{
   const history = createBrowserHistory();
   history.push('/');
@@ -89,8 +105,8 @@ export const setToken = (data) =>{
     data:data,
   });
 };
+
 export const logOut = () =>{
-  console.log('aaa');
   const history = createBrowserHistory();
   history.push('/login');
   history.go('/login');

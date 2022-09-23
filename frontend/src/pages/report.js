@@ -45,7 +45,7 @@ export default class Report extends Component {
   }
 
   componentDidMount() {
-      axios.get('http://127.0.0.1:4000/nurse/list')
+      axios.get('nurse/list')
           .then(response => {
             console.log(response.data);
               this.setState({ rotas: response.data });

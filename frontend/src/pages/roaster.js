@@ -1,25 +1,21 @@
 import React, { Component } from 'react';
-import './../App.css';
-import './../react-confirm-alert.css';
 
 import axios from 'axios'
-import {Form,Button} from 'react-bootstrap';
-import { MDBContainer } from 'mdb-react-ui-kit';
+import {Form} from 'react-bootstrap';
+import { MDBContainer,MDBBtn } from 'mdb-react-ui-kit';
 import DataTable from 'react-data-table-component';
 import {connect} from 'react-redux'
 import {confirmAlert} from 'react-confirm-alert'
 import TimePicker from 'react-bootstrap-time-picker';
 
 import { FaPlus,FaMinus } from "react-icons/fa";
-import { FiHome, FiLogOut, FiArrowLeftCircle, FiArrowRightCircle } from "react-icons/fi";
 
-import {
-  npUpd
-} from '../store/Actions/BasicAction';
+import { nAllUpd } from '../store/Actions/BasicAction';
 
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
+import './../css/react-confirm-alert.css';
 
 class Roaster extends Component {
 
@@ -55,7 +51,7 @@ class Roaster extends Component {
         assignData:assigns
       })
       .then(function (response) {
-        _self.props.assign(response.data);
+        _self.props.getRoaster(response.data);
       })
       .catch(function (error) {
       });
@@ -173,7 +169,6 @@ class Roaster extends Component {
       if(j == row.rotation-1){
         assigns.splice( n+j, 1);
       }else if(j >= row.rotation){
-        console.log(n+j-1);
         assigns[n+j-1].rotation--;
       }
     }
@@ -197,12 +192,14 @@ class Roaster extends Component {
     this.setState({
       ...this.state,
       selYear:e.target.value,
+      isEditable:false,
     });
   }
   onChangeMonth = (e) =>{
     this.setState({
       ...this.state,
       selMonth:e.target.value,
+      isEditable:false,
     });
   }
   onChangeMultiDay = (e) =>{
@@ -250,10 +247,9 @@ class Roaster extends Component {
     let step = function(){
       return new Promise(function(resolve){   
         assigns.map((assign,index)=>{
-          console.log(assign.duty_start,assign.duty_end,_start)
-          if(assign.rotation !== row.rotation && assign.date == row.date && assign.duty_start != "NA" && assign.duty_end != "NA" &&  assign.duty_start<_start && assign.duty_end>_start){
+          if(assign.rotation !== row.rotation && assign.date == row.date && assign.duty_start<_start && assign.duty_end>_start){
             isAssign = true;
-            toastr.info("Already Assign Hour!");
+            toastr.info("Already Assign Hour in rotation"+assign.rotation+"!");
           }
           if(index == assignCount-1 && isAssign == false){
             resolve();
@@ -304,13 +300,12 @@ class Roaster extends Component {
               basic.nurses.map((nurse) =>{
               if(nurse._id == row.nurse_id){
                 assigns[assignIndex].duty_start = _start;
-                  if(assigns[assignIndex].duty_end != 'NA'){
-                    assigns[assignIndex].hour = Math.abs(assigns[assignIndex].duty_end.split(':')[0]-assigns[assignIndex].duty_start.split(':')[0]);
-                  }
-                }
-              })
-            }
-          });
+                assigns[assignIndex].duty_end = _start;
+                assigns[assignIndex].hour = 'NA';
+              }
+            });
+          }
+        });
       
           _self.setState({
             ..._self.state,
@@ -337,10 +332,9 @@ class Roaster extends Component {
     let step = function(){
       return new Promise(function(resolve){   
         assigns.map((assign,index)=>{
-          console.log(assign.duty_start,assign.duty_end,row.duty_start,_end)
-          if(assign.rotation !== row.rotation && assign.date == row.date && assign.duty_start != "NA" && assign.duty_end != "NA" &&  assign.duty_end<row.duty_start && assign.duty_start>_end){
+          if(assign.rotation !== row.rotation && assign.date == row.date && assign.duty_start != "NA" && assign.duty_end != "NA" && assign.duty_start < _end &&  assign.duty_end>row.duty_start){
             isAssign = true;
-            toastr.info("Already Assign Hour!");
+            toastr.info("Already Assign Hour in rotation"+assign.rotation+"!");
           }
           if(index == assignCount-1 && isAssign == false){
             resolve();
@@ -409,10 +403,17 @@ class Roaster extends Component {
     step();
   }
 
+  swap(json){
+    let ret = [];
+    for(var key in json){
+      ret[json[key]] = key;
+    }
+    return ret;
+  }
 
   render() {
     const {basic} = this.props;
-    const {selPatient,selMonth,selYear,selMultiDay,isEditable,assigns,assignPerDay} = this.state;
+    const {selPatient,selYear,selMonth,isEditable,assigns,assignPerDay} = this.state;
     let assignColumns = [];
     let assignDatas =[];
     let assignPerDayDatas =[];
@@ -420,6 +421,24 @@ class Roaster extends Component {
     let assignHour;
     let month = selYear+'-'+(selMonth<10?+'0'+String(selMonth):selMonth);
     let daysInMonth = new Date(selYear, selMonth, 0). getDate();
+
+    //get holidays per month
+    let holidays = basic.holidays;
+    let holidaysPerMonth = [];
+    holidays.map(holiday =>{
+      if(parseInt(holiday.slice(0,2)) == 1){
+        holidaysPerMonth.push(selYear+'-'+holiday);
+      }
+    });
+    //get sundays per month
+    let sundaysPerMonth = [];
+    let date = selYear+selMonth+'-01';
+    let firstDate = new Date(date).getDay();
+    if(firstDate == 0){firstDate = 7}
+    for(let selDay = 7- firstDate;selDay < daysInMonth;selDay+=7){
+      let day = selDay > 9?selDay:'0'+selDay;
+      sundaysPerMonth.push(selYear+'-'+selMonth+'-'+day);
+    }
 
     if(isEditable){
       assignColumns =[
@@ -443,9 +462,30 @@ class Roaster extends Component {
             <Form.Select aria-label="patient select" value={row._nurse_id} onChange = {(e) =>this.onChangeNurse(e,row)}>
               <option value="0" >Select Nurse</option>
               {
-                
                 basic.nurses.map((nurse,index) =>{
-                  assignHour = 208;
+                  
+                //get leavedays per month
+                let leaves = nurse.leave;
+                let leavedaysPerMonth = [];
+
+                for(let leave of leaves){
+                  let from = new Date(leave.from);
+                  let to = new Date(leave.to);
+                  for(let betweenDay = from;betweenDay <= to;){
+                    let year = betweenDay.getFullYear();
+                    let month = betweenDay.getMonth()+1>9?betweenDay.getMonth()+1:'0'+(betweenDay.getMonth()+1);
+                    let day = betweenDay.getDate()>9?betweenDay.getDate():'0'+betweenDay.getDate();
+                    if(year == selYear && month == selMonth){
+                      leavedaysPerMonth.push(year+'-'+month+'-'+day);
+                    }
+                    betweenDay.setDate(betweenDay.getDate() + 1);
+                  }
+                }
+
+                let workingdays = [...leavedaysPerMonth,...holidaysPerMonth,...sundaysPerMonth];
+                workingdays = [...new Set(workingdays)];
+
+                  assignHour = (daysInMonth-workingdays.length)*8;
                   
                   basic.nurses.map((_nurse,index) =>{
                     if(_nurse._id == nurse._id){
@@ -510,9 +550,9 @@ class Roaster extends Component {
           width:'80px',
           selector: (row) =>
             row.rotation == 1 ?
-              <Button variant="outline-primary" size="sm" onClick={(e) =>this.multiAssign(e,row)}><FaPlus /></Button>
+              <MDBBtn outline floating  color='primary' size="sm" onClick={(e) =>this.multiAssign(e,row)}><FaPlus /></MDBBtn>
               :
-              <Button variant="outline-primary" size="sm" onClick={(e) =>this.multiRemove(e,row)}><FaMinus /></Button>
+              <MDBBtn outline floating  color='primary'  size="sm" onClick={(e) =>this.multiRemove(e,row)}><FaMinus /></MDBBtn>
         },
       ];
 
@@ -663,7 +703,7 @@ class Roaster extends Component {
             </Form.Group>
           </div>
           <div className='col-md-2'>
-            <button type="button" className="btn btn-primary" onClick={() =>this.save()}>{isEditable?'save':'edit'}</button>
+            <MDBBtn  outline rounded color='primary' type="button" onClick={() =>this.save()}>{isEditable?'save':'edit'}</MDBBtn>
           </div>
         </div>
         <div className='row p-2'>
@@ -681,7 +721,7 @@ class Roaster extends Component {
 }
 
 const mapDispatchToProps = (dispatch) => ({
-  assign:(data) =>dispatch(npUpd(data))
+  getRoaster:(data) =>dispatch(nAllUpd(data))
 });
 
 const mapStateToProps = (BasicData) => ({

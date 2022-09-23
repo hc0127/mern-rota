@@ -1,14 +1,30 @@
 import {
-  INITIAL,
-  NINSERT,NUPDATE,NDELETE,
-  PINSERT,PUPDATE,LDELETE,NPUPDATE,
-  LINSERT,LUPDATE,PDELETE, TOKENCHECK,
+  INITIAL, TOKENCHECK,HSET,
+  NINSERT,NUPDATE,NDELETE,NAUPDATE,
+  PINSERT,PUPDATE,PDELETE,PAUPDATE,
+  LINSERT,LUPDATE,LDELETE,
 } from '../Types';
+
+const monthNames = [];
+monthNames['Jan'] = '01';
+monthNames['Feb'] = '02';
+monthNames['Mar'] = '03';
+monthNames['Apr'] = '04';
+monthNames['May'] = '05';
+monthNames['Jun'] = '06';
+monthNames['Jul'] = '07';
+monthNames['Aug'] = '08';
+monthNames['Sep'] = '09';
+monthNames['Oct'] = '10';
+monthNames['Nov'] = '11';
+monthNames['Dec'] = '12';
 
 const initialState = {
   nurses: [],
   patients: [],
   levels: [],
+  holidays: [],
+  monthNames:monthNames
   };
 
 export default function BasicReducer(state = initialState, action) {
@@ -20,6 +36,7 @@ export default function BasicReducer(state = initialState, action) {
         nurses: action.data.nurses,
         patients: action.data.patients,
         levels: action.data.levels,
+        holidays: action.data.holidays,
       };
     case NINSERT:
       return {
@@ -43,9 +60,13 @@ export default function BasicReducer(state = initialState, action) {
           key = index;
         }
       });
-      console.log(key,state.nurses);
       state.nurses.splice(key,1);
-      console.log(state.nurses);
+      return {
+        ...state,
+        nurses:[...state.nurses],
+      };
+    case NAUPDATE: 
+      state.nurses = action.nurses;
       return {
         ...state,
         nurses:[...state.nurses],
@@ -72,18 +93,16 @@ export default function BasicReducer(state = initialState, action) {
           key = index;
         }
       });
-      console.log(key,state.patients);
       state.patients.splice(key,1);
-      console.log(state.patients);
       return {
         ...state,
         patients:[...state.patients],
       };
-    case NPUPDATE: 
-      state.nurses = action.nurses;
+    case PAUPDATE: 
+      state.patients = action.patients;
       return {
         ...state,
-        nurses:[...state.nurses],
+        nurses:[...state.patients],
       };
     case LINSERT:
       return {
@@ -107,12 +126,15 @@ export default function BasicReducer(state = initialState, action) {
           key = index;
         }
       });
-      console.log(key,state.levels);
       state.levels.splice(key,1);
-      console.log(state.levels);
       return {
         ...state,
         levels:[...state.levels],
+      };
+    case HSET:
+      return {
+        ...state,
+        holidays:[...action.holidays],
       };
     case TOKENCHECK:{
       return {

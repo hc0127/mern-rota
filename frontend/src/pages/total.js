@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-import './../App.css';
 import {Form} from 'react-bootstrap';
 import { MDBContainer } from 'mdb-react-ui-kit';
 import {connect} from 'react-redux'
@@ -184,12 +183,12 @@ class Total extends Component {
                 </div>
                 <div className='col-md-3'>
                   <Form.Group>
-                    <Form.Control type="date" value={from}  onChange = {(e) =>this.setDate('from',e)} />
+                    <Form.Control type="date" value={from} max={to}  onChange = {(e) =>this.setDate('from',e)} />
                   </Form.Group>
                 </div>
                 <div className='col-md-3'>
                   <Form.Group>
-                    <Form.Control type="date" value={to}  onChange = {(e) =>this.setDate('to',e)}/>
+                    <Form.Control type="date" value={to} min={from}  onChange = {(e) =>this.setDate('to',e)}/>
                   </Form.Group>
                 </div>
             </div>

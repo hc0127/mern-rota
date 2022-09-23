@@ -13,8 +13,8 @@ import {
 } from "react-pro-sidebar";
 
 //import icons from react icons
-import { FaAddressBook, FaCalculator, FaCalendar, FaCalendarDay, FaDashcube, FaList } from "react-icons/fa";
-import { FiHome, FiLogOut, FiArrowLeftCircle, FiArrowRightCircle } from "react-icons/fi";
+import { FaHome,FaDatabase,FaUserNurse,FaWheelchair, FaClock,FaBookMedical ,FaRegMoneyBillAlt } from "react-icons/fa";
+import { FiLogOut, FiArrowLeftCircle, FiArrowRightCircle } from "react-icons/fi";
 import { NavLink as Link } from 'react-router-dom';
 import {connect} from 'react-redux'
 import {
@@ -73,10 +73,13 @@ class Sidebar extends Component{
               </SidebarHeader>
               <SidebarContent>
                 <Menu iconShape="square">
-                  <MenuItem icon={<FaDashcube className="text-primary" />}><NavLink to=''>DashBoard</NavLink></MenuItem>
-                  <MenuItem icon={<FaAddressBook className="text-primary" />}><NavLink to='basic'>Staff</NavLink></MenuItem>
-                  <MenuItem icon={<FaCalendarDay className="text-primary"  />}><NavLink to='roaster'>Roaster</NavLink></MenuItem>
-                  <MenuItem icon={<FaCalculator className="text-primary" />}><NavLink to='total'>Report</NavLink></MenuItem>
+                  <MenuItem icon={<FaHome className="text-primary" />}><NavLink to=''>DashBoard</NavLink></MenuItem>
+                  <MenuItem icon={<FaDatabase className="text-primary" />}><NavLink to='basic'>Staff</NavLink></MenuItem>
+                  <MenuItem icon={<FaUserNurse className="text-primary" />}><NavLink to='working'>Working Days</NavLink></MenuItem>
+                  <MenuItem icon={<FaWheelchair className="text-primary" />}><NavLink to='leave'>Leave Days</NavLink></MenuItem>
+                  <MenuItem icon={<FaClock className="text-primary"  />}><NavLink to='roaster'>Roaster</NavLink></MenuItem>
+                  <MenuItem icon={<FaBookMedical className="text-primary" />}><NavLink to='total'>Report</NavLink></MenuItem>
+                  <MenuItem icon={<FaRegMoneyBillAlt className="text-primary" />}><NavLink to='payroll'>PayRoll</NavLink></MenuItem>
                 </Menu>
               </SidebarContent>
               <SidebarFooter>

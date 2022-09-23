@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
-import './../App.css';
+import './../css/App.css';
 import axios from '../config/server.config'
 import {
-  DropdownButton,Dropdown,Button,Tab,Tabs,
-  Row,Col,Modal,Form,FloatingLabel
+  Tab,Tabs,Modal,Form,FloatingLabel
 } from 'react-bootstrap';
-import {MDBContainer,MDBIcon,MDBBtn,MDBTabs,MDBRow,MDBCol} from 'mdb-react-ui-kit'
+import {MDBContainer,MDBRow,MDBCol,MDBBtn,MDBBtnGroup} from 'mdb-react-ui-kit'
 import DataTable from 'react-data-table-component';
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
+import { FaEdit,FaTrash } from "react-icons/fa";
 
 import {
-  nIns,nUpd,nDel,pIns,pUpd,pDel,lIns,lUpd,lDel,
+  nIns,nUpd,nDel,pIns,pUpd,pDel,lIns,lUpd,lDel,hSet
 } from './../store/Actions/BasicAction';
 import {connect} from 'react-redux'
 
@@ -32,6 +32,9 @@ class Basic extends Component {
             date:'',
             workexp:'',
             level:'',
+            basic_allowances:0,
+            housing_allowances:0,
+            other_allowances:0,
           }
         },patient:{
           open:false,
@@ -49,6 +52,10 @@ class Basic extends Component {
             level:'',
             rate:'',
           }
+        },
+        holiday:{
+          month:1,
+          day:1,
         }
       };
   }
@@ -94,10 +101,8 @@ class Basic extends Component {
   nurseConfirm = () =>{
     const _self = this;
     const {nurse} = this.state;
-    console.log(nurse.modal);
     const values =  Object.values(nurse.modal).filter(e =>  e).length;
-    console.log(values);
-    if(values < 9){
+    if(values < 12){
       toastr.options = {
         positionClass : 'toast-top-full-width',
         hideDuration: 300,
@@ -124,7 +129,6 @@ class Basic extends Component {
         if(res.state === 'insert'){
           _self.props.nurseInsert(data);
         }else{
-          console.log('aa',data._id)
           _self.props.nurseUpdate(data);
         }
       })
@@ -270,7 +274,6 @@ class Basic extends Component {
       }
     });
   }
-
   //Level Manage
   levelModal = (open,data)  =>{
     if(data !== null && data != undefined){
@@ -322,7 +325,6 @@ class Basic extends Component {
       }
       toastr.clear()
       setTimeout(() => toastr.info('please input correct!'), 300)
-
     }else{
       this.setState({
         ...this.state,
@@ -359,6 +361,29 @@ class Basic extends Component {
           [target]:e.target.value
         }
       }
+    });
+  }
+  //Holiday Manage
+  onChangeHoliday = (i,row) =>{
+    const {basic} = this.props;
+    var _self = this;
+
+    const day = i > 9?'-'+i:'-0'+i;
+    const date = basic.monthNames[row.month]+day;
+
+    axios.post('basic/holiday/get',{
+      state:row[i].checked,date:date,
+    })
+    .then(function (response) {
+      if(row[i].checked == false){
+        toastr.info("Holiday Added");
+      }else{
+        toastr.info("Holiday Removed");
+      }
+      _self.props.holidaySet(response.data);
+    })
+    .catch(function (error) {
+      console.log(error);
     });
   }
 
@@ -428,10 +453,10 @@ class Basic extends Component {
           wrap:true,
           sortable: false,
           cell: (d) => [
-            <DropdownButton key={d._id} id="dropdown-basic-button" title="Action" style={{width:'100px'}}>
-              <Dropdown.Item href="#" onClick={() => this.nurseModal(true,d)}>edit</Dropdown.Item>
-              <Dropdown.Item href= "#" onClick={() => this.removeNurse(d)}>delete</Dropdown.Item>
-            </DropdownButton>
+            <MDBBtnGroup key={d._id}>
+              <MDBBtn outline className='my-1 ms-1' size="sm" onClick={() =>this.nurseModal(true,d)}><FaEdit /></MDBBtn>
+              <MDBBtn outline className='my-1 me-1' size="sm" onClick={() =>this.removeNurse(d)}><FaTrash /></MDBBtn>
+            </MDBBtnGroup>
           ]
         }
       ];
@@ -471,10 +496,10 @@ class Basic extends Component {
           wrap:true,
           sortable: false,
           cell: (d) => [
-            <DropdownButton key={d._id} id="dropdown-basic-button" title="Action" style={{width:'100px'}}>
-              <Dropdown.Item href="#" onClick={() => this.patientModal(true,d)}>edit</Dropdown.Item>
-              <Dropdown.Item href= "#" onClick={() => this.removePatient(d)}>delete</Dropdown.Item>
-            </DropdownButton>
+            <MDBBtnGroup  key={d._id}>
+              <MDBBtn outline  className='my-1 ms-1' size="sm" onClick={() =>this.patientModal(true,d)}><FaEdit /></MDBBtn>
+              <MDBBtn outline  className='my-1 me-1' size="sm" onClick={() =>this.removePatient(d)}><FaTrash /></MDBBtn>
+            </MDBBtnGroup>
           ]
         }
       ];
@@ -496,63 +521,133 @@ class Basic extends Component {
           name: "Action",
           center:true,
           cell: (d) => [
-            <DropdownButton key={d._id} id="dropdown-basic-button" title="Action" style={{width:'100px'}}>
-              <Dropdown.Item href="#" onClick={() => this.levelModal(true,d)}>edit</Dropdown.Item>
-              <Dropdown.Item href= "#" onClick={() => this.removeLevel(d)}>delete</Dropdown.Item>
-            </DropdownButton>
+            <MDBBtnGroup key={d._id}>
+              <MDBBtn outline  className='my-1 ms-1' size="sm" onClick={() =>this.levelModal(true,d)}><FaEdit /></MDBBtn>
+              <MDBBtn outline  className='my-1 me-1' size="sm" onClick={() =>this.removeLevel(d)}><FaTrash /></MDBBtn>
+            </MDBBtnGroup>
           ]
         }
       ];
+      
+      const holidayColumns = [];
+      let holidayDatas = [];
+      let holidays = basic.holidays;
+
+      holidayColumns.push({
+        name: "Month",
+        center:true,
+        wrap:true,
+        selector: (row) => row.month,
+      });
+      for(let i = 1 ; i <= 31;i++){
+        holidayColumns.push({
+          name: i,
+          center:true,
+          width:'50px',
+          wrap:true,
+          cell: (row) => 
+          <Form.Check
+            disabled = {row[i]['disabled']}
+            checked = {row[i]['checked']}
+            type='checkbox'
+            onChange={() => this.onChangeHoliday(i,row)}
+          />
+        });
+      }
+      
+      let monthNames = basic.monthNames;
+      let date = new Date();
+      let year = date.getFullYear();
+      for(let i in monthNames){
+        let row = [];
+        let month = monthNames[i];
+        let daysInMonth = new Date(year,month,0).getDate();
+
+        row["month"] = i;
+        for(let j=1;j<=31;j++){
+          row[j] = [];
+          row[j]['checked'] = false;
+          row[j]['disabled'] = false;
+
+          let day = j>9?j:'0'+j;
+
+          if(holidays.includes(month+'-'+day)){
+            row[j]['checked'] = true;
+          }
+          if(j > daysInMonth){
+            row[j]['disabled'] = true;
+          }
+        }
+        holidayDatas.push(row);
+      }
+
+      // let holidayDatas=[{
+      //   month:'Jan'
+      // }];
+
+
 
       return (
           <MDBContainer>
               <div className="pt-5 text-center text-dark">
                 <h1 className="mt-3">BASIC DATA</h1>
               </div>
-              <Row>
-                <Col>
+              <MDBRow>
+                <MDBCol>
                     <Tabs id="basic_tab">
                         <Tab eventKey="nurse" key={1} title="nurse" className='p-2'>
-                          <Button variant="primary" onClick={() => this.nurseModal(true,null)}>Add Nurse</Button>
+                          <MDBBtn outline rounded  color='primary' onClick={() => this.nurseModal(true,null)}>Add Nurse</MDBBtn>
                           <div className='p-2'>
                             <DataTable
                               id="nurseTable"
                               columns={nurseColumns} 
                               data={basic.nurses} 
                               fixedHeader
-                              fixedHeaderScrollHeight={'300px'}
-                              header={'300px'}                          
+                              fixedHeaderScrollHeight={'65vh'}          
                               defaultPageSize={100}
                               pagination
                             />
                           </div>
                         </Tab>
                         <Tab eventKey="patient" key={2} title="patient" className='p-2'>
-                          <Button variant="primary" onClick={() => this.patientModal(true)}>Add Patient</Button>
+                          <MDBRow>
+                            <MDBCol>
+                              <MDBBtn  outline rounded  color='primary' onClick={() => this.patientModal(true)}>Add Patient</MDBBtn>
+                            </MDBCol>
+                          </MDBRow>
                           <div className='p-2'>
                             <DataTable
                               columns={patientColumns} 
                               data={basic.patients}
                               fixedHeader
-                              fixedHeaderScrollHeight={'300px'}
+                              fixedHeaderScrollHeight={'65vh'}
                               pagination/>
                           </div>
                         </Tab>
                         <Tab eventKey="level" key={3} title="level" className='p-2'>
-                          <Button variant="primary" onClick={() => this.levelModal(true)}>Add Level</Button>
+                          <MDBBtn outline rounded  color='primary' onClick={() => this.levelModal(true)}>Add Level</MDBBtn>
                           <div className='p-2'>
                             <DataTable 
                               columns={levelColumns} 
                               data={basic.levels}
                               fixedHeader
-                              fixedHeaderScrollHeight={'300px'}
-                              height={'300px'}
+                              fixedHeaderScrollHeight={'65vh'}
                               pagination />
                           </div>
                         </Tab>
+                        <Tab eventKey="holiday" key={4} title="holiday" className='p-2'>
+                          <MDBRow>
+                            <DataTable
+                              fixedHeader 
+                              fixedHeaderScrollHeight={'70vh'}
+                              columns={holidayColumns}
+                              data={holidayDatas}
+                            />
+                          </MDBRow>
+                        </Tab>
                     </Tabs>
-                </Col>
-              </Row>
+                </MDBCol>
+              </MDBRow>
               <Modal show={nurse.open}
                 size="lg"
                 aria-labelledby="contained-modal-title-vcenter"
@@ -562,101 +657,120 @@ class Basic extends Component {
                   <Modal.Title>Nurse {nurse.action_id == '0'?'Insert':'Edit'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                  <div className="row mb-2 text-center">
-                    <div className='col-md-6'>
+                  <MDBRow className="mb-2">
+                    <MDBCol>
                       <img alt="No Image" src={nurse.modal.image} style={{width:'90px',height:'120px'}}></img>
-                    </div>
-                    <div className='col-md-6'>
+                    </MDBCol>
+                    <MDBCol>
                       <Form.Group controlId="ImageInput" className="mt-3">
                         <Form.Label>Select Image File</Form.Label>
                         <Form.Control type="file" accept="image/*" onChange={(e) =>this.onNurseImageChange(e,this)} />
                       </Form.Group>
-                    </div>
-                  </div>
-                  <div className='row'>
-                    <Col>
+                    </MDBCol>
+                  </MDBRow>
+                  <MDBRow className="mb-2">
+                    <MDBCol>
                       <FloatingLabel
                         controlId="NameInput"
                         label="Full Name"
-                        className="mb-3"
                       >
                         <Form.Control type="text" value={nurse.modal.name} onChange={(e) => this.nurseModalChange('name',e)} placeholder="Full Name" />
                       </FloatingLabel>
-                    </Col>
-                    <Col>
+                    </MDBCol>
+                    <MDBCol>
                       <FloatingLabel 
                         controlId="AddressInput" 
                         label="Address"
-                        className="mb-3"
                       >
                         <Form.Control type="text" value={nurse.modal.address} onChange={(e) => this.nurseModalChange('address',e)} placeholder="Address" />
                       </FloatingLabel>
-                    </Col>
-                  </div>
-                  <div className='row'>
-                    <div className='col-md-3'>
+                    </MDBCol>
+                  </MDBRow>
+                  <MDBRow  className="mb-2">
+                    <MDBCol md="3">
                       <FloatingLabel
                         controlId="CellInput"
                         label="Cell Number"
-                        className="mb-3"
                       >
                         <Form.Control type="number" value={nurse.modal.cell} onChange={(e) => this.nurseModalChange('cell',e)} placeholder="Cell Number" />
                       </FloatingLabel>
-                    </div>
-                    <div className='col-md-3'>
+                    </MDBCol>
+                    <MDBCol md='3'>
                       <FloatingLabel 
                         controlId="DateInput" 
                         label="Joining Date"
-                        className="mb-3"
                       >
                         <Form.Control type="date" value={nurse.modal.date} onChange={(e) => this.nurseModalChange('date',e)} placeholder="Joining Date" />
                       </FloatingLabel>
-                    </div>
-                    <div className='col-md-6'>
+                    </MDBCol>
+                    <MDBCol md="6">
                       <FloatingLabel 
                         controlId="CountryInput" 
                         label="Original Country"
-                        className="mb-3"
                       >
                         <Form.Control type="text" value={nurse.modal.country} onChange={(e) => this.nurseModalChange('country',e)} placeholder="Original Country" />
                       </FloatingLabel>
-                    </div>
-                  </div>
-                  <div>
-                    <Col>
+                    </MDBCol>
+                  </MDBRow>
+                  <MDBRow className="mb-2">
+                    <MDBCol>
                       <FloatingLabel
                         controlId="ExperienceInput"
                         label="Experience"
-                        className="mb-3"
                       >
                         <Form.Control type="text" value={nurse.modal.experience} onChange={(e) => this.nurseModalChange('experience',e)} placeholder="Experience" />
                       </FloatingLabel>
-                    </Col>
-                    <Col>
+                    </MDBCol>
+                    <MDBCol>
                       <FloatingLabel 
                         controlId="WorkingExperienceInput" 
                         label="Working Experience"
-                        className="mb-3"
                       >
                         <Form.Control type="text" value={nurse.modal.workexp} onChange={(e) => this.nurseModalChange('workexp',e)} placeholder="Working Experience" />
                       </FloatingLabel>
-                    </Col>
-                    <Col>
-                      <Form.Select aria-label="patient select" value={nurse.modal.level} onChange = {(e) =>this.nurseModalChange('level',e)}>
+                    </MDBCol>
+                    <MDBCol>
+                      <Form.Select aria-label="patient select" value={nurse.modal.level} style={{height:'100%'}} onChange = {(e) =>this.nurseModalChange('level',e)}>
                         <option value="" >Select Here</option>
                         <option value="0" >Registered Nurse</option>
                         <option value="1">Assistant Nurse</option>
                       </Form.Select>
-                    </Col>
-                  </div>
+                    </MDBCol>
+                  </MDBRow>
+                  <MDBRow className="mb-2">
+                    <MDBCol>
+                      <FloatingLabel
+                        controlId="BasicInput"
+                        label="Basic Allowance"
+                      >
+                        <Form.Control type="number" value={nurse.modal.basic_allowances} onChange={(e) => this.nurseModalChange('basic_allowances',e)} placeholder="Basic Allowance" />
+                      </FloatingLabel>
+                    </MDBCol>
+                    <MDBCol>
+                      <FloatingLabel
+                        controlId="HousingInput"
+                        label="Housing Allowance"
+                      >
+                        <Form.Control type="number" value={nurse.modal.housing_allowances} onChange={(e) => this.nurseModalChange('housing_allowances',e)} placeholder="Housing Allowance" />
+                      </FloatingLabel>
+                    </MDBCol>
+                    <MDBCol>
+                      <FloatingLabel
+                        controlId="OtherInput"
+                        label="Other Allowance"
+                      >
+                        <Form.Control type="number" value={nurse.modal.other_allowances} onChange={(e) => this.nurseModalChange('other_allowances',e)} placeholder="Other Allowance" />
+                      </FloatingLabel>
+                    </MDBCol>
+                  </MDBRow>
                 </Modal.Body>
                 <Modal.Footer>
-                  <button type="button" className='btn btn-secondary' onClick={() => this.nurseModal(false)}>
+                  <MDBBtn type="button" className='btn btn-secondary' onClick={() => this.nurseModal(false)}>
                     Close
-                  </button>
-                  <button  type="button" className='btn btn-primary' onClick={() => this.nurseConfirm()}>
+                  </MDBBtn>
+                  <MDBBtn  type="button" className='btn btn-primary' onClick={() => this.nurseConfirm()}>
                     Save
-                  </button>
+                  </MDBBtn>
                 </Modal.Footer>
               </Modal>   
 
@@ -669,19 +783,19 @@ class Basic extends Component {
                   <Modal.Title>Patient {patient.action_id == '0'?'Insert':'Edit'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                  <Row className="mb-2 text-center">
-                    <Col xs={6}>
+                  <MDBRow className="mb-2 text-center">
+                    <MDBCol>
                       <img alt="No Image" src={patient.modal.image} style={{width:'90px',height:'120px'}}></img>
-                    </Col>
-                    <Col>
+                    </MDBCol>
+                    <MDBCol>
                       <Form.Group controlId="ImageInput" className="mt-3">
                         <Form.Label>Select Image File</Form.Label>
                         <Form.Control type="file" accept="image/*" onChange={(e) =>this.onPatientImageChange(e,this)} />
                       </Form.Group>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
+                    </MDBCol>
+                  </MDBRow>
+                  <MDBRow>
+                    <MDBCol>
                       <FloatingLabel
                         controlId="NameInput"
                         label="Full Name"
@@ -689,10 +803,10 @@ class Basic extends Component {
                       >
                         <Form.Control type="text" value={patient.modal.name} onChange={(e) => this.patientModalChange('name',e)} placeholder="Full Name" />
                       </FloatingLabel>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
+                    </MDBCol>
+                  </MDBRow>
+                  <MDBRow>
+                    <MDBCol>
                       <FloatingLabel 
                         controlId="AddressInput" 
                         label="Address"
@@ -700,10 +814,10 @@ class Basic extends Component {
                       >
                         <Form.Control type="text" value={patient.modal.address} onChange={(e) => this.patientModalChange('address',e)} placeholder="Address" />
                       </FloatingLabel>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
+                    </MDBCol>
+                  </MDBRow>
+                  <MDBRow>
+                    <MDBCol>
                       <FloatingLabel
                         controlId="CellInput"
                         label="Cell Number"
@@ -711,16 +825,16 @@ class Basic extends Component {
                       >
                         <Form.Control type="number" value={patient.modal.cell} onChange={(e) => this.patientModalChange('cell',e)} placeholder="Cell Number" />
                       </FloatingLabel>
-                    </Col>
-                  </Row>
+                    </MDBCol>
+                  </MDBRow>
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button variant="secondary" onClick={() => this.patientModal(false)}>
+                  <MDBBtn variant="secondary" onClick={() => this.patientModal(false)}>
                     Close
-                  </Button>
-                  <Button variant="primary" onClick={() => this.patientConfirm()}>
+                  </MDBBtn>
+                  <MDBBtn variant="primary" onClick={() => this.patientConfirm()}>
                     Save
-                  </Button>
+                  </MDBBtn>
                 </Modal.Footer>
               </Modal>   
                    
@@ -733,8 +847,8 @@ class Basic extends Component {
                   <Modal.Title>Level {level.action_id == '0'?'Insert':'Edit'}</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                  <Row>
-                    <Col>
+                  <MDBRow>
+                    <MDBCol>
                       <FloatingLabel
                         controlId="LevelInput"
                         label="Level"
@@ -742,10 +856,10 @@ class Basic extends Component {
                       >
                         <Form.Control type="text" value={level.modal.level} onChange={(e) => this.levelModalChange('level',e)} placeholder="Level" />
                       </FloatingLabel>
-                    </Col>
-                  </Row>
-                  <Row>
-                    <Col>
+                    </MDBCol>
+                  </MDBRow>
+                  <MDBRow>
+                    <MDBCol>
                       <FloatingLabel 
                         controlId="RateInput" 
                         label="Rate"
@@ -753,16 +867,16 @@ class Basic extends Component {
                       >
                         <Form.Control type="text" value={level.modal.rate} onChange={(e) => this.levelModalChange('rate',e)} placeholder="Rat" />
                       </FloatingLabel>
-                    </Col>
-                  </Row>
+                    </MDBCol>
+                  </MDBRow>
                 </Modal.Body>
                 <Modal.Footer>
-                  <Button variant="secondary" onClick={() => this.levelModal(false)}>
+                  <MDBBtn variant="secondary" onClick={() => this.levelModal(false)}>
                     Close
-                  </Button>
-                  <Button variant="primary" onClick={() => this.levelConfirm()}>
+                  </MDBBtn>
+                  <MDBBtn variant="primary" onClick={() => this.levelConfirm()}>
                     Save
-                  </Button>
+                  </MDBBtn>
                 </Modal.Footer>
               </Modal>  
           </MDBContainer>
@@ -774,12 +888,16 @@ const mapDispatchToProps = (dispatch) => ({
     nurseInsert:(data) =>dispatch(nIns(data)),
     nurseUpdate:(data) =>dispatch(nUpd(data)),
     nurseRemove:(_id) =>dispatch(nDel(_id)),
+
     patientInsert:(data) =>dispatch(pIns(data)),
     patientUpdate:(data) =>dispatch(pUpd(data)),
     patientRemove:(_id) =>dispatch(pDel(_id)),
+    
     levelInsert:(data) =>dispatch(lIns(data)),
     levelUpdate:(data) =>dispatch(lUpd(data)),
     levelRemove:(_id) =>dispatch(lDel(_id)),
+    
+    holidaySet:(data) =>dispatch(hSet(data)),
 });
 
 const mapStateToProps = (BasicData) => ({

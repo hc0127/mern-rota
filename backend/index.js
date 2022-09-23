@@ -16,7 +16,11 @@ connection.once('open', function() {
     console.log("MongoDB database connection established successfully");
 })
 
-app.use("/basic", require("./routes/basic"));
+// app.use('/api', proxy(process.env.API_ENDPOINT || 'http://localhost:3000', {
+//   limit: '10mb'
+// ));
+
+app.use("/basic",require("./routes/basic"));
 app.use("/nurse", require("./routes/basic/nurse"));
 app.use("/patient", require("./routes/basic/patient"));
 app.use("/level", require("./routes/basic/level"));
