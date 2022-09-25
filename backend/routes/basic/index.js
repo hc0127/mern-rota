@@ -93,7 +93,6 @@ router.route('/login').post(function(req,res){
 });
 router.route('/holiday/get').post(function(req,res){
     const holiday = req.body;
-    console.log(holiday);
     Holiday.find({},function(err,data){
         if(data == null || data.length == 0){
             Holiday.create({
