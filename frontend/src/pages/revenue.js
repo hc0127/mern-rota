@@ -157,7 +157,7 @@ class Revenue extends Component {
             backgroundColor: 'rgb(160,160,160)',
           }),
         }
-      ];
+    ];
 
     return (
       <MDBContainer>

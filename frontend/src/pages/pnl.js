@@ -257,6 +257,8 @@ class PNL extends Component {
       });
       
       for(let month in monthNames){
+        if(revenue[month] == undefined){revenue[month] = 0}
+        if(payrollPerMonth[month] == undefined){payrollPerMonth[month] = 0}
         pnlDatas.push({
           month:month,
           revenue:revenue[month],
