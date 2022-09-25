@@ -73,13 +73,13 @@ class Sidebar extends Component{
               </SidebarHeader>
               <SidebarContent>
                 <Menu iconShape="square">
-                  <MenuItem icon={<FaHome className="text-primary" />}><NavLink to=''>DashBoard</NavLink></MenuItem>
-                  <MenuItem icon={<FaDatabase className="text-primary" />}><NavLink to='basic'>Staff</NavLink></MenuItem>
-                  <MenuItem icon={<FaUserNurse className="text-primary" />}><NavLink to='working'>Working Days</NavLink></MenuItem>
-                  <MenuItem icon={<FaWheelchair className="text-primary" />}><NavLink to='leave'>Leave Days</NavLink></MenuItem>
-                  <MenuItem icon={<FaClock className="text-primary"  />}><NavLink to='roaster'>Roaster</NavLink></MenuItem>
-                  <MenuItem icon={<FaBookMedical className="text-primary" />}><NavLink to='total'>Report</NavLink></MenuItem>
-                  <MenuItem icon={<FaRegMoneyBillAlt className="text-primary" />}><NavLink to='payroll'>PayRoll</NavLink></MenuItem>
+                  <MenuItem icon={<FaHome className="text-primary" />}><NavLink to='' onClick={this.menuIconClick}>DashBoard</NavLink></MenuItem>
+                  <MenuItem icon={<FaDatabase className="text-primary" />}><NavLink to='basic' onClick={this.menuIconClick}>Staff</NavLink></MenuItem>
+                  <MenuItem icon={<FaUserNurse className="text-primary" />}><NavLink to='working' onClick={this.menuIconClick}>Working Days</NavLink></MenuItem>
+                  <MenuItem icon={<FaWheelchair className="text-primary" />}><NavLink to='leave' onClick={this.menuIconClick}>Leave Days</NavLink></MenuItem>
+                  <MenuItem icon={<FaClock className="text-primary"  />}><NavLink to='roaster' onClick={this.menuIconClick}>Roaster</NavLink></MenuItem>
+                  <MenuItem icon={<FaBookMedical className="text-primary" />}><NavLink to='total' onClick={this.menuIconClick}>Report</NavLink></MenuItem>
+                  <MenuItem icon={<FaRegMoneyBillAlt className="text-primary" />}><NavLink to='payroll' onClick={this.menuIconClick}>PayRoll</NavLink></MenuItem>
                 </Menu>
               </SidebarContent>
               <SidebarFooter>

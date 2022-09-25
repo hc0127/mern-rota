@@ -103,10 +103,28 @@ class DashBoard extends Component {
       utilization:0
     }];
 
-    let daysInMonth = new Date(selYear, selMonth, 0).getDate();
+    let daysInMonth = new Date(selYear, selMonth, 0). getDate();
     let month = selMonth<10?+'0'+String(selMonth):selMonth;
     let from = selYear+'-'+month+'-01';
     let to = selYear+'-'+month+'-'+daysInMonth;
+
+    //get holidays per month
+    let holidays = basic.holidays;
+    let holidaysPerMonth = [];
+    holidays.map(holiday =>{
+      if(parseInt(holiday.slice(0,2)) == 1){
+        holidaysPerMonth.push(selYear+'-'+holiday);
+      }
+    });
+    //get sundays per month
+    let sundaysPerMonth = [];
+    let date = selYear+selMonth+'-01';
+    let firstDate = new Date(date).getDay();
+    if(firstDate == 0){firstDate = 7}
+    for(let selDay = 7- firstDate;selDay < daysInMonth;selDay+=7){
+      let day = selDay > 9?selDay:'0'+selDay;
+      sundaysPerMonth.push(selYear+'-'+selMonth+'-'+day);
+    }
 
     basic.nurses.map((nurse) =>{
       let nurseLevel = nurse.level;
@@ -118,9 +136,32 @@ class DashBoard extends Component {
             nurseDatas[2].assigned += rota.hour*1;
           }
         });
+
+        //get leavedays per month
+        let leaves = nurse.leave;
+        let leavedaysPerMonth = [];
+
+        for(let leave of leaves){
+          let from = new Date(leave.from);
+          let to = new Date(leave.to);
+          for(let betweenDay = from;betweenDay <= to;){
+            let year = betweenDay.getFullYear();
+            let month = betweenDay.getMonth()+1>9?betweenDay.getMonth()+1:'0'+(betweenDay.getMonth()+1);
+            let day = betweenDay.getDate()>9?betweenDay.getDate():'0'+betweenDay.getDate();
+            if(year == selYear && month == selMonth){
+              leavedaysPerMonth.push(year+'-'+month+'-'+day);
+            }
+            betweenDay.setDate(betweenDay.getDate() + 1);
+          }
+        }
+
+        let workingdays = [...leavedaysPerMonth,...holidaysPerMonth,...sundaysPerMonth];
+        console.log(nurse.level,workingdays.length);
+        workingdays = [...new Set(workingdays)];
+        nurseDatas[nurseLevel].available += (daysInMonth-workingdays.length)*8;
+        nurseDatas[2].available += (daysInMonth-workingdays.length)*8;
     });
     nurseDatas.map((nurseData) =>{
-        nurseData.available = nurseData.members * 208;
         nurseData.overtime = nurseData.assigned*1 - nurseData.available*1;
         nurseData.utilization = parseFloat(nurseData.assigned*1 / nurseData.available*1 * 100).toFixed(2) + '%';
     });

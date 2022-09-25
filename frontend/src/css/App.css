@@ -112,7 +112,15 @@ div#toast-container {
   color:red;
 }
 
-
+.payroll.hover{
+ cursor:pointer;
+}
+.payroll.hover:hover{
+  color:red;
+}
+.form-check-label{
+  color:black;
+}
 
 @keyframes App-logo-spin {
   from {

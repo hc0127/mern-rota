@@ -426,7 +426,7 @@ class Roaster extends Component {
     let holidays = basic.holidays;
     let holidaysPerMonth = [];
     holidays.map(holiday =>{
-      if(parseInt(holiday.slice(0,2)) == 1){
+      if(parseInt(holiday.slice(0,2)) == selMonth){
         holidaysPerMonth.push(selYear+'-'+holiday);
       }
     });
@@ -434,10 +434,10 @@ class Roaster extends Component {
     let sundaysPerMonth = [];
     let date = selYear+selMonth+'-01';
     let firstDate = new Date(date).getDay();
-    if(firstDate == 0){firstDate = 7}
+    if(firstDate == 0){firstDate = 1}else{firstDate = 7-firstDate+1}
     for(let selDay = 7- firstDate;selDay < daysInMonth;selDay+=7){
       let day = selDay > 9?selDay:'0'+selDay;
-      sundaysPerMonth.push(selYear+'-'+selMonth+'-'+day);
+      sundaysPerMonth.push(month+'-'+day);
     }
 
     if(isEditable){
@@ -465,7 +465,7 @@ class Roaster extends Component {
                 basic.nurses.map((nurse,index) =>{
                   
                 //get leavedays per month
-                let leaves = nurse.leave;
+                let leaves = nurse.leave?nurse.leave:[];
                 let leavedaysPerMonth = [];
 
                 for(let leave of leaves){
@@ -484,8 +484,7 @@ class Roaster extends Component {
 
                 let workingdays = [...leavedaysPerMonth,...holidaysPerMonth,...sundaysPerMonth];
                 workingdays = [...new Set(workingdays)];
-
-                  assignHour = (daysInMonth-workingdays.length)*8;
+                assignHour = (daysInMonth-workingdays.length)*8;
                   
                   basic.nurses.map((_nurse,index) =>{
                     if(_nurse._id == nurse._id){
@@ -710,8 +709,8 @@ class Roaster extends Component {
           <DataTable 
             columns={assignColumns} 
             data={assignDatas}
-            // fixedHeader
-            // fixedHeaderScrollHeight={'60vh'}
+            fixedHeader
+            fixedHeaderScrollHeight={'70vh'}
             conditionalRowStyles={conditionalRowStyles}
              />
         </div>

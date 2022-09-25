@@ -76,7 +76,7 @@ class Total extends Component {
       patientList[patient._id] = patient.name;
     });
 
-    let hours = [];
+    let hours = {};
     basic.nurses.map((nurse) =>{
       if(nurse._id == selNurse){
         nurse.rota.map((rota)=>{
@@ -102,6 +102,15 @@ class Total extends Component {
         };
         totalDatas.push(row);
       }
+      
+      let thour = Object.values(hours).reduce((a,b) => a+b,0);
+      
+      let total = {
+        date:'Total',
+        detail:'',
+        hour:thour
+      }
+      totalDatas.push(total);
     }
 
     //show all nurse data.

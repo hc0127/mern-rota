@@ -22,6 +22,9 @@ class LeaveDays extends Component {
     let month = date.getMonth()+1 > 9 ? date.getMonth()+1 : '0'+(date.getMonth()+1);
     let day = date.getDate() > 9 ? date.getDate() : '0'+date.getDate();
     this.state = {
+      selView:1,
+      selYear:year,
+      selMonth:date.getMonth()+1,
       from:year+'-'+month+'-'+day,
       to:year+'-'+month+'-'+day,
       selNurse:0,
@@ -60,6 +63,12 @@ class LeaveDays extends Component {
       selNurse:e.target.value,
     });
   }
+  onChangeView = (target,e) =>{
+    this.setState({
+      ...this.state,
+      [target]:e.target.value,
+    });
+  }
 
   addLeave = () =>{
     var _self = this;
@@ -86,7 +95,6 @@ class LeaveDays extends Component {
   }
 
   leaveModal = (isOpen,row) =>{
-    console.log(row);
     if(isOpen){
       this.setState({
         ...this.state,
@@ -138,28 +146,37 @@ class LeaveDays extends Component {
   }
   
   render() {
-    const {from,to,selNurse,modal,isOpen} = this.state;
+    const {from,to,selNurse,modal,isOpen,selView,selYear,selMonth} = this.state;
     const {basic} =this.props;
-    
-    const leaveColumns = [
-      {
-        name: "No",
-        center:true,
-        wrap:true,
-        selector: (row) => row.no,
-      },
-      {
-        name: "Staff ID",
-        center:true,
-        wrap:true,
-        selector: (row) => row.nurse_short_id,
-      },
-      {
-        name: "Staff Name",
-        center:true,
-        selector: (row) => row.name,
-      },
-      {
+
+    let leaveColumns = [];
+    leaveColumns.push(
+    {
+      name: "No",
+      center:true,
+      wrap:true,
+      selector: (row) => row.no,
+    },
+    {
+      name: "Image",
+      center:true,
+      wrap:true,
+      width:'70px',
+      cell: (row) => <img src={row.image} style={{width:'30px',height:'40px'}} />
+    },
+    {
+      name: "Staff ID",
+      center:true,
+      wrap:true,
+      selector: (row) => row.nurse_short_id,
+    },
+    {
+      name: "Staff Name",
+      center:true,
+      selector: (row) => row.name,
+    });
+    if(selView == 1){
+      leaveColumns.push({
         name: "Leave Start",
         center:true,
         wrap:true,
@@ -169,26 +186,36 @@ class LeaveDays extends Component {
         name: "Leave End",
         center:true,
         selector: (row) => row.leave_end,
-      },
-      {
-        name: "Leave Days",
+      });
+    }else{
+      leaveColumns.push({
+        name: "Leave Periods",
         center:true,
         wrap:true,
-        selector: (row) => row.leave_days,
-      },
-      {
-        name: "Daily Hours",
-        center:true,
-        wrap:true,
-        selector: (row) => row.daily_hours,
-      },
-      {
-        name: "Leave Hours",
-        center:true,
-        wrap:true,
-        selector: (row) => row.leave_hours,
-      },
-      {
+        width:'300px',
+        selector: (row) => row.leave_periods,
+      });
+    }
+    leaveColumns.push({
+      name: "Leave Days",
+      center:true,
+      wrap:true,
+      selector: (row) => row.leave_days,
+    },
+    {
+      name: "Daily Hours",
+      center:true,
+      wrap:true,
+      selector: (row) => row.daily_hours,
+    },
+    {
+      name: "Leave Hours",
+      center:true,
+      wrap:true,
+      selector: (row) => row.leave_hours,
+    });
+    if(selView == 1){
+      leaveColumns.push({
         name: "Action",
         center:true,
         wrap:true,
@@ -198,30 +225,67 @@ class LeaveDays extends Component {
           <MDBBtn outline size="sm" className='my-1 me-1' onClick={() =>this.removeLeave(row)}><FaTrash /></MDBBtn>
         </MDBBtnGroup>
         ]
-      }
-    ];
+      });
+    }
 
     let leaveDatas = [];
     let rowCount = 0;
     basic.nurses.map((nurse)=>{
+      let total_leave_days = 0;
+      let leave_periods = [];
       nurse.leave.map((leave) =>{
-        const from = new Date(leave.from);
-        const to = new Date(leave.to);
-        let leave_days = Math.ceil((to - from) / (1000 * 60 * 60 * 24))+1;
-        rowCount++;
-        leaveDatas.push({
-          no:rowCount,
-          nurse_id:nurse._id,
-          nurse_short_id:nurse._id.slice(20),
-          name:nurse.name,
-          leave_id:leave.leave_id,
-          leave_start:leave.from,
-          leave_end:leave.to,
-          leave_days:leave_days,
-          daily_hours:8,
-          leave_hours:8*leave_days
-        });
+        let month = selYear+'-'+(selMonth>9?selMonth:'0'+selMonth);
+        let daysInMonth = new Date(selYear,selMonth,0).getDate();
+        if(leave.from.startsWith(month) || leave.to.startsWith(month)){
+          let from = new Date(leave.from);
+          let to = new Date(leave.to);
+          let leave_days = Math.ceil((to - from) / (1000 * 60 * 60 * 24))+1;
+          if(selView == 2){
+            if(!leave.from.startsWith(month)){
+              leave_days = parseInt(leave.to.slice(8,10));
+              leave_periods.push('(1~'+parseInt(leave.to.slice(8))+")");
+            }else if(!leave.to.startsWith(month)){
+              leave_days = Math.ceil((new Date(selYear+'-'+selMonth+'-'+daysInMonth) - from) / (1000 * 60 * 60 * 24))+1;
+              leave_periods.push("("+parseInt(leave.from.slice(8))+'~'+daysInMonth+")");
+            }else{
+              leave_periods.push("("+parseInt(leave.from.slice(8))+'~'+parseInt(leave.to.slice(8))+")");
+            }
+            total_leave_days += leave_days;
+          }
+          if(selView == 1){
+            rowCount++;
+            leaveDatas.push({
+              no:rowCount,
+              image:nurse.image,
+              nurse_id:nurse._id,
+              nurse_short_id:nurse._id.slice(20),
+              name:nurse.name,
+              leave_id:leave.leave_id,
+              leave_start:leave.from,
+              leave_end:leave.to,
+              leave_days:leave_days,
+              daily_hours:8,
+              leave_hours:8*leave_days
+            });
+          }
+        }
       });
+      if(selView == 2){
+        if(total_leave_days != 0){
+          rowCount++;
+          leaveDatas.push({
+            no:rowCount,
+            image:nurse.image,
+            nurse_id:nurse._id,
+            nurse_short_id:nurse._id.slice(20),
+            name:nurse.name,
+            leave_periods:leave_periods.join(","),
+            leave_days:total_leave_days,
+            daily_hours:8,
+            leave_hours:8*total_leave_days
+          });
+        }
+      }
     });
 
     return (
@@ -256,7 +320,27 @@ class LeaveDays extends Component {
               <MDBBtn outline rounded  color='primary' onClick={() =>this.addLeave()}>Add Leave</MDBBtn>
             </MDBCol>
           </MDBRow>
-          <MDBRow className='mt-5'>   
+          <MDBRow className="mt-3 align-items-center justify-content-center">
+            <MDBCol md="2">
+              <Form.Group>
+                <Form.Select aria-label="nurse select" value={selView} onChange = {(e) =>this.onChangeView('selView',e)}>
+                <option value="1" >View Per Record</option>
+                <option value="2" >View Per Nurse</option>
+                </Form.Select>
+              </Form.Group>
+            </MDBCol>
+            <MDBCol md="2">
+              <Form.Group>
+                <Form.Control type="number" value={selYear} min = {2000} onChange = {(e) =>this.onChangeView('selYear',e)}/>
+              </Form.Group>
+            </MDBCol>
+            <MDBCol md="2">
+              <Form.Group>
+                <Form.Control type="number" value={selMonth} min={1} max={12} onChange = {(e) =>this.onChangeView('selMonth',e)}/>
+              </Form.Group>
+            </MDBCol>
+          </MDBRow>
+          <MDBRow className='mt-2'>   
             <DataTable
                 columns={leaveColumns} 
                 data={leaveDatas}

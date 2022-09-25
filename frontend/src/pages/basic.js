@@ -438,7 +438,7 @@ class Basic extends Component {
           name: "JoinDate",
           center:true,
           wrap:true,
-          selector: (row) => row.date,
+          selector: (row) => row.date.slice(0,10),
           sortable: true
         },
         {

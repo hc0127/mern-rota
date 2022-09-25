@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import {connect} from 'react-redux'
 import DataTable from 'react-data-table-component';
 import {
-  MDBCol,MDBContainer,MDBRow
+  MDBCol,MDBContainer,MDBRow,MDBBtn
 } from 'mdb-react-ui-kit';
 import {Form} from 'react-bootstrap';
 import toastr from 'toastr'
@@ -10,6 +10,7 @@ import 'toastr/build/toastr.min.css'
 import { read, utils } from 'xlsx';
 import axios from '../config/server.config'
 import { pAllUpd } from '../store/Actions/BasicAction';
+import { FaThemeisle } from 'react-icons/fa';
 
 class Revenue extends Component {
   constructor(props) {
@@ -19,40 +20,54 @@ class Revenue extends Component {
       let year = date.getFullYear();
       
       this.state = {
-        selYear:year
+        selYear:year,
+        file:''
       };
   }
   componentDidMount() {
   }
 
-  onImportPatients = (e,_self) =>{
+  onImportPatients = (e) =>{
     const files = e.target.files;
     if (files.length) {
         const file = files[0];
-        const reader = new FileReader();
-        reader.onload = (event) => {
-            const wb = read(event.target.result);
-            const sheets = wb.SheetNames;
-            let revenueSheet = sheets.indexOf('Revenue');
-            if(revenueSheet != -1){
-              const rows = utils.sheet_to_json(wb.Sheets[sheets[revenueSheet]]);
-              axios.post('patient/import',{
-                importData:rows
-              })
-              .then(function (response) {
-                let notFound = response.data.notFound;
-                let data = response.data;
-                if(notFound.length != 0){
-                  toastr.warning("Not Found These Patients:"+notFound.join(","));
-                }
-                _self.props.getImportData(data);
-              })
-              .catch(function (error) {
-                console.log(error);
-              });
+        this.setState({
+          ...this.state,
+          file:file
+        });
+    }
+  }
+  submit = () =>{
+    var _self = this;
+    console.log(this.state.file);
+    if(this.state.file){
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const wb = read(event.target.result);
+        const sheets = wb.SheetNames;
+        let revenueSheet = sheets.indexOf('Revenue');
+        if(revenueSheet != -1){
+          const rows = utils.sheet_to_json(wb.Sheets[sheets[revenueSheet]]);
+          axios.post('patient/import',{
+            importData:rows
+          })
+          .then(function (response) {
+            let notFound = response.data.notFound;
+            let data = response.data;
+            if(notFound.length != 0){
+              toastr.warning("Not Found These Patients:"+notFound.join(","));
             }
+            _self.props.getImportData(data);
+          })
+          .catch(function (error) {
+            console.log(error);
+          });
         }
-        reader.readAsArrayBuffer(file);
+      }
+      reader.readAsArrayBuffer(this.state.file);
+    }
+    else{
+      toastr.info("Please select import file!");
     }
   }
   onChangeYear = (e) =>{
@@ -159,6 +174,9 @@ class Revenue extends Component {
                 <Form.Group controlId="ImageInput">
                 <Form.Control type="file" accept=".xlsx" onChange={(e) =>this.onImportPatients(e,this)} />
                 </Form.Group>
+            </MDBCol>
+            <MDBCol md="2">
+              <MDBBtn outline rounded  color='primary' onClick={() =>this.submit()}>SUBMIT</MDBBtn>
             </MDBCol>
           </MDBRow>
           <MDBRow className='mt-2'>   

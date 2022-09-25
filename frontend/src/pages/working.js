@@ -61,7 +61,7 @@ class WorkingDays extends Component {
         selector: (row) => row.days,
       },
       {
-        name: "Normal Off days",
+        name: "Sundays",
         center:true,
         selector: (row) => row.sundays,
       },
@@ -139,10 +139,10 @@ class WorkingDays extends Component {
     //get sundays per month
     for(let selMonth in monthNumbers){
       let daysInMonth = new Date(selYear, selMonth, 0).getDate();
-      let date = selYear+selMonth+'-01';
+      let date = selYear+'-'+selMonth+'-01';
       let firstDate = new Date(date).getDay();
-      if(firstDate == 0){firstDate = 7}
-      for(let selDay = 7- firstDate;selDay < daysInMonth;selDay+=7){
+      if(firstDate == 0){firstDate = 1}else{firstDate = 7-firstDate+1}
+      for(let selDay = firstDate;selDay < daysInMonth;selDay+=7){
         let day = selDay > 9?selDay:'0'+selDay;
         
         let key = monthNumbers[selMonth];

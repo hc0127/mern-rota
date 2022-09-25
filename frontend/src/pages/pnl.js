@@ -5,6 +5,7 @@ import {
   MDBCol,MDBContainer,MDBRow
 } from 'mdb-react-ui-kit';
 import {Form} from 'react-bootstrap';
+import revenue from './revenue';
 
 class PNL extends Component {
   constructor(props) {
@@ -12,9 +13,12 @@ class PNL extends Component {
 
       let date = new Date();
       let year = date.getFullYear();
+      let month = date.getMonth()+1;
       
       this.state = {
-        selYear:year
+        selYear:year,
+        selMonth:month,
+        perPatient:false,
       };
   }
   componentDidMount() {
@@ -24,6 +28,18 @@ class PNL extends Component {
     this.setState({
       ...this.state,
       selYear:e.target.value,
+    });
+  }
+  onChangeMonth = (e) =>{
+    this.setState({
+      ...this.state,
+      selMonth:e.target.value,
+    });
+  }
+  viewPerPatient = (e) =>{
+    this.setState({
+      ...this.state,
+      perPatient:!this.state.perPatient
     });
   }
   getTotals(data, key){
@@ -43,23 +59,232 @@ class PNL extends Component {
   }
   
   render() {
-    const {selYear} = this.state;
+    const {selYear,selMonth,perPatient} = this.state;
     const {basic} =this.props;
 
     let monthNames = basic.monthNames;
     let monthNumbers = this.swap(monthNames);
     
-    let payrollColumns = [];
-    let payrollDatas = [];
+    let pnlColumns = [];
+    let pnlDatas = [];
+
+    if(perPatient){
+      pnlColumns.push({
+        name: "Patient",
+        center:true,
+        wrap:true,
+        selector: (row) => row.patient,
+      });
+    }else{
+      pnlColumns.push({
+        name: "Month",
+        center:true,
+        wrap:true,
+        selector: (row) => row.month,
+      });
+    }
+    pnlColumns.push({
+      name: "Revenue",
+      center:true,
+      wrap:true,
+      selector: (row) => row.revenue,
+    },{
+      name: "Payroll",
+      center:true,
+      wrap:true,
+      selector: (row) => row.payroll,
+    },{
+      name: "Profit/Loss",
+      center:true,
+      wrap:true,
+      selector: (row) => row.pnl,
+    });
+
+
+
+
+      //get holidays per month
+      let holidays = basic.holidays;
+      let holidaysPerMonth = [];
+      holidays.map(holiday =>{
+        let key = monthNumbers[holiday.slice(0,2)];
+        if(holidaysPerMonth[key] == undefined){holidaysPerMonth[key] = [];}
+        holidaysPerMonth[key].push(selYear+'-'+holiday);
+      });
+      //get sundays per month
+      let sundaysPerMonth = [];
+      for(let loopMonth in monthNumbers){
+        let daysInMonth = new Date(selYear, loopMonth, 0).getDate();
+        let date = selYear+loopMonth+'-01';
+        let firstDate = new Date(date).getDay();
+        if(firstDate == 0){firstDate = 1}else{firstDate = 7-firstDate+1}
+        for(let selDay = firstDate;selDay < daysInMonth;selDay+=7){
+          let day = selDay > 9?selDay:'0'+selDay;
+          let key = monthNumbers[loopMonth];
+          if(sundaysPerMonth[key] == undefined){sundaysPerMonth[key] = [];}
+          sundaysPerMonth[key].push(selYear+'-'+loopMonth+'-'+day);
+        }
+      }
+      //get payroll
+      let payrollPerMonth = []; 
+      let payrollPerPatient = [];
+      let payrollHourly = [];
+
+      basic.nurses.map((nurse) =>{
+        let salary = nurse.basic_allowances+nurse.housing_allowances+nurse.other_allowances;
+  
+        //leave days
+        let leaves = nurse.leave?nurse.leave:[];
+        let leavedaysPerMonth = [];
+        for(let leave of leaves){
+          let from = new Date(leave.from);
+          let to = new Date(leave.to);
+          for(let betweenDay = from;betweenDay <= to;){
+            let year = betweenDay.getFullYear();
+            let month = betweenDay.getMonth()+1>9?betweenDay.getMonth()+1:'0'+(betweenDay.getMonth()+1);
+            let day = betweenDay.getDate()>9?betweenDay.getDate():'0'+betweenDay.getDate();
+            if(year == selYear){
+              let key = monthNumbers[month];
+              if(leavedaysPerMonth[key] == undefined){leavedaysPerMonth[key] = [];}
+              leavedaysPerMonth[key].push(year+'-'+month+'-'+day);
+            }
+            betweenDay.setDate(betweenDay.getDate() + 1);
+          }
+        }
+        //rota hours per month
+        let rotas = nurse.rota;
+        let rotaPerMonth = [];
+        rotas.map(rota =>{
+          if(rota.date.startsWith(selYear)){
+            let month = monthNumbers[[rota.date.slice(5,7)]];
+            if(rotaPerMonth[month] == undefined){
+              rotaPerMonth[month] = rota.hour;
+            }else{
+              rotaPerMonth[month] += rota.hour;
+            }
+            if(parseInt(rota.date.slice(5,7)) == selMonth){
+              if(payrollPerPatient[rota.patient_id] == undefined){payrollPerPatient[rota.patient_id] = []}
+              if(payrollPerPatient[rota.patient_id][nurse._id] == undefined){
+                payrollPerPatient[rota.patient_id][nurse._id] = rota.hour
+              }else{
+                payrollPerPatient[rota.patient_id][nurse._id] += rota.hour
+              }
+              console.log(payrollPerPatient);
+            }
+          }
+        });
+        //datatable set
+        let offDaysPerMonth = [];
+        let dutyHoursPerMonth = [];
+
+        for(let loopMonth in monthNames){
+          let daysInMonth = new Date(selYear, monthNames[loopMonth], 0).getDate();
+          if(leavedaysPerMonth[loopMonth] == undefined){leavedaysPerMonth[loopMonth] = [];}
+          if(holidaysPerMonth[loopMonth] == undefined){holidaysPerMonth[loopMonth] = [];}
+          if(sundaysPerMonth[loopMonth] == undefined){sundaysPerMonth[loopMonth] = [];}
+          
+          offDaysPerMonth[loopMonth] = [...leavedaysPerMonth[loopMonth],...holidaysPerMonth[loopMonth],...sundaysPerMonth[loopMonth]];
+          offDaysPerMonth[loopMonth] = [...new Set(offDaysPerMonth[loopMonth])];
+          dutyHoursPerMonth[loopMonth] = (daysInMonth-offDaysPerMonth[loopMonth].length)*8;
+  
+          if(rotaPerMonth[loopMonth] == undefined){rotaPerMonth[loopMonth] = 0;}
+          if(payrollPerMonth[loopMonth] == undefined){payrollPerMonth[loopMonth] = 0;}
+          
+          if(rotaPerMonth[loopMonth]){
+            if(dutyHoursPerMonth[loopMonth] < rotaPerMonth[loopMonth]){
+              let overtime = rotaPerMonth[loopMonth] - dutyHoursPerMonth[loopMonth];
+              let basicPerDay = parseFloat(nurse.basic_allowances*15/365/8);
+              let holidayPerDay = parseInt(nurse.basic_allowances*18/365/8);
+              
+              salary += parseInt(basicPerDay*overtime);
+            }
+            payrollPerMonth[loopMonth] += salary;
+            if(parseInt(monthNames[loopMonth]) == selMonth){
+              payrollHourly[nurse._id] = parseFloat(salary/rotaPerMonth[loopMonth]);
+            }
+          }
+        }
+      });
+  
+
+
+    if(perPatient){
+      basic.patients.map(patient =>{
+        let revenue = 0;
+        let payroll = 0;
+        let pnl = 0;
+        for(let month in patient.revenue){
+          if(month.slice(4,6) == selYear%100 && parseInt(monthNames[month.slice(0,3)]) == selMonth){
+            revenue = patient.revenue[month];
+          }
+        }
+        if(payrollPerPatient[patient._id] == undefined){
+          payroll = 0;
+        }else{
+          for(let loopNurse in payrollPerPatient[patient._id]){
+            payroll += parseInt(payrollPerPatient[patient._id][loopNurse] * payrollHourly[loopNurse]);
+          }
+        }
+          
+        pnlDatas.push({
+          patient:patient.name,
+          revenue:revenue,
+          payroll:payroll,
+          pnl:revenue-payroll
+        });
+        
+      });
+
+      let row={};
+      row.patient = "Total";
+      row.revenue = this.getTotals(pnlDatas,'revenue');
+      row.payroll = this.getTotals(pnlDatas,'payroll');
+      row.pnl = this.getTotals(pnlDatas,'pnl');
+      pnlDatas.push(row);
+    }else{
+      let revenue = [];
+      basic.patients.map(patient =>{
+          for(let month in patient.revenue){
+            if(month.slice(4,6) == selYear%100){
+              let m = month.slice(0,3);
+              revenue[m] == undefined 
+              ?
+              revenue[m] = patient.revenue[month]
+              :
+              revenue[m] += patient.revenue[month];
+            }
+          }
+      });
+      
+      for(let month in monthNames){
+        pnlDatas.push({
+          month:month,
+          revenue:revenue[month],
+          payroll:payrollPerMonth[month],
+          pnl:revenue[month]-payrollPerMonth[month],
+        });
+      }
+
+      let row={};
+      revenue = Object.values(revenue).reduce((a,b) => a+b,0)
+      let payroll = Object.values(payrollPerMonth).reduce((a,b) => a+b,0);
+      let pnl = revenue - payroll
+      row.month = 'Total';
+      row.revenue = revenue
+      row.payroll = payroll
+      row.pnl = pnl
+      
+      pnlDatas.push(row);
+    }
 
     const conditionalRowStyles = [
         {
-          when: (row) => row.nurse == 'total',
+          when: (row) => row.month == 'Total' || row.patient == 'Total',
           style: row => ({
             backgroundColor: 'rgb(160,160,160)',
           }),
         }
-      ];
+    ];
 
     return (
       <MDBContainer>
@@ -72,16 +297,31 @@ class PNL extends Component {
                 <Form.Control type="number" value={selYear} placeholder="Year" onChange = {(e) =>this.onChangeYear(e)}/>
               </Form.Group>
             </MDBCol>
+            {perPatient &&
+            <MDBCol md="2">
+                <Form.Group>
+                  <Form.Control type="number" value={selMonth} min={1} max={12} onChange = {(e) =>this.onChangeMonth(e)}/>
+                </Form.Group>
+            </MDBCol>
+            }
+            <MDBCol md="2">
+              <Form.Check 
+                checked ={perPatient}
+                type="checkbox"
+                label="Per Patient"
+                onChange = {(e) => this.viewPerPatient(e)}
+              />
+            </MDBCol>
           </MDBRow>
           <MDBRow className='mt-2'>   
             <DataTable
-                columns={payrollColumns} 
-                data={payrollDatas}
+                columns={pnlColumns} 
+                data={pnlDatas}
                 fixedHeader
                 striped
                 conditionalRowStyles={conditionalRowStyles}
                 fixedHeaderScrollHeight={'60vh'}
-                pagination
+                // pagination
             />
           </MDBRow>
       </MDBContainer>
@@ -92,4 +332,5 @@ class PNL extends Component {
 const mapStateToProps = (BasicData) => ({
   basic:BasicData.BasicData
 });
+
 export default connect(mapStateToProps,null)(PNL)
