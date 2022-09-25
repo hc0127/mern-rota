@@ -1,4 +1,4 @@
-# MernStack-rota(live:.cid.b7619ec3b3e4fc6e)
+# MernStack-rota
 This project is rota system for hospital.
 My Rota System consists of 3 pages - basic data,assign and report, total
 
