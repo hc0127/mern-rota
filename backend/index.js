@@ -7,7 +7,9 @@ require('dotenv').config()
 const PORT = 4000;
 
 app.use(cors({ origin: true }));
-app.use(bodyParser.json());
+
+app.use(bodyParser.json({limit: '10mb', extended: true}))
+app.use(bodyParser.urlencoded({limit: '10mb', extended: true}))
 
 mongoose.connect('mongodb://127.0.0.1:27017', { useNewUrlParser: true });
 const connection = mongoose.connection;
@@ -15,10 +17,6 @@ const connection = mongoose.connection;
 connection.once('open', function() {
     console.log("MongoDB database connection established successfully");
 })
-
-// app.use('/api', proxy(process.env.API_ENDPOINT || 'http://localhost:3000', {
-//   limit: '10mb'
-// ));
 
 app.use("/basic",require("./routes/basic"));
 app.use("/nurse", require("./routes/basic/nurse"));
