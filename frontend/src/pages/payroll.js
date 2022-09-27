@@ -73,7 +73,7 @@ class PayRoll extends Component {
             </Tooltip>
           }
         >
-          <p className="payroll hover">{row[month]}</p>
+          <p className="payroll hover">{row[month].toLocaleString('en')}</p>
         </OverlayTrigger>
       });
     }
@@ -82,7 +82,7 @@ class PayRoll extends Component {
       name: "Total",
       center:true,
       wrap:true,
-      selector: (row) => row['total'],
+      selector: (row) => row['total'].toLocaleString('en'),
     });
 
     let payrollDatas = [];

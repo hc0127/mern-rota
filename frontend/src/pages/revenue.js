@@ -112,14 +112,14 @@ class Revenue extends Component {
         center:true,
         wrap:true,
         width:'75px',
-        selector: (row) => row[month],
+        selector: (row) => row[month].toLocaleString('en'),
       });
     }
     revenueColumns.push({
       name: "Total",
       center:true,
       wrap:true,
-      selector: (row) => row.total,
+      selector: (row) => row.total.toLocaleString('en'),
     });
 
     let revenueDatas = [];
