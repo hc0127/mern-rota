@@ -208,8 +208,6 @@ class PNL extends Component {
               let overtime = rotaPerMonth[loopMonth] - dutyHoursPerMonth[loopMonth];
               let holidayovertime = 0;
 
-              console.log(rotaPerMonth[loopMonth],dutyHoursPerMonth[loopMonth]);
-
               if(rotaHolidayPerMonth[loopMonth] != undefined){
                 if(overtime <= rotaHolidayPerMonth[loopMonth]){
                   holidayovertime = overtime;
