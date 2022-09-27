@@ -296,9 +296,9 @@ class PNL extends Component {
       let payroll = Object.values(payrollPerMonth).reduce((a,b) => a+b,0);
       let pnl = revenue - payroll
       row.month = 'Total';
-      row.revenue = revenue
-      row.payroll = payroll
-      row.pnl = pnl
+      row.revenue = revenue;
+      row.payroll = payroll;
+      row.pnl = pnl;
       
       pnlDatas.push(row);
     }
