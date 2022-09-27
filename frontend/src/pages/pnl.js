@@ -87,17 +87,17 @@ class PNL extends Component {
       name: "Revenue",
       center:true,
       wrap:true,
-      selector: (row) => row.revenue?row.revenue.toLocaleString('en'):'',
+      selector: (row) => row.revenue?row.revenue.toLocaleString('en'):0,
     },{
       name: "Payroll",
       center:true,
       wrap:true,
-      selector: (row) => row.payroll?row.payroll.toLocaleString('en'):'',
+      selector: (row) => row.payroll?row.payroll.toLocaleString('en'):0,
     },{
       name: "Profit/Loss",
       center:true,
       wrap:true,
-      selector: (row) => row.pnl?row.pnl.toLocaleString('en'):'',
+      selector: (row) => row.pnl?row.pnl.toLocaleString('en'):0,
     });
 
 
