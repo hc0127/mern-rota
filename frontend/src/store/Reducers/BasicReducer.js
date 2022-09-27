@@ -102,7 +102,7 @@ export default function BasicReducer(state = initialState, action) {
       state.patients = action.patients;
       return {
         ...state,
-        nurses:[...state.patients],
+        patients:[...state.patients],
       };
     case LINSERT:
       return {
