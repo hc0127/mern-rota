@@ -39,7 +39,6 @@ class Revenue extends Component {
   }
   submit = () =>{
     var _self = this;
-    console.log(this.state.file);
     if(this.state.file){
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -60,7 +59,6 @@ class Revenue extends Component {
             _self.props.getImportData(data);
           })
           .catch(function (error) {
-            console.log(error);
           });
         }
       }
@@ -112,14 +110,14 @@ class Revenue extends Component {
         center:true,
         wrap:true,
         width:'75px',
-        selector: (row) => row[month].toLocaleString('en'),
+        selector: (row) => row[month]?row[month].toLocaleString('en'):'',
       });
     }
     revenueColumns.push({
       name: "Total",
       center:true,
       wrap:true,
-      selector: (row) => row.total.toLocaleString('en'),
+      selector: (row) => row.total?row.total.toLocaleString('en'):'',
     });
 
     let revenueDatas = [];

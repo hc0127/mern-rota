@@ -87,17 +87,17 @@ class PNL extends Component {
       name: "Revenue",
       center:true,
       wrap:true,
-      selector: (row) => row.revenue.toLocaleString('en'),
+      selector: (row) => row.revenue?row.revenue.toLocaleString('en'):'',
     },{
       name: "Payroll",
       center:true,
       wrap:true,
-      selector: (row) => row.payroll.toLocaleString('en'),
+      selector: (row) => row.payroll?row.payroll.toLocaleString('en'):'',
     },{
       name: "Profit/Loss",
       center:true,
       wrap:true,
-      selector: (row) => row.pnl.toLocaleString('en'),
+      selector: (row) => row.pnl?row.pnl.toLocaleString('en'):'',
     });
 
 
@@ -244,7 +244,6 @@ class PNL extends Component {
           payroll = 0;
         }else{
           for(let loopNurse in payrollPerPatient[patient._id]){
-            console.log(patient.name,payrollPerPatient[patient._id][loopNurse],payrollHourly[loopNurse]);
             payroll += parseFloat(payrollPerPatient[patient._id][loopNurse] * payrollHourly[loopNurse]);
           }
           payrollTotal += payroll;
@@ -252,7 +251,7 @@ class PNL extends Component {
           
         pnlDatas.push({
           patient:patient.name,
-          revenue:revenue,
+          revenue:parseInt(revenue),
           payroll:parseInt(payroll),
           pnl:revenue-parseInt(payroll)
         });
