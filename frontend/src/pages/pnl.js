@@ -246,6 +246,7 @@ class PNL extends Component {
           payroll = 0;
         }else{
           for(let loopNurse in payrollPerPatient[patient._id]){
+            console.log(patient.name,payrollPerPatient[patient._id][loopNurse],payrollHourly[loopNurse]);
             payroll += parseFloat(payrollPerPatient[patient._id][loopNurse] * payrollHourly[loopNurse]);
           }
           payrollTotal += payroll;
