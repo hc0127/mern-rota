@@ -168,7 +168,7 @@ class PayRoll extends Component {
           offDaysPerMonth[selMonth] = [...new Set(offDaysPerMonth[selMonth])];
           dutyHoursPerMonth[selMonth] = (daysInMonth-offDaysPerMonth[selMonth].length)*8;
           if(rotaPerMonth[selMonth] == undefined){rotaPerMonth[selMonth] = 0;}
-          if(dutyHoursPerMonth[selMonth] >= rotaPerMonth[selMonth]){
+          if(dutyHoursPerMonth[selMonth] >= rotaPerMonth[selMonth] && rotaPerMonth[selMonth] >= 192){
             payrollPerMonth[selMonth] = salary;
             payrollCommentPerMonth[selMonth] = comment;
           }else{
