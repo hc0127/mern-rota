@@ -23,7 +23,7 @@ height: 100%;
 cursor: pointer;
 &.active {
 	color: white;
-	background-color: #0088ff;
+	background-color: #32a852;
 }
 `;
 
@@ -59,7 +59,7 @@ class Navbar extends Component{
 	render(){
 		const {isLoading} = this.state;
 		return (
-			<MDBNavbar  expand='lg'  fixed='top' bgColor='primary'>
+			<MDBNavbar  expand='lg'  fixed='top' bgColor='success'>
 				<ReactLoading type={"bubbles"} style={{display:isLoading?"block":"none",position:'fixed',top:'50vh',left:'50vw',width:'100px'}}/>
 				<MDBContainer fluid>
 					<NavBrand href='/' style={{marginLeft:'25px'}}>
@@ -78,7 +78,7 @@ class Navbar extends Component{
 						<MDBNavbarNav className='me-auto mb-2 mb-lg-0'>
 							<NavItem>
 								<NavLink aria-current='page' to='basic'>
-								Staff
+								Registration
 								</NavLink>
 							</NavItem>
 							<NavItem>

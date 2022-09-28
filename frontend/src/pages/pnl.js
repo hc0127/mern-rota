@@ -204,7 +204,9 @@ class PNL extends Component {
             let basicPerDay = parseFloat(nurse.basic_allowances*15/365/8);
             let holidayPerDay = parseFloat(nurse.basic_allowances*18/365/8);
 
-            if(dutyHoursPerMonth[loopMonth] < rotaPerMonth[loopMonth]  && rotaPerMonth[loopMonth] >= 192){
+            if(dutyHoursPerMonth[loopMonth] < rotaPerMonth[loopMonth] 
+              //  && rotaPerMonth[loopMonth] >= 192
+               ){
               let overtime = rotaPerMonth[loopMonth] - dutyHoursPerMonth[loopMonth];
               let holidayovertime = 0;
 

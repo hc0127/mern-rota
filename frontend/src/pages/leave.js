@@ -8,6 +8,7 @@ import {
 } from 'mdb-react-ui-kit';
 import {Form,Modal} from 'react-bootstrap';
 import { FaEdit,FaTrash } from "react-icons/fa";
+import {Autocomplete} from "react-autocomplete";
 
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
@@ -25,13 +26,17 @@ class LeaveDays extends Component {
       selView:1,
       selYear:year,
       selMonth:date.getMonth()+1,
+
       from:year+'-'+month+'-'+day,
       to:year+'-'+month+'-'+day,
+      selFilter:'',
       selNurse:0,
+      selType:1,
       isOpen:false,
       modal:{
         nurse_id:'',
         leave_id:'',
+        type:'',
         from:'',
         to:'',
       }
@@ -40,7 +45,6 @@ class LeaveDays extends Component {
 
   componentDidMount() {
   }
-
   setDate = (target,e) =>{
     this.setState({
       ...this.state,
@@ -57,10 +61,30 @@ class LeaveDays extends Component {
     });
   }
 
-  onChangeNurse = (e) =>{
+  filterChange = (e) =>{
+    this.setState({
+      ...this.state,
+      selFilter:e.target.value,
+    });
+  }
+
+  nurseSelect = (e) =>{
     this.setState({
       ...this.state,
       selNurse:e.target.value,
+    });
+  }
+
+  // onChangeNurse = (e) =>{
+  //   this.setState({
+  //     ...this.state,
+  //     selNurse:e.target.value,
+  //   });
+  // }
+  onChangeType = (e) =>{
+    this.setState({
+      ...this.state,
+      selType:e.target.value,
     });
   }
   onChangeView = (target,e) =>{
@@ -72,7 +96,7 @@ class LeaveDays extends Component {
 
   addLeave = () =>{
     var _self = this;
-    const {selNurse,from,to} = this.state;
+    const {selNurse,selType,from,to} = this.state;
     if(selNurse == 0){
       toastr.info("Please select nurse!");
     }else{
@@ -82,6 +106,7 @@ class LeaveDays extends Component {
       
       axios.post('leave/add',{
         nurse_id:selNurse,
+        type:selType,
         from:from,
         to:to,
       })
@@ -102,6 +127,7 @@ class LeaveDays extends Component {
         modal:{
           nurse_id:row.nurse_id,
           leave_id:row.leave_id,
+          type:row.type,
           from:row.leave_start,
           to:row.leave_end,
         }
@@ -146,7 +172,9 @@ class LeaveDays extends Component {
   }
   
   render() {
-    const {from,to,selNurse,modal,isOpen,selView,selYear,selMonth} = this.state;
+    const {from,to,selNurse,selType,modal,isOpen,selView,selYear,selMonth
+      ,selFilter
+    } = this.state;
     const {basic} =this.props;
 
     let leaveColumns = [];
@@ -296,13 +324,39 @@ class LeaveDays extends Component {
           <MDBRow className=" align-items-center justify-content-center">
             <MDBCol md="2">
               <Form.Group>
-                <Form.Select aria-label="nurse select" value={selNurse} onChange = {(e) =>this.onChangeNurse(e)}>
+                {/* <Form.Select aria-label="nurse select" value={selNurse} onChange = {(e) =>this.onChangeNurse(e)}>
                 <option value="0" >Select Nurse</option>
                 {
                   basic.nurses.map((value,index) =>{
                     return <option key = {index} value={value._id}>{value.name}</option>
                   })
                 }
+                </Form.Select> */}
+                <Autocomplete
+                  // getItemValue={(item) => item.label}
+                  // items={[
+                  //   { label: 'apple' },
+                  //   { label: 'banana' },
+                  //   { label: 'pear' }
+                  // ]}
+                  // renderItem={(item, isHighlighted) =>
+                  //   <div style={{ background: isHighlighted ? 'lightgray' : 'white' }}>
+                  //     {item.label}
+                  //   </div>
+                  // }
+                  // value={selFilter}
+                  // onChange={(e) => this.filterChange(e)}
+                  // onSelect={(e) => this.nurseSelect(e)}
+                />
+              </Form.Group>
+            </MDBCol>
+            <MDBCol md="2">
+              <Form.Group>
+                <Form.Select aria-label="nurse select" value={selType} onChange = {(e) =>this.onChangeType(e)}>
+                <option value="1" >Annual leave</option>
+                <option value="2" >sick leave</option>
+                <option value="3" >Maternity leave</option>
+                <option value="4" >Other Leave</option>
                 </Form.Select>
               </Form.Group>
             </MDBCol>
@@ -339,6 +393,11 @@ class LeaveDays extends Component {
                 <Form.Control type="number" value={selMonth} min={1} max={12} onChange = {(e) =>this.onChangeView('selMonth',e)}/>
               </Form.Group>
             </MDBCol>
+            {/* <MDBCol md="2">
+              <Form.Group>
+                <Form.Control type="text" value={selFilter} placeholder={"Search..."} onChange = {(e) =>this.onChangeView('selFilter',e)}/>
+              </Form.Group>
+            </MDBCol> */}
           </MDBRow>
           <MDBRow className='mt-2'>   
             <DataTable

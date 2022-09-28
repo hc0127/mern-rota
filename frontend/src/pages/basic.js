@@ -27,6 +27,7 @@ class Basic extends Component {
             address:'',
             image:'',
             cell:'',
+            code:'',
             country:'',
             experience:'',
             date:'',
@@ -44,6 +45,7 @@ class Basic extends Component {
             address:'',
             image:'',
             cell:'',
+            leve:'',
           }
         },level:{
           open:false,
@@ -102,7 +104,7 @@ class Basic extends Component {
     const _self = this;
     const {nurse} = this.state;
     const values =  Object.values(nurse.modal).filter(e =>  e).length;
-    if(values < 12){
+    if(values < 13){
       toastr.options = {
         positionClass : 'toast-top-full-width',
         hideDuration: 300,
@@ -210,7 +212,7 @@ class Basic extends Component {
     const _self = this;
     const {patient} = this.state;
     const values =  Object.values(patient.modal).filter(e =>  e).length;
-    if(values < 4){
+    if(values < 5){
       toastr.options = {
         positionClass : 'toast-top-full-width',
         hideDuration: 300,
@@ -275,94 +277,94 @@ class Basic extends Component {
     });
   }
   //Level Manage
-  levelModal = (open,data)  =>{
-    if(data !== null && data != undefined){
-      this.setState({
-        level:{
-          ...this.state.level,
-          open:open,
-          action_id:data._id,
-          modal:{
-            ...this.state.level.modal,
-            ...data
-          }
-        }
-      }); 
-    }else{
-      this.setState({
-        level:{
-          ...this.state.level,
-          open:open,
-          action_id:'0',
-          modal:{
-          }
-        }
-      });
-    }
-  }
-  removeLevel = (data) =>{
-    const _self = this;
-    axios.post('level/remove',{
-      _id:data._id
-    })
-    .then(function (response) {
-      const _id = response.data._id;
-      _self.props.levelRemove(_id);
-    })
-    .catch(function (error) {
-      console.log(error);
-    });
-  }
-  levelConfirm = () =>{
-    const _self = this;
-    const {level} = this.state;
-    const values =  Object.values(level.modal).filter(e =>  e).length;
-    if(values < 2){
-      toastr.options = {
-        positionClass : 'toast-top-full-width',
-        hideDuration: 300,
-        timeOut: 3000
-      }
-      toastr.clear()
-      setTimeout(() => toastr.info('please input correct!'), 300)
-    }else{
-      this.setState({
-        ...this.state,
-        level:{
-          ...this.state.level,
-          open:false,
-          level:{}
-        }
-      });
+  // levelModal = (open,data)  =>{
+  //   if(data !== null && data != undefined){
+  //     this.setState({
+  //       level:{
+  //         ...this.state.level,
+  //         open:open,
+  //         action_id:data._id,
+  //         modal:{
+  //           ...this.state.level.modal,
+  //           ...data
+  //         }
+  //       }
+  //     }); 
+  //   }else{
+  //     this.setState({
+  //       level:{
+  //         ...this.state.level,
+  //         open:open,
+  //         action_id:'0',
+  //         modal:{
+  //         }
+  //       }
+  //     });
+  //   }
+  // }
+  // removeLevel = (data) =>{
+  //   const _self = this;
+  //   axios.post('level/remove',{
+  //     _id:data._id
+  //   })
+  //   .then(function (response) {
+  //     const _id = response.data._id;
+  //     _self.props.levelRemove(_id);
+  //   })
+  //   .catch(function (error) {
+  //     console.log(error);
+  //   });
+  // }
+  // levelConfirm = () =>{
+  //   const _self = this;
+  //   const {level} = this.state;
+  //   const values =  Object.values(level.modal).filter(e =>  e).length;
+  //   if(values < 2){
+  //     toastr.options = {
+  //       positionClass : 'toast-top-full-width',
+  //       hideDuration: 300,
+  //       timeOut: 3000
+  //     }
+  //     toastr.clear()
+  //     setTimeout(() => toastr.info('please input correct!'), 300)
+  //   }else{
+  //     this.setState({
+  //       ...this.state,
+  //       level:{
+  //         ...this.state.level,
+  //         open:false,
+  //         level:{}
+  //       }
+  //     });
       
-      axios.post('level/add',{
-        ...this.state.level.modal,id:this.state.level.action_id
-      })
-      .then(function (response) {
-        const res = response.data;
-        const data = res.data;
-        if(res.state === 'insert'){
-          _self.props.levelInsert(data);
-        }else{
-          _self.props.levelUpdate(data);
-        }
-      })
-      .catch(function (error) {
-        console.log(error);
-      });
-    }
-  }
-  levelModalChange = (target,e) =>{
-    this.setState({
-      level:{
-        ...this.state.level,
-        modal:{
-          ...this.state.level.modal,
-          [target]:e.target.value
-        }
-      }
-    });
-  }
+  //     axios.post('level/add',{
+  //       ...this.state.level.modal,id:this.state.level.action_id
+  //     })
+  //     .then(function (response) {
+  //       const res = response.data;
+  //       const data = res.data;
+  //       if(res.state === 'insert'){
+  //         _self.props.levelInsert(data);
+  //       }else{
+  //         _self.props.levelUpdate(data);
+  //       }
+  //     })
+  //     .catch(function (error) {
+  //       console.log(error);
+  //     });
+  //   }
+  // }
+  // levelModalChange = (target,e) =>{
+  //   this.setState({
+  //     level:{
+  //       ...this.state.level,
+  //       modal:{
+  //         ...this.state.level.modal,
+  //         [target]:e.target.value
+  //       }
+  //     }
+  //   });
+  // }
   //Holiday Manage
   onChangeHoliday = (i,row) =>{
     const {basic} = this.props;
@@ -454,8 +456,8 @@ class Basic extends Component {
           sortable: false,
           cell: (d) => [
             <MDBBtnGroup key={d._id}>
-              <MDBBtn outline className='my-1 ms-1' size="sm" onClick={() =>this.nurseModal(true,d)}><FaEdit /></MDBBtn>
-              <MDBBtn outline className='my-1 me-1' size="sm" onClick={() =>this.removeNurse(d)}><FaTrash /></MDBBtn>
+              <MDBBtn outline color="success" className='my-1 ms-1' size="sm" onClick={() =>this.nurseModal(true,d)}><FaEdit /></MDBBtn>
+              <MDBBtn outline color="success" className='my-1 me-1' size="sm" onClick={() =>this.removeNurse(d)}><FaTrash /></MDBBtn>
             </MDBBtnGroup>
           ]
         }
@@ -497,8 +499,8 @@ class Basic extends Component {
           sortable: false,
           cell: (d) => [
             <MDBBtnGroup  key={d._id}>
-              <MDBBtn outline  className='my-1 ms-1' size="sm" onClick={() =>this.patientModal(true,d)}><FaEdit /></MDBBtn>
-              <MDBBtn outline  className='my-1 me-1' size="sm" onClick={() =>this.removePatient(d)}><FaTrash /></MDBBtn>
+              <MDBBtn outline color="success" className='my-1 ms-1' size="sm" onClick={() =>this.patientModal(true,d)}><FaEdit /></MDBBtn>
+              <MDBBtn outline  color="success" className='my-1 me-1' size="sm" onClick={() =>this.removePatient(d)}><FaTrash /></MDBBtn>
             </MDBBtnGroup>
           ]
         }
@@ -522,8 +524,8 @@ class Basic extends Component {
           center:true,
           cell: (d) => [
             <MDBBtnGroup key={d._id}>
-              <MDBBtn outline  className='my-1 ms-1' size="sm" onClick={() =>this.levelModal(true,d)}><FaEdit /></MDBBtn>
-              <MDBBtn outline  className='my-1 me-1' size="sm" onClick={() =>this.removeLevel(d)}><FaTrash /></MDBBtn>
+              <MDBBtn outline color="success" className='my-1 ms-1' size="sm" onClick={() =>this.levelModal(true,d)}><FaEdit /></MDBBtn>
+              <MDBBtn outline  color="success" className='my-1 me-1' size="sm" onClick={() =>this.removeLevel(d)}><FaTrash /></MDBBtn>
             </MDBBtnGroup>
           ]
         }
@@ -537,13 +539,15 @@ class Basic extends Component {
         name: "Month",
         center:true,
         wrap:true,
+        width:'70px',
+        padding:'3px',
         selector: (row) => row.month,
       });
       for(let i = 1 ; i <= 31;i++){
         holidayColumns.push({
           name: i,
           center:true,
-          width:'50px',
+          width:'2.4vw',
           wrap:true,
           cell: (row) => 
           <Form.Check
@@ -590,13 +594,13 @@ class Basic extends Component {
       return (
           <MDBContainer>
               <div className="pt-5 text-center text-dark">
-                <h1 className="mt-3">BASIC DATA</h1>
+                <h1 className="mt-3">Registration</h1>
               </div>
               <MDBRow>
                 <MDBCol>
                     <Tabs id="basic_tab">
                         <Tab eventKey="nurse" key={1} title="nurse" className='p-2'>
-                          <MDBBtn outline rounded  color='primary' onClick={() => this.nurseModal(true,null)}>Add Nurse</MDBBtn>
+                          <MDBBtn outline rounded  color='success' onClick={() => this.nurseModal(true,null)}>Add Nurse</MDBBtn>
                           <div className='p-2'>
                             <DataTable
                               id="nurseTable"
@@ -612,7 +616,7 @@ class Basic extends Component {
                         <Tab eventKey="patient" key={2} title="patient" className='p-2'>
                           <MDBRow>
                             <MDBCol>
-                              <MDBBtn  outline rounded  color='primary' onClick={() => this.patientModal(true)}>Add Patient</MDBBtn>
+                              <MDBBtn  outline rounded  color='success' onClick={() => this.patientModal(true)}>Add Patient</MDBBtn>
                             </MDBCol>
                           </MDBRow>
                           <div className='p-2'>
@@ -624,8 +628,8 @@ class Basic extends Component {
                               pagination/>
                           </div>
                         </Tab>
-                        <Tab eventKey="level" key={3} title="level" className='p-2'>
-                          <MDBBtn outline rounded  color='primary' onClick={() => this.levelModal(true)}>Add Level</MDBBtn>
+                        {/* <Tab eventKey="level" key={3} title="level" className='p-2'>
+                          <MDBBtn outline rounded  color='success' onClick={() => this.levelModal(true)}>Add Level</MDBBtn>
                           <div className='p-2'>
                             <DataTable 
                               columns={levelColumns} 
@@ -634,10 +638,11 @@ class Basic extends Component {
                               fixedHeaderScrollHeight={'65vh'}
                               pagination />
                           </div>
-                        </Tab>
-                        <Tab eventKey="holiday" key={4} title="holiday" className='p-2'>
+                        </Tab> */}
+                        <Tab eventKey="holiday" key={3} title="holiday" className='p-2'>
                           <MDBRow>
                             <DataTable
+                              id="holidayTable"
                               fixedHeader 
                               fixedHeaderScrollHeight={'70vh'}
                               columns={holidayColumns}
@@ -687,12 +692,20 @@ class Basic extends Component {
                     </MDBCol>
                   </MDBRow>
                   <MDBRow  className="mb-2">
-                    <MDBCol md="3">
+                    <MDBCol md="2">
                       <FloatingLabel
                         controlId="CellInput"
-                        label="Cell Number"
+                        label="Cell"
                       >
-                        <Form.Control type="number" value={nurse.modal.cell} onChange={(e) => this.nurseModalChange('cell',e)} placeholder="Cell Number" />
+                        <Form.Control type="number" value={nurse.modal.cell} onChange={(e) => this.nurseModalChange('cell',e)} placeholder="Cell" />
+                      </FloatingLabel>
+                    </MDBCol>
+                    <MDBCol md="2">
+                      <FloatingLabel
+                        controlId="CodeInput"
+                        label="Code"
+                      >
+                        <Form.Control type="text" value={nurse.modal.code} onChange={(e) => this.nurseModalChange('code',e)} placeholder="Code" />
                       </FloatingLabel>
                     </MDBCol>
                     <MDBCol md='3'>
@@ -703,7 +716,7 @@ class Basic extends Component {
                         <Form.Control type="date" value={nurse.modal.date} onChange={(e) => this.nurseModalChange('date',e)} placeholder="Joining Date" />
                       </FloatingLabel>
                     </MDBCol>
-                    <MDBCol md="6">
+                    <MDBCol md="5">
                       <FloatingLabel 
                         controlId="CountryInput" 
                         label="Original Country"
@@ -723,10 +736,10 @@ class Basic extends Component {
                     </MDBCol>
                     <MDBCol>
                       <FloatingLabel 
-                        controlId="WorkingExperienceInput" 
-                        label="Working Experience"
+                        controlId="SpecialtyInput" 
+                        label="Specialty"
                       >
-                        <Form.Control type="text" value={nurse.modal.workexp} onChange={(e) => this.nurseModalChange('workexp',e)} placeholder="Working Experience" />
+                        <Form.Control type="text" value={nurse.modal.workexp} onChange={(e) => this.nurseModalChange('workexp',e)} placeholder="Specialty" />
                       </FloatingLabel>
                     </MDBCol>
                     <MDBCol>
@@ -768,7 +781,7 @@ class Basic extends Component {
                   <MDBBtn type="button" className='btn btn-secondary' onClick={() => this.nurseModal(false)}>
                     Close
                   </MDBBtn>
-                  <MDBBtn  type="button" className='btn btn-primary' onClick={() => this.nurseConfirm()}>
+                  <MDBBtn  type="button" className='btn btn-success' onClick={() => this.nurseConfirm()}>
                     Save
                   </MDBBtn>
                 </Modal.Footer>
@@ -816,15 +829,23 @@ class Basic extends Component {
                       </FloatingLabel>
                     </MDBCol>
                   </MDBRow>
-                  <MDBRow>
+                  <MDBRow className="mb-3">
                     <MDBCol>
                       <FloatingLabel
                         controlId="CellInput"
                         label="Cell Number"
-                        className="mb-3"
                       >
                         <Form.Control type="number" value={patient.modal.cell} onChange={(e) => this.patientModalChange('cell',e)} placeholder="Cell Number" />
                       </FloatingLabel>
+                    </MDBCol>
+                    <MDBCol>
+                      <Form.Select aria-label="patient select" value={nurse.modal.level} style={{height:'100%'}} onChange = {(e) =>this.patientModalChange('level',e)}>
+                        <option value="" >Select Level</option>
+                        <option value="1" >Level 1</option>
+                        <option value="2">Level 2</option>
+                        <option value="3">Level 3</option>
+                        <option value="4">Level 4</option>
+                      </Form.Select>
                     </MDBCol>
                   </MDBRow>
                 </Modal.Body>
@@ -832,7 +853,7 @@ class Basic extends Component {
                   <MDBBtn variant="secondary" onClick={() => this.patientModal(false)}>
                     Close
                   </MDBBtn>
-                  <MDBBtn variant="primary" onClick={() => this.patientConfirm()}>
+                  <MDBBtn variant="success" onClick={() => this.patientConfirm()}>
                     Save
                   </MDBBtn>
                 </Modal.Footer>
@@ -874,7 +895,7 @@ class Basic extends Component {
                   <MDBBtn variant="secondary" onClick={() => this.levelModal(false)}>
                     Close
                   </MDBBtn>
-                  <MDBBtn variant="primary" onClick={() => this.levelConfirm()}>
+                  <MDBBtn variant="success" onClick={() => this.levelConfirm()}>
                     Save
                   </MDBBtn>
                 </Modal.Footer>

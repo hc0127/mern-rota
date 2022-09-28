@@ -17,6 +17,9 @@ let Patient = new Schema({
     cell: {
         type: String
     },
+    level: {
+        type: Number
+    },
 });
 
 module.exports = mongoose.model('Patient', Patient);

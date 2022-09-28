@@ -37,7 +37,7 @@ height: 100%;
 cursor: pointer;
 &.active {
 	color: white;
-	background-color: #0088ff;
+	background-color: #32a852;
 }
 `;
 
@@ -49,6 +49,11 @@ class Sidebar extends Component{
     };
   }
   menuIconClick = () => {
+    this.setState({
+      menuCollapse:!this.state.menuCollapse
+    });
+  };
+  menuLinkClick = () => {
     this.setState({
       menuCollapse:!this.state.menuCollapse
     });
@@ -73,13 +78,13 @@ class Sidebar extends Component{
               </SidebarHeader>
               <SidebarContent>
                 <Menu iconShape="square">
-                  <MenuItem icon={<FaHome className="text-primary" />}><NavLink to='' onClick={this.menuIconClick}>DashBoard</NavLink></MenuItem>
-                  <MenuItem icon={<FaDatabase className="text-primary" />}><NavLink to='basic' onClick={this.menuIconClick}>Staff</NavLink></MenuItem>
-                  <MenuItem icon={<FaUserNurse className="text-primary" />}><NavLink to='working' onClick={this.menuIconClick}>Working Days</NavLink></MenuItem>
-                  <MenuItem icon={<FaWheelchair className="text-primary" />}><NavLink to='leave' onClick={this.menuIconClick}>Leave Days</NavLink></MenuItem>
-                  <MenuItem icon={<FaClock className="text-primary"  />}><NavLink to='roaster' onClick={this.menuIconClick}>Roaster</NavLink></MenuItem>
-                  <MenuItem icon={<FaBookMedical className="text-primary" />}><NavLink to='total' onClick={this.menuIconClick}>Report</NavLink></MenuItem>
-                  <MenuItem icon={<FaRegMoneyBillAlt className="text-primary" />}><NavLink to='payroll' onClick={this.menuIconClick}>PayRoll</NavLink></MenuItem>
+                  <MenuItem icon={<FaHome className="text-success" />}><NavLink to='' onClick={this.menuLinkClick}>DashBoard</NavLink></MenuItem>
+                  <MenuItem icon={<FaDatabase className="text-success" />}><NavLink to='basic' onClick={this.menuLinkClick}>Registration</NavLink></MenuItem>
+                  <MenuItem icon={<FaUserNurse className="text-success" />}><NavLink to='working' onClick={this.menuLinkClick}>Working Days</NavLink></MenuItem>
+                  <MenuItem icon={<FaWheelchair className="text-success" />}><NavLink to='leave' onClick={this.menuLinkClick}>Leave Days</NavLink></MenuItem>
+                  <MenuItem icon={<FaClock className="text-success"  />}><NavLink to='roaster' onClick={this.menuLinkClick}>Roaster</NavLink></MenuItem>
+                  <MenuItem icon={<FaBookMedical className="text-success" />}><NavLink to='total' onClick={this.menuLinkClick}>Report</NavLink></MenuItem>
+                  <MenuItem icon={<FaRegMoneyBillAlt className="text-success" />}><NavLink to='payroll' onClick={this.menuLinkClick}>PayRoll</NavLink></MenuItem>
                 </Menu>
               </SidebarContent>
               <SidebarFooter>

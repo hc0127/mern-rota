@@ -43,7 +43,7 @@ h1{
 
 li a:hover{
   color:white !important;
-  background-color: #0088ff;
+  background-color: #329852;
 }
 .card-body a:hover{
   color:white !important;
@@ -123,6 +123,15 @@ div#toast-container {
 }
 .form-check-label{
   color:black;
+}
+#basic_tab-tabpane-holiday .eKUwAx{
+  padding:5px !important;
+}
+#basic_tab-tabpane-holiday .blgbK{
+  min-height: 5vh !important;
+}
+.workingTable .rdt_TableRow{
+  min-height: 5vh !important;
 }
 
 @keyframes App-logo-spin {

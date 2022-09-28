@@ -14,6 +14,9 @@ let Nurse = new Schema({
     cell: {
         type: Number
     },
+    code: {
+        type: String
+    },
     country: {
         type: String
     },
