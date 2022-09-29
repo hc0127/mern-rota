@@ -13,7 +13,7 @@ class PNL extends Component {
 
       let date = new Date();
       let year = date.getFullYear();
-      let month = date.getMonth()+1;
+      let month = date.getMonth()+1>9?date.getMonth()+1:'0'+(date.getMonth()+1);
       
       this.state = {
         selYear:year,
@@ -65,6 +65,13 @@ class PNL extends Component {
     let monthNames = basic.monthNames;
     let monthNumbers = this.swap(monthNames);
     
+    let Mon = Object.keys(monthNames);
+    let NoMon = Object.values(monthNames);
+    
+    const MonthSelect = Mon.map((month,index) =>
+      <option value={NoMon[index]}>{month}</option>
+    );
+
     let pnlColumns = [];
     let pnlDatas = [];
 
@@ -73,7 +80,14 @@ class PNL extends Component {
         name: "Patient",
         center:true,
         wrap:true,
-        selector: (row) => row.patient,
+        filterable: true,
+        selector: (row) => row.patient
+      },{
+        name: "Level",
+        center:true,
+        wrap:true,
+        sortable:true,
+        selector: (row) => row.level,
       });
     }else{
       pnlColumns.push({
@@ -171,7 +185,7 @@ class PNL extends Component {
               }
             }
 
-            if(parseInt(rota.date.slice(5,7)) == selMonth){
+            if(rota.date.slice(5,7) == selMonth){
               if(payrollPerPatient[rota.patient_id] == undefined){payrollPerPatient[rota.patient_id] = []}
               if(payrollPerPatient[rota.patient_id][nurse._id] == undefined){
                 payrollPerPatient[rota.patient_id][nurse._id] = rota.hour
@@ -222,7 +236,7 @@ class PNL extends Component {
               salary += parseInt(basicPerDay*overtime+holidayPerDay*holidayovertime);
             }
             payrollPerMonth[loopMonth] += salary;
-            if(parseInt(monthNames[loopMonth]) == selMonth){
+            if(monthNames[loopMonth] == selMonth){
               payrollHourly[nurse._id] = parseFloat(salary/rotaPerMonth[loopMonth]);
             }
           }
@@ -237,7 +251,7 @@ class PNL extends Component {
         let payroll = 0;
 
         for(let month in patient.revenue){
-          if(month.slice(4,6) == selYear%100 && parseInt(monthNames[month.slice(0,3)]) == selMonth){
+          if(month.slice(4,6) == selYear%100 && monthNames[month.slice(0,3)] == selMonth){
             revenue = patient.revenue[month];
             revenueTotal += revenue;
           }
@@ -253,6 +267,7 @@ class PNL extends Component {
           
         pnlDatas.push({
           patient:patient.name,
+          level:patient.level,
           revenue:parseInt(revenue),
           payroll:parseInt(payroll),
           pnl:revenue-parseInt(payroll)
@@ -328,7 +343,11 @@ class PNL extends Component {
             {perPatient &&
             <MDBCol md="2">
                 <Form.Group>
-                  <Form.Control type="number" value={selMonth} min={1} max={12} onChange = {(e) =>this.onChangeMonth(e)}/>
+                  <Form.Select aria-label="select" value={selMonth} onChange = {(e) =>this.onChangeMonth(e)}>
+                    {
+                      MonthSelect
+                    }
+                  </Form.Select>
                 </Form.Group>
             </MDBCol>
             }
@@ -345,6 +364,7 @@ class PNL extends Component {
             <DataTable
                 columns={pnlColumns} 
                 data={pnlDatas}
+                filter={true}
                 fixedHeader
                 striped
                 conditionalRowStyles={conditionalRowStyles}

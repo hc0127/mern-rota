@@ -16,6 +16,7 @@
     "react-bootstrap-time-picker": "^2.0.1",
     "react-confirm-alert": "^3.0.6",
     "react-data-table-component": "^7.5.2",
+    "react-data-table-component-with-filter": "^7.4.5",
     "react-dom": "^18.2.0",
     "react-icons": "^4.4.0",
     "react-image-select": "^1.0.1",

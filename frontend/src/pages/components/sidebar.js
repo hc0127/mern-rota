@@ -83,7 +83,7 @@ class Sidebar extends Component{
                   <MenuItem icon={<FaUserNurse className="text-success" />}><NavLink to='working' onClick={this.menuLinkClick}>Working Days</NavLink></MenuItem>
                   <MenuItem icon={<FaWheelchair className="text-success" />}><NavLink to='leave' onClick={this.menuLinkClick}>Leave Days</NavLink></MenuItem>
                   <MenuItem icon={<FaClock className="text-success"  />}><NavLink to='roaster' onClick={this.menuLinkClick}>Roaster</NavLink></MenuItem>
-                  <MenuItem icon={<FaBookMedical className="text-success" />}><NavLink to='total' onClick={this.menuLinkClick}>Report</NavLink></MenuItem>
+                  <MenuItem icon={<FaBookMedical className="text-success" />}><NavLink to='total' onClick={this.menuLinkClick}>DTR</NavLink></MenuItem>
                   <MenuItem icon={<FaRegMoneyBillAlt className="text-success" />}><NavLink to='payroll' onClick={this.menuLinkClick}>PayRoll</NavLink></MenuItem>
                 </Menu>
               </SidebarContent>

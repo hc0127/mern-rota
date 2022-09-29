@@ -8,7 +8,7 @@ import {
 } from 'mdb-react-ui-kit';
 import {Form,Modal} from 'react-bootstrap';
 import { FaEdit,FaTrash } from "react-icons/fa";
-import {Autocomplete} from "react-autocomplete";
+// import {Autocomplete} from "react-autocomplete";
 
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
@@ -75,12 +75,12 @@ class LeaveDays extends Component {
     });
   }
 
-  // onChangeNurse = (e) =>{
-  //   this.setState({
-  //     ...this.state,
-  //     selNurse:e.target.value,
-  //   });
-  // }
+  onChangeNurse = (e) =>{
+    this.setState({
+      ...this.state,
+      selNurse:e.target.value,
+    });
+  }
   onChangeType = (e) =>{
     this.setState({
       ...this.state,
@@ -324,30 +324,30 @@ class LeaveDays extends Component {
           <MDBRow className=" align-items-center justify-content-center">
             <MDBCol md="2">
               <Form.Group>
-                {/* <Form.Select aria-label="nurse select" value={selNurse} onChange = {(e) =>this.onChangeNurse(e)}>
+                <Form.Select aria-label="nurse select" value={selNurse} onChange = {(e) =>this.onChangeNurse(e)}>
                 <option value="0" >Select Nurse</option>
                 {
                   basic.nurses.map((value,index) =>{
                     return <option key = {index} value={value._id}>{value.name}</option>
                   })
                 }
-                </Form.Select> */}
-                <Autocomplete
-                  // getItemValue={(item) => item.label}
-                  // items={[
-                  //   { label: 'apple' },
-                  //   { label: 'banana' },
-                  //   { label: 'pear' }
-                  // ]}
-                  // renderItem={(item, isHighlighted) =>
-                  //   <div style={{ background: isHighlighted ? 'lightgray' : 'white' }}>
-                  //     {item.label}
-                  //   </div>
-                  // }
-                  // value={selFilter}
-                  // onChange={(e) => this.filterChange(e)}
-                  // onSelect={(e) => this.nurseSelect(e)}
-                />
+                </Form.Select>
+                {/* <Autocomplete
+                  getItemValue={(item) => item.label}
+                  items={[
+                    { label: 'apple' },
+                    { label: 'banana' },
+                    { label: 'pear' }
+                  ]}
+                  renderItem={(item, isHighlighted) =>
+                    <div style={{ background: isHighlighted ? 'lightgray' : 'white' }}>
+                      {item.label}
+                    </div>
+                  }
+                  value={selFilter}
+                  onChange={(e) => this.filterChange(e)}
+                  onSelect={(e) => this.nurseSelect(e)}
+                /> */}
               </Form.Group>
             </MDBCol>
             <MDBCol md="2">
@@ -399,7 +399,7 @@ class LeaveDays extends Component {
               </Form.Group>
             </MDBCol> */}
           </MDBRow>
-          <MDBRow className='mt-2'>   
+          <MDBRow className='mt-2'>
             <DataTable
                 columns={leaveColumns} 
                 data={leaveDatas}

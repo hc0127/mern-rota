@@ -10,12 +10,11 @@ class Total extends Component {
       let date = new Date();
       let year = date.getFullYear();
       let month = date.getMonth()+1 > 9 ? date.getMonth()+1 : '0'+(date.getMonth()+1);
-      let beforemonth = date.getMonth() > 9 ? date.getMonth() : '0'+date.getMonth();
-      let day = date.getDate() > 9 ? date.getDate() : '0'+date.getDate();
-      let afterday = date.getDate()+1 > 9 ? date.getDate()+1 : '0'+(date.getDate()+1);
+      let day = new Date(year,month,0).getDate();
+      
       this.state = {
         type:0,
-        from:year+'-'+beforemonth+'-'+afterday,
+        from:year+'-'+month+'-'+'01',
         to:year+'-'+month+'-'+day,
         selNurse:0
       };
@@ -77,8 +76,24 @@ class Total extends Component {
     });
 
     let hours = {};
+    let leavedays = [];
+
     basic.nurses.map((nurse) =>{
       if(nurse._id == selNurse){
+        let leaves = nurse.leave?nurse.leave:[];
+
+        for(let leave of leaves){
+          let leavefrom = new Date(leave.from);
+          let leaveto = new Date(leave.to);
+          for(let betweenDay = leavefrom;betweenDay <= leaveto;){
+            let between = betweenDay.toISOString().slice(0,10);
+            if(between >= from && between <= to){
+              leavedays.push(between);
+            }
+            betweenDay.setDate(betweenDay.getDate() + 1);
+          }
+        }
+
         nurse.rota.map((rota)=>{
           if(rota.date >= from && rota.date <= to){
             if(details[rota.date] == undefined){
@@ -97,7 +112,7 @@ class Total extends Component {
       for(var i of dates){
         let row = {
           date:i,
-          detail:details[i]?details[i]:'N/A',
+          detail:details[i]?details[i]:leavedays.includes(i)?'Off Day':'N/A',
           hour:hours[i]?hours[i]:0,
         };
         totalDatas.push(row);
@@ -173,7 +188,7 @@ class Total extends Component {
     return (
       <MDBContainer>
         <div className="pt-5 text-center text-dark">
-          <h1 className="mt-3">REPORT</h1>
+          <h1 className="mt-3">DAILY TIME RECORD</h1>
         </div>
         <div className='row'>
           <div className='col'>

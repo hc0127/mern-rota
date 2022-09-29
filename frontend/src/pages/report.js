@@ -60,7 +60,7 @@ export default class Report extends Component {
 
     return (
       <div className="wrapper">
-        <h1>REPORT</h1>
+        <h1>Daily Time Record</h1>
         <Row>
           <Col>
             <Form.Group className="mb-3">

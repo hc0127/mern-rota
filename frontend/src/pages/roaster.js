@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 
 import axios from 'axios'
 import {Form} from 'react-bootstrap';
-import { MDBContainer,MDBBtn } from 'mdb-react-ui-kit';
+import { MDBContainer,MDBBtn,MDBBtnGroup,MDBRow,MDBCol } from 'mdb-react-ui-kit';
 import DataTable from 'react-data-table-component';
 import {connect} from 'react-redux'
 import {confirmAlert} from 'react-confirm-alert'
@@ -18,17 +18,19 @@ import 'toastr/build/toastr.min.css'
 import './../css/react-confirm-alert.css';
 
 class Roaster extends Component {
-
+  
+  
   constructor(props) {
-      super(props);
-      this.state = {
-        isEditable:false,
-        selPatient:0,
-        selYear:new Date().getFullYear(),
-        selMonth:new Date().getMonth()+1,
-        assigns:[],
-        assignPerDay:[],
-      };
+    super(props);
+    let selMonth = new Date().getMonth()+1>9?new Date().getMonth()+1>9:'0'+(new Date().getMonth()+1)
+    this.state = {
+      isEditable:false,
+      selPatient:0,
+      selYear:new Date().getFullYear(),
+      selMonth:selMonth,
+      assigns:[],
+      assignPerDay:[],
+    };
   }
 
   componentDidMount() {
@@ -60,7 +62,7 @@ class Roaster extends Component {
       let assigns = [];
       let assignPerDay = [];
       let newAssign = [];
-      let month = selYear+'-'+(selMonth<10?+'0'+String(selMonth):selMonth);
+      let month = selYear+'-'+selMonth;
       let daysInMonth = new Date(selYear, selMonth, 0).getDate();
 
       if(selPatient !== 0){
@@ -79,7 +81,7 @@ class Roaster extends Component {
                 nurse_name : nurse.name,
                 nurse_short_id : nurse._id.slice(20),
                 nurse_id : nurse._id,
-                designation : nurse.level == 0 ? "Assistant" : "Registered",
+                designation : nurse.level == 0 ? "Registered":"Assistant",
                 duty_start : rota.duty_start,
                 duty_end : rota.duty_end,
                 hour : rota.hour,
@@ -128,7 +130,7 @@ class Roaster extends Component {
     const {selYear,selMonth,assigns,assignPerDay} = this.state;
     
     let selMultiDay = row.day;
-    let month = selYear+'-'+(selMonth<10?+'0'+String(selMonth):selMonth);
+    let month = selYear+'-'+selMonth;
 
     let newAssign={};
     newAssign.date = month+'-'+(selMultiDay<9?+'0'+String(selMultiDay):selMultiDay);
@@ -157,28 +159,42 @@ class Roaster extends Component {
     });
   }
   multiRemove = (e,row) =>{
-    const {selYear,selMonth,assigns,assignPerDay} = this.state;
-    
-    let selMultiDay = row.day;
+    const {assigns,assignPerDay} = this.state;
 
+    let selMultiDay = row.day;
     let n=0;
     for(let i = 1; i < selMultiDay; i++) {
       n += assignPerDay[i];
     }
-    for(let j = 0; j < assignPerDay[selMultiDay];j++){
-      if(j == row.rotation-1){
-        assigns.splice( n+j, 1);
-      }else if(j >= row.rotation){
-        assigns[n+j-1].rotation--;
-      }
-    }
-    assignPerDay[selMultiDay]--;
 
-    this.setState({
-      ...this.state,
-      assigns:[...assigns],
-      assignPerDay:[...assignPerDay]
-    });
+    if(assignPerDay[selMultiDay] == 1){
+      assigns[n].nurse_name = 'NA';
+      assigns[n].nurse_short_id = 'NA';
+      assigns[n].nurse_id = 'NA';
+      assigns[n].designation = 'NA';
+      assigns[n].duty_start = 'NA';
+      assigns[n].duty_end = 'NA';
+      assigns[n].hour = 'NA';
+      this.setState({
+        ...this.state,
+        assigns:[...assigns],
+      });
+    }else{
+      for(let j = 0; j < assignPerDay[selMultiDay];j++){
+        if(j == row.rotation-1){
+          assigns.splice( n+j, 1);
+        }else if(j >= row.rotation){
+          assigns[n+j-1].rotation--;
+        }
+      }
+      assignPerDay[selMultiDay]--;
+  
+      this.setState({
+        ...this.state,
+        assigns:[...assigns],
+        assignPerDay:[...assignPerDay]
+      });
+    }
   }
 
   onChangePatient = (e) =>{
@@ -219,7 +235,7 @@ class Roaster extends Component {
             assigns[assignIndex].nurse_name = nurse.name;
             assigns[assignIndex].nurse_id = nurse._id;
             assigns[assignIndex].nurse_short_id = nurse._id.slice(20);
-            assigns[assignIndex].designation = nurse.level == 0 ? "Assistant" : "Registered" ;
+            assigns[assignIndex].designation = nurse.level == 0 ? "Registered":"Assistant";
           }
         })
       }
@@ -238,6 +254,14 @@ class Roaster extends Component {
     var hour = parseInt(e/3600)>9?parseInt(e/3600):'0'+parseInt(e/3600);
     var min = (e%3600) == 0 ?"00":"30";
     var _start = hour+":"+min;
+    var _end,_hour;
+    if(hour >= 12){
+      _end = "23:30";
+      _hour = 23-hour;
+    }else{
+      _end = (hour+12)+":"+min;
+      _hour = 12;
+    }
     var rotas;
     var isduplicate = false;
 
@@ -300,8 +324,8 @@ class Roaster extends Component {
               basic.nurses.map((nurse) =>{
               if(nurse._id == row.nurse_id){
                 assigns[assignIndex].duty_start = _start;
-                assigns[assignIndex].duty_end = _start;
-                assigns[assignIndex].hour = 'NA';
+                assigns[assignIndex].duty_end = _end;
+                assigns[assignIndex].hour = _hour;
               }
             });
           }
@@ -419,20 +443,33 @@ class Roaster extends Component {
     let assignPerDayDatas =[];
     let newAssign = [];
     let assignHour;
-    let month = selYear+'-'+(selMonth<10?+'0'+String(selMonth):selMonth);
+    let month = selYear+'-'+ selMonth;
     let daysInMonth = new Date(selYear, selMonth, 0). getDate();
+
+    let monthNames = basic.monthNames;
+    let monthNumbers = this.swap(monthNames);
+
+    // console.log(monthNames);
+    // let monthObject = {...monthNames};
+    
+    let Mon = Object.keys(monthNames);
+    let NoMon = Object.values(monthNames);
+    
+    const MonthSelect = Mon.map((month,index) =>
+      <option value={NoMon[index]}>{month}</option>
+    );
 
     //get holidays per month
     let holidays = basic.holidays;
     let holidaysPerMonth = [];
     holidays.map(holiday =>{
-      if(parseInt(holiday.slice(0,2)) == selMonth){
+      if(holiday.slice(0,2) == selMonth){
         holidaysPerMonth.push(selYear+'-'+holiday);
       }
     });
     //get sundays per month
     let sundaysPerMonth = [];
-    let date = selYear+selMonth+'-01';
+    let date = selYear+'-'+selMonth+'-01';
     let firstDate = new Date(date).getDay();
     if(firstDate == 0){firstDate = 1}else{firstDate = 7-firstDate+1}
     for(let selDay = firstDate;selDay < daysInMonth;selDay+=7){
@@ -447,11 +484,19 @@ class Roaster extends Component {
           center:true,
           wrap:true,
           selector: (row) => row.date,
-        },{
-          name: "Rotation No",
+        },
+        // {
+        //   name: "Rotation No",
+        //   center:true,
+        //   wrap:true,
+        //   selector: (row) => row.rotation,
+        // },
+        {
+          name: "Emp ID",
           center:true,
           wrap:true,
-          selector: (row) => row.rotation,
+          with:'80px',
+          selector: (row) => row.nurse_short_id,
         },
         {
           name: "Emp Name",
@@ -473,10 +518,9 @@ class Roaster extends Component {
                   let to = new Date(leave.to);
                   for(let betweenDay = from;betweenDay <= to;){
                     let year = betweenDay.getFullYear();
-                    let month = betweenDay.getMonth()+1>9?betweenDay.getMonth()+1:'0'+(betweenDay.getMonth()+1);
                     let day = betweenDay.getDate()>9?betweenDay.getDate():'0'+betweenDay.getDate();
-                    if(year == selYear && month == selMonth){
-                      leavedaysPerMonth.push(year+'-'+month+'-'+day);
+                    if(year == selYear && betweenDay.getMonth()+1 == parseInt(selMonth)){
+                      leavedaysPerMonth.push(month+'-'+day);
                     }
                     betweenDay.setDate(betweenDay.getDate() + 1);
                   }
@@ -485,7 +529,6 @@ class Roaster extends Component {
                 let workingdays = [...leavedaysPerMonth,...holidaysPerMonth,...sundaysPerMonth];
                 workingdays = [...new Set(workingdays)];
                 assignHour = (daysInMonth-workingdays.length)*8;
-                console.log(nurse.name,workingdays,assignHour);
                   
                   basic.nurses.map((_nurse,index) =>{
                     if(_nurse._id == nurse._id){
@@ -506,12 +549,6 @@ class Roaster extends Component {
                 })
               }
             </Form.Select>,
-        },
-        {
-          name: "Emp ID",
-          center:true,
-          wrap:true,
-          selector: (row) => row.nurse_short_id,
         },
         {
           name: "Designation",
@@ -547,10 +584,14 @@ class Roaster extends Component {
           name: "Action",
           center:true,
           wrap:true,
-          width:'80px',
+          width:'120px',
           selector: (row) =>
-            row.rotation == 1 ?
-              <MDBBtn outline floating  color='primary' size="sm" onClick={(e) =>this.multiAssign(e,row)}><FaPlus /></MDBBtn>
+            row.rotation == 1 ?[
+              <MDBBtnGroup key={row.leave_id}>
+                <MDBBtn outline floating  color='primary' size="sm" onClick={(e) =>this.multiAssign(e,row)}><FaPlus /></MDBBtn>
+                <MDBBtn outline floating  color='primary' size="sm" onClick={(e) =>this.multiRemove(e,row)}><FaMinus /></MDBBtn>
+              </MDBBtnGroup>
+              ]
               :
               <MDBBtn outline floating  color='primary'  size="sm" onClick={(e) =>this.multiRemove(e,row)}><FaMinus /></MDBBtn>
         },
@@ -565,23 +606,25 @@ class Roaster extends Component {
           center:true,
           wrap:true,
           selector: (row) => row.date,
-        },{
-          name: "Rotation No",
+        },
+        // {
+        //   name: "Rotation No",
+        //   center:true,
+        //   wrap:true,
+        //   selector: (row) => row.rotation,
+        // },
+        {
+          name: "Emp ID",
           center:true,
           wrap:true,
-          selector: (row) => row.rotation,
+          with:'80px',
+          selector: (row) => row.nurse_short_id,
         },
         {
           name: "Emp Name",
           center:true,
           wrap:true,
           selector: (row) => row.nurse_name,
-        },
-        {
-          name: "Emp ID",
-          center:true,
-          wrap:true,
-          selector: (row) => row.nurse_short_id,
         },
         {
           name: "Designation",
@@ -626,7 +669,7 @@ class Roaster extends Component {
                 nurse_name : nurse.name,
                 nurse_short_id : nurse._id.slice(20),
                 nurse_id : nurse._id,
-                designation : nurse.level == 0 ? "Assistant" : "Registered",
+                designation : nurse.level == 0 ? "Registered":"Assistant",
                 duty_start : rota.duty_start,
                 duty_end : rota.duty_end,
                 hour : rota.hour,
@@ -679,8 +722,8 @@ class Roaster extends Component {
         <div className="pt-5 text-center text-dark">
           <h1 className="mt-3">DUTY ROASTER</h1>
         </div>
-        <div className="row lex align-items-center justify-content-center">
-          <div className="col-md-3 col-xs-5">
+        <MDBRow className=" align-items-center justify-content-center">
+          <MDBCol md="2">
             <Form.Group>
               <Form.Select aria-label="patient select" value={selPatient} onChange = {(e) =>this.onChangePatient(e)}>
                 <option value="0" >Select Patient</option>
@@ -691,22 +734,24 @@ class Roaster extends Component {
                 }
               </Form.Select>
             </Form.Group>
-          </div>
-          <div className="col-md-2 col-xs-3">
+          </MDBCol>
+          <MDBCol md="2">
             <Form.Group>
               <Form.Control type="number" value={selYear} placeholder="Year"  min={2022} max={new Date().getFullYear()} onChange = {(e) =>this.onChangeYear(e)}/>
             </Form.Group>
-          </div>
-          <div className="col-md-1 col-xs-3">
-            <Form.Group>
-              <Form.Control type="number" value={selMonth} placeholder="Month" min={1} max={12}  onChange = {(e) =>this.onChangeMonth(e)}/>
-            </Form.Group>
-          </div>
-          <div className='col-md-2'>
+          </MDBCol>
+          <MDBCol md="2">
+            <Form.Select aria-label="select" value={selMonth} onChange = {(e) =>this.onChangeMonth(e)}>
+              {
+                MonthSelect
+              }
+            </Form.Select>
+          </MDBCol>
+          <MDBCol md="2">
             <MDBBtn  outline rounded color='primary' type="button" onClick={() =>this.save()}>{isEditable?'save':'edit'}</MDBBtn>
-          </div>
-        </div>
-        <div className='row p-2'>
+          </MDBCol>
+        </MDBRow>
+        <MDBRow className='p-2'>
           <DataTable 
             columns={assignColumns} 
             data={assignDatas}
@@ -714,7 +759,7 @@ class Roaster extends Component {
             fixedHeaderScrollHeight={'70vh'}
             conditionalRowStyles={conditionalRowStyles}
              />
-        </div>
+        </MDBRow>
       </MDBContainer>
     );
   };
