@@ -203,8 +203,13 @@ class PayRoll extends Component {
     
     if(selYear <= new Date().getFullYear()){
       basic.nurses.map((nurse) =>{
+        let basicPerDay = parseFloat(nurse.basic_allowances*15/365/8);
+        let holidayPerDay = parseFloat(nurse.basic_allowances*18/365/8);
+        let reducePerDay;
+
         if(selDesignation == "-1" || parseInt(nurse.level) == selDesignation){
           let salary = nurse.basic_allowances+nurse.housing_allowances+nurse.other_allowances;
+          reducePerDay = parseFloat(salary*12/365);
           let comment = "basic:"+nurse.basic_allowances+"\nhousing:"+nurse.housing_allowances+"\nother:"+nurse.other_allowances;
     
           //leave days
@@ -230,6 +235,7 @@ class PayRoll extends Component {
           let rotaPerMonth = [],rotaHolidayPerMonth = [];
           let workeddays = [],totalhoursworked = 0;
 
+          //rota calculate
           rotas.map(rota =>{
             if(rota.date.startsWith(selYear)){
               let month = monthNumbers[[rota.date.slice(5,7)]];
@@ -250,7 +256,6 @@ class PayRoll extends Component {
               }
             }
           });
-          console.log("c:totalhoursworked",nurse.name,totalhoursworked,workeddays);
 
           //datatable set
           let payrollPerMonth = [],payrollCommentPerMonth = [],offDaysPerMonth = [],dutyHoursPerMonth = [];
@@ -268,6 +273,7 @@ class PayRoll extends Component {
             offDaysPerMonth[loopMonth] = [...new Set(offDaysPerMonth[loopMonth])];
             dutyHoursPerMonth[loopMonth] = (daysInMonth-offDaysPerMonth[loopMonth].length)*8;
             if(rotaPerMonth[loopMonth] == undefined){rotaPerMonth[loopMonth] = 0;}
+            //extra salary calculate
             if(dutyHoursPerMonth[loopMonth] < rotaPerMonth[loopMonth]
               //  && rotaPerMonth[loopMonth] >= 192
               ){
@@ -284,9 +290,6 @@ class PayRoll extends Component {
                 }
               }
               
-              let basicPerDay = parseFloat(nurse.basic_allowances*15/365/8);
-              let holidayPerDay = parseFloat(nurse.basic_allowances*18/365/8);
-              
               payrollPerMonth[loopMonth] = salary+parseInt(basicPerDay*overtime+holidayPerDay*hovertime);
               payrollCommentPerMonth[loopMonth] = comment+"\novertime:"+overtime+"hours"+"\nholiday overtime:"+hovertime+"hours";
               
@@ -298,9 +301,22 @@ class PayRoll extends Component {
                 grosssalary = salary;
                 totalsalary = payrollPerMonth[loopMonth]
               }
+            //commmon salary
             }else{
               payrollPerMonth[loopMonth] = salary;
               payrollCommentPerMonth[loopMonth] = comment;
+
+              if(selYear == parseInt(nurse.date.slice(0,4))){
+                let joined = nurse.date;
+                if(monthNames[loopMonth] < joined.slice(5,7)){
+                  payrollPerMonth[loopMonth] = 0;
+                }else if(monthNames[loopMonth] == joined.slice(5,7)){
+                  console.log(reducePerDay);
+                  payrollPerMonth[loopMonth] = salary - parseInt(reducePerDay*(parseInt(joined.slice(8,10)-1)));
+                }
+              }else if(selYear < parseInt(nurse.date.slice(0,4))){
+                payrollPerMonth[loopMonth] = 0;
+              }
             
               if(monthNames[loopMonth] == selMonth){
                 normalovertimehours = 0;
@@ -308,12 +324,14 @@ class PayRoll extends Component {
                 normalovertime = 0;
                 holidayovertime = 0;
                 grosssalary = salary;
-                totalsalary = salary;
+                totalsalary = payrollPerMonth[loopMonth];
               }
             }
           }
+
           let row = {};
           row.nurse = nurse.name;
+          //all data
           if(selMonth == "00"){
             row.total = 0;
             for(let month in monthNames){
@@ -333,22 +351,22 @@ class PayRoll extends Component {
               }
             }
             payrollDatas.push(row);
+          //detail month data
           }else{
             workeddays = [...new Set(workeddays)];
 
             console.log(workeddays);
-            let daysInMonth = new Date(selYear, selMonth, 0).getDate();
             row.code = nurse.code;
             row.name = nurse.name;
             row.designation = nurse.level==0?"Registered":"Assistant";
-            row.monthdays = daysInMonth;
+            row.monthdays = monthdays;
             row.workeddays = workeddays.length;
             row.totalhoursworked = totalhoursworked;
             row.normalovertimehours = normalovertimehours;
             row.holidayovertimehours = holidayovertimehours;
             row.grosssalary = grosssalary;
-            row.normalovertime = normalovertime;  
-            row.holidayovertime = holidayovertime;
+            row.normalovertime = parseInt(normalovertime);  
+            row.holidayovertime = parseInt(holidayovertime);
             row.total = totalsalary;
             console.log("b",row);
 

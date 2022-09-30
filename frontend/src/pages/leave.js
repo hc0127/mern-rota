@@ -25,7 +25,7 @@ class LeaveDays extends Component {
     this.state = {
       selView:1,
       selYear:year,
-      selMonth:date.getMonth()+1,
+      selMonth:month,
 
       from:year+'-'+month+'-'+day,
       to:year+'-'+month+'-'+day,
@@ -262,7 +262,7 @@ class LeaveDays extends Component {
       let total_leave_days = 0;
       let leave_periods = [];
       nurse.leave.map((leave) =>{
-        let month = selYear+'-'+(selMonth>9?selMonth:'0'+selMonth);
+        let month = selYear+'-'+selMonth;
         let daysInMonth = new Date(selYear,selMonth,0).getDate();
         if(leave.from.startsWith(month) || leave.to.startsWith(month)){
           let from = new Date(leave.from);
@@ -315,6 +315,15 @@ class LeaveDays extends Component {
         }
       }
     });
+
+    let monthNames = basic.monthNames;
+    // let monthNumbers = this.swap(monthNames);
+    let Mon = Object.keys(monthNames);
+    let NoMon = Object.values(monthNames);
+    
+    const MonthSelect = Mon.map((month,index) =>
+      <option value={NoMon[index]}>{month}</option>
+    );
 
     return (
       <MDBContainer>
@@ -389,9 +398,11 @@ class LeaveDays extends Component {
               </Form.Group>
             </MDBCol>
             <MDBCol md="2">
-              <Form.Group>
-                <Form.Control type="number" value={selMonth} min={1} max={12} onChange = {(e) =>this.onChangeView('selMonth',e)}/>
-              </Form.Group>
+              <Form.Select aria-label="select" value={selMonth} onChange = {(e) =>this.onChangeView('selMonth',e)}>
+                {
+                  MonthSelect
+                }
+              </Form.Select>
             </MDBCol>
             {/* <MDBCol md="2">
               <Form.Group>

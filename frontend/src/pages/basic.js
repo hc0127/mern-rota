@@ -42,6 +42,7 @@ class Basic extends Component {
           action_id:'0',
           modal:{
             name:'',
+            specialty:'',
             address:'',
             image:'',
             cell:'',
@@ -813,6 +814,15 @@ class Basic extends Component {
                         className="mb-3"
                       >
                         <Form.Control type="text" value={patient.modal.name} onChange={(e) => this.patientModalChange('name',e)} placeholder="Full Name" />
+                      </FloatingLabel>
+                    </MDBCol>
+                    <MDBCol>
+                      <FloatingLabel
+                        controlId="SpecialtyInput"
+                        label="Specialty"
+                        className="mb-3"
+                      >
+                        <Form.Control type="text" value={patient.modal.specialty} onChange={(e) => this.patientModalChange('specialty',e)} placeholder="Full Name" />
                       </FloatingLabel>
                     </MDBCol>
                   </MDBRow>

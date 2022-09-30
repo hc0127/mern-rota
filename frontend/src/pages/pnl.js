@@ -218,6 +218,7 @@ class PNL extends Component {
           if(rotaPerMonth[loopMonth]){
             let basicPerDay = parseFloat(nurse.basic_allowances*15/365/8);
             let holidayPerDay = parseFloat(nurse.basic_allowances*18/365/8);
+            let reducePerDay = parseFloat(salary*12/365);
 
             if(dutyHoursPerMonth[loopMonth] < rotaPerMonth[loopMonth] 
               //  && rotaPerMonth[loopMonth] >= 192
@@ -236,6 +237,18 @@ class PNL extends Component {
               }
               salary += parseInt(basicPerDay*overtime+holidayPerDay*holidayovertime);
             }
+            
+            if(selYear == parseInt(nurse.date.slice(0,4))){
+              let joined = nurse.date;
+              if(monthNames[loopMonth] < joined.slice(5,7)){
+                salary = 0;
+              }else if(monthNames[loopMonth] == joined.slice(5,7)){
+                salary = salary - parseInt(reducePerDay*(parseInt(joined.slice(8,10))-1));
+              }
+            }else if(selYear < parseInt(nurse.date.slice(0,4))){
+              salary = 0;
+            }
+
             payrollPerMonth[loopMonth] += salary;
             if(monthNames[loopMonth] == selMonth){
               payrollHourly[nurse._id] = parseFloat(salary/rotaPerMonth[loopMonth]);
