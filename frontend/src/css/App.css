@@ -124,6 +124,10 @@ div#toast-container {
 .form-check-label{
   color:black;
 }
+.form-check-input:before{
+  content:none !important;
+}
+
 .sc-iBkjds{
   padding:5px !important;
 }

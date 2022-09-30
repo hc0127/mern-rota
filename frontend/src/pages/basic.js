@@ -555,6 +555,7 @@ class Basic extends Component {
             disabled = {row[i]['disabled']}
             checked = {row[i]['checked']}
             type='checkbox'
+            isValid={true}
             onChange={() => this.onChangeHoliday(i,row)}
           />
         });

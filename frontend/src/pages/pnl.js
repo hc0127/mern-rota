@@ -365,10 +365,11 @@ class PNL extends Component {
                 </Form.Group>
             </MDBCol>
             }
-            <MDBCol md="2">
+            <MDBCol md="2" className='pt-3'>
               <Form.Check 
                 checked ={perPatient}
                 type="checkbox"
+                isValid={true}
                 label="Per Patient"
                 onChange = {(e) => this.viewPerPatient(e)}
               />
