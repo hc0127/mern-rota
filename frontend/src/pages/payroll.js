@@ -234,7 +234,7 @@ class PayRoll extends Component {
             if(rota.date.startsWith(selYear)){
               let month = monthNumbers[[rota.date.slice(5,7)]];
               console.log(month,selMonth);
-              if(month == selMonth){workeddays.push(rota.date);totalhoursworked += rota.hour;}
+              if(monthNames[month] == selMonth){workeddays.push(rota.date);totalhoursworked += rota.hour;}
               
               if(rotaPerMonth[month] == undefined){
                 rotaPerMonth[month] = rota.hour;
@@ -312,7 +312,6 @@ class PayRoll extends Component {
               }
             }
           }
-          console.log("d",normalovertimehours,holidayovertimehours,normalovertime,holidayovertime);
           let row = {};
           row.nurse = nurse.name;
           if(selMonth == "00"){
