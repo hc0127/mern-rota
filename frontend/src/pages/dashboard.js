@@ -184,7 +184,6 @@ class DashBoard extends Component {
 
         let offdays = [...leavedaysPerMonth,...holidaysPerMonth,...sundaysPerMonth];
         offdays = [...new Set(offdays)];
-        console.log(nurse.level,offdays.length,offdays);
         nurseDatas[nurseLevel].available += (daysInMonth-offdays.length)*8;
         nurseDatas[2].available += (daysInMonth-offdays.length)*8;
     });
