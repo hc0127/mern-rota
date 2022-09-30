@@ -233,6 +233,7 @@ class PayRoll extends Component {
           rotas.map(rota =>{
             if(rota.date.startsWith(selYear)){
               let month = monthNumbers[[rota.date.slice(5,7)]];
+              console.log(month,selMonth);
               if(month == selMonth){workeddays.push(rota.date);totalhoursworked += rota.hour;}
               
               if(rotaPerMonth[month] == undefined){
@@ -293,7 +294,7 @@ class PayRoll extends Component {
                 normalovertimehours = overtime;
                 holidayovertimehours = hovertime;
                 normalovertime = basicPerDay*overtime;
-                holidayovertime = holidayPerDay*holidayovertime;
+                holidayovertime = holidayPerDay*hovertime;
                 grosssalary = salary;
                 totalsalary = payrollPerMonth[loopMonth]
               }
