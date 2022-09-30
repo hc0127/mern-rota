@@ -387,7 +387,7 @@ class Assign extends Component {
             </Form.Group>
           </div>
           <div className='col-md-2'>
-            <button type="button" className="btn btn-primary" onClick={() =>this.save()}>{isEditable?'save':'edit'}</button>
+            <button type="button" className="btn btn-success" onClick={() =>this.save()}>{isEditable?'save':'edit'}</button>
           </div>
         </div>
         <div className='row p-2'>

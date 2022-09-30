@@ -80,6 +80,7 @@ class PNL extends Component {
         name: "Patient",
         center:true,
         wrap:true,
+        sortable:true,
         filterable: true,
         selector: (row) => row.patient
       },{
@@ -276,7 +277,7 @@ class PNL extends Component {
       });
 
       let row={
-        patient:"Total",
+        patient:" Total",
         revenue:revenueTotal,
         payroll:parseInt(payrollTotal),
         pnl:revenueTotal-parseInt(payrollTotal)

@@ -76,7 +76,7 @@ class PayRoll extends Component {
         name: "ID",
         center:true,
         wrap:true,
-        width:'100px',
+        width:'70px',
         selector: (row) => row['code'],
       },{
         name: "Name",
@@ -91,31 +91,31 @@ class PayRoll extends Component {
         width:'100px',
         selector: (row) => row['designation'],
       },{
-        name: "MonthDays",
+        name: "Month(d)",
         center:true,
         wrap:true,
-        width:'100px',
+        width:'70px',
         selector: (row) => row['monthdays'],
       },{
-        name: "WorkedDays",
+        name: "Worked(d)",
         center:true,
         wrap:true,
-        width:'100px',
+        width:'70px',
         selector: (row) => row['workeddays'],
       },{
-        name: "TotalHoursWorked",
+        name: "Worked(h)",
         center:true,
         wrap:true,
-        width:'100px',
+        width:'70px',
         selector: (row) => row['totalhoursworked'],
       },{
-        name: "NormalOvertimeHours",
+        name: "NormalOver(h)",
         center:true,
         wrap:true,
         width:'100px',
         selector: (row) => row['normalovertimehours'],
       },{
-        name: "HolidayOvertimeHours",
+        name: "HolidayOver(h)",
         center:true,
         wrap:true,
         width:'100px',
@@ -155,7 +155,7 @@ class PayRoll extends Component {
           width:'70px',
           cell: (row) =>
           <OverlayTrigger
-            key={row.leave_id}
+            key={row._id}
             placement="top"
             overlay={
               <Tooltip  className="display-linebreak" style={{position:'fixed'}} >
@@ -249,6 +249,7 @@ class PayRoll extends Component {
               }
             }
           });
+          console.log("c:totalhoursworked",nurse.name,totalhoursworked,workeddays);
 
           //datatable set
           let payrollPerMonth = [],payrollCommentPerMonth = [],offDaysPerMonth = [],dutyHoursPerMonth = [];
@@ -271,6 +272,7 @@ class PayRoll extends Component {
               ){
               let overtime = rotaPerMonth[loopMonth] - dutyHoursPerMonth[loopMonth];
               let hovertime = 0;
+
               if(rotaHolidayPerMonth[loopMonth] != undefined){
                 if(overtime <= rotaHolidayPerMonth[loopMonth]){
                   hovertime = overtime;
@@ -281,12 +283,11 @@ class PayRoll extends Component {
                 }
               }
               
-              payrollCommentPerMonth[loopMonth] = comment+"\novertime:"+overtime+"hours"+"\nholiday overtime:"+hovertime+"hours";
-              
               let basicPerDay = parseFloat(nurse.basic_allowances*15/365/8);
               let holidayPerDay = parseFloat(nurse.basic_allowances*18/365/8);
               
-              payrollPerMonth[loopMonth] = salary+parseInt(basicPerDay*overtime+holidayPerDay*holidayovertime);
+              payrollPerMonth[loopMonth] = salary+parseInt(basicPerDay*overtime+holidayPerDay*hovertime);
+              payrollCommentPerMonth[loopMonth] = comment+"\novertime:"+overtime+"hours"+"\nholiday overtime:"+hovertime+"hours";
               
               if(monthNames[loopMonth] == selMonth){
                 normalovertimehours = overtime;
@@ -310,11 +311,13 @@ class PayRoll extends Component {
               }
             }
           }
+          console.log("d",normalovertimehours,holidayovertimehours,normalovertime,holidayovertime);
           let row = {};
           row.nurse = nurse.name;
           if(selMonth == "00"){
             row.total = 0;
             for(let month in monthNames){
+              console.log("a:",month,payrollPerMonth);
               if(selYear == new Date().getFullYear()){
                 if(parseInt(monthNames[month]) <= new Date().getMonth()+1){
                   row[month] = payrollPerMonth[month];
@@ -323,6 +326,10 @@ class PayRoll extends Component {
                 }else{
                   row[month] = 0;
                 }
+              }else if(selYear < new Date().getFullYear()){
+                row[month] = payrollPerMonth[month];
+                row[month+'comment'] = payrollCommentPerMonth[month];
+                row.total += row[month];
               }
             }
             payrollDatas.push(row);
@@ -343,7 +350,8 @@ class PayRoll extends Component {
             row.normalovertime = normalovertime;  
             row.holidayovertime = holidayovertime;
             row.total = totalsalary;
-            
+            console.log("b",row);
+
             payrollDatas.push(row);
           }
         }
@@ -351,6 +359,7 @@ class PayRoll extends Component {
   
       let total = {
         nurse:'Total',
+        code:'Total',
       }
       for(let month in monthNames){
         total[month] = this.getTotals(payrollDatas,month);

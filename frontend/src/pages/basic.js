@@ -506,30 +506,30 @@ class Basic extends Component {
         }
       ];
       
-      const levelColumns = [
-        {
-          name: "Level",
-          center:true,
-          wrap:true,
-          selector: (row) => row.level,
-        },
-        {
-          name: "Rate",
-          center:true,
-          wrap:true,
-          selector: (row) => row.rate,
-        },
-        {
-          name: "Action",
-          center:true,
-          cell: (d) => [
-            <MDBBtnGroup key={d._id}>
-              <MDBBtn outline color="success" className='my-1 ms-1' size="sm" onClick={() =>this.levelModal(true,d)}><FaEdit /></MDBBtn>
-              <MDBBtn outline  color="success" className='my-1 me-1' size="sm" onClick={() =>this.removeLevel(d)}><FaTrash /></MDBBtn>
-            </MDBBtnGroup>
-          ]
-        }
-      ];
+      // const levelColumns = [
+      //   {
+      //     name: "Level",
+      //     center:true,
+      //     wrap:true,
+      //     selector: (row) => row.level,
+      //   },
+      //   {
+      //     name: "Rate",
+      //     center:true,
+      //     wrap:true,
+      //     selector: (row) => row.rate,
+      //   },
+      //   {
+      //     name: "Action",
+      //     center:true,
+      //     cell: (d) => [
+      //       <MDBBtnGroup key={d._id}>
+      //         <MDBBtn outline color="success" className='my-1 ms-1' size="sm" onClick={() =>this.levelModal(true,d)}><FaEdit /></MDBBtn>
+      //         <MDBBtn outline  color="success" className='my-1 me-1' size="sm" onClick={() =>this.removeLevel(d)}><FaTrash /></MDBBtn>
+      //       </MDBBtnGroup>
+      //     ]
+      //   }
+      // ];
       
       const holidayColumns = [];
       let holidayDatas = [];
@@ -588,9 +588,7 @@ class Basic extends Component {
       // let holidayDatas=[{
       //   month:'Jan'
       // }];
-
-
-
+      
       return (
           <MDBContainer>
               <div className="pt-5 text-center text-dark">

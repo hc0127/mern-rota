@@ -249,8 +249,8 @@ class LeaveDays extends Component {
         wrap:true,
         cell: (row) => [
         <MDBBtnGroup key={row.leave_id}>
-          <MDBBtn outline size="sm" className='my-1 ms-1' onClick={() =>this.leaveModal(true,row)}><FaEdit /></MDBBtn>
-          <MDBBtn outline size="sm" className='my-1 me-1' onClick={() =>this.removeLeave(row)}><FaTrash /></MDBBtn>
+          <MDBBtn outline  color='success' size="sm" className='my-1 ms-1' onClick={() =>this.leaveModal(true,row)}><FaEdit /></MDBBtn>
+          <MDBBtn outline  color='success' size="sm" className='my-1 me-1' onClick={() =>this.removeLeave(row)}><FaTrash /></MDBBtn>
         </MDBBtnGroup>
         ]
       });
@@ -371,7 +371,7 @@ class LeaveDays extends Component {
               </Form.Group>
             </MDBCol>
             <MDBCol md="2">
-              <MDBBtn outline rounded  color='primary' onClick={() =>this.addLeave()}>Add Leave</MDBBtn>
+              <MDBBtn outline rounded  color='success' onClick={() =>this.addLeave()}>Add Leave</MDBBtn>
             </MDBCol>
           </MDBRow>
           <MDBRow className="mt-3 align-items-center justify-content-center">
@@ -428,10 +428,10 @@ class LeaveDays extends Component {
               </MDBRow>
             </Modal.Body>
             <Modal.Footer>
-              <MDBBtn variant="secondary" onClick={() => this.leaveModal(false)}>
+              <MDBBtn  color='secondary' onClick={() => this.leaveModal(false)}>
                 Close
               </MDBBtn>
-              <MDBBtn variant="primary" onClick={() => this.editConfirmLeave()}>
+              <MDBBtn  color='success' onClick={() => this.editConfirmLeave()}>
                 Save
               </MDBBtn>
             </Modal.Footer>

@@ -95,7 +95,7 @@ export default class Report extends Component {
             </Form.Group>
           </Col>
           <Col>
-            <Button variant="primary" className='mb-3 float-right'>Assign</Button>
+            <Button variant="success" className='mb-3 float-right'>Assign</Button>
           </Col>
         </Row>
         <div className='p-2'>

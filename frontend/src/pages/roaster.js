@@ -588,12 +588,12 @@ class Roaster extends Component {
           selector: (row) =>
             row.rotation == 1 ?[
               <MDBBtnGroup key={row.leave_id}>
-                <MDBBtn outline floating  color='primary' size="sm" onClick={(e) =>this.multiAssign(e,row)}><FaPlus /></MDBBtn>
-                <MDBBtn outline floating  color='primary' size="sm" onClick={(e) =>this.multiRemove(e,row)}><FaMinus /></MDBBtn>
+                <MDBBtn outline floating  color='success' size="sm" onClick={(e) =>this.multiAssign(e,row)}><FaPlus /></MDBBtn>
+                <MDBBtn outline floating  color='success' size="sm" onClick={(e) =>this.multiRemove(e,row)}><FaMinus /></MDBBtn>
               </MDBBtnGroup>
               ]
               :
-              <MDBBtn outline floating  color='primary'  size="sm" onClick={(e) =>this.multiRemove(e,row)}><FaMinus /></MDBBtn>
+              <MDBBtn outline floating  color='success'  size="sm" onClick={(e) =>this.multiRemove(e,row)}><FaMinus /></MDBBtn>
         },
       ];
 
@@ -748,7 +748,7 @@ class Roaster extends Component {
             </Form.Select>
           </MDBCol>
           <MDBCol md="2">
-            <MDBBtn  outline rounded color='primary' type="button" onClick={() =>this.save()}>{isEditable?'save':'edit'}</MDBBtn>
+            <MDBBtn  outline rounded color='success' type="button" onClick={() =>this.save()}>{isEditable?'save':'edit'}</MDBBtn>
           </MDBCol>
         </MDBRow>
         <MDBRow className='p-2'>

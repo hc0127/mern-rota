@@ -47,16 +47,43 @@ class Total extends Component {
         center:true,
         wrap:true,
         selector: (row) => row.date,
-      },{
-        name: "Detail",
+      }
+      // ,{
+      //   name: "Detail",
+      //   center:true,
+      //   wrap:true,
+      //   width:'70%',
+      //   selector: (row) => row.detail,
+      // }
+      ,{
+        name: "Patient",
         center:true,
         wrap:true,
-        width:'70%',
-        selector: (row) => row.detail,
-    },{
+        width:'20vw%',
+        sortable:true,
+        selector: (row) => row.patient,
+      }
+      ,{
+        name: "Duty Start",
+        center:true,
+        wrap:true,
+        width:'20vw',
+        sortable:true,
+        selector: (row) => row.duty_start,
+      }
+      ,{
+        name: "Duty End",
+        center:true,
+        wrap:true,
+        width:'20vw',
+        sortable:true,
+        selector: (row) => row.duty_end,
+      }
+      ,{
         name: "Hour",
         center:true,
         wrap:true,
+        sortable:true,
         selector: (row) => row.hour,
     });
 
@@ -77,6 +104,7 @@ class Total extends Component {
 
     let hours = {};
     let leavedays = [];
+    let thour = 0;
 
     basic.nurses.map((nurse) =>{
       if(nurse._id == selNurse){
@@ -96,33 +124,42 @@ class Total extends Component {
 
         nurse.rota.map((rota)=>{
           if(rota.date >= from && rota.date <= to){
-            if(details[rota.date] == undefined){
-              details[rota.date] = patientList[rota.patient_id]+"("+rota.duty_start+"~"+rota.duty_end+"-"+rota.hour+"hour)";
-              hours[rota.date] = rota.hour;
-            }else{
-              details[rota.date] += ","+patientList[rota.patient_id]+"("+rota.duty_start+"~"+rota.duty_end+"-"+rota.hour+"hour)";
-              hours[rota.date] += rota.hour;
+            // if(details[rota.date] == undefined){
+            //   details[rota.date] = patientList[rota.patient_id]+"("+rota.duty_start+"~"+rota.duty_end+"-"+rota.hour+"hour)";
+            //   hours[rota.date] = rota.hour;
+            // }else{
+            //   details[rota.date] += ","+patientList[rota.patient_id]+"("+rota.duty_start+"~"+rota.duty_end+"-"+rota.hour+"hour)";
+            //   hours[rota.date] += rota.hour;
+            // }
+            thour += rota.hour;
+            let row = {
+              date:rota.date,
+              patient:patientList[rota.patient_id],
+              duty_start:rota.duty_start,
+              duty_end:rota.duty_end,
+              hour:rota.hour,
             }
+            totalDatas.push(row);
           }
         });
       }
     });
 
     if(selNurse != 0){
-      for(var i of dates){
-        let row = {
-          date:i,
-          detail:details[i]?details[i]:leavedays.includes(i)?'Off Day':'N/A',
-          hour:hours[i]?hours[i]:0,
-        };
-        totalDatas.push(row);
-      }
+      // for(var i of dates){
+      //   let row = {
+      //     date:i,
+      //     detail:details[i]?details[i]:leavedays.includes(i)?'Off Day':'N/A',
+      //     hour:hours[i]?hours[i]:0,
+      //   };
+      //   totalDatas.push(row);
+      // }
       
       let thour = Object.values(hours).reduce((a,b) => a+b,0);
       
       let total = {
         date:'Total',
-        detail:'',
+        // detail:'',
         hour:thour
       }
       totalDatas.push(total);

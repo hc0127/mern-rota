@@ -77,7 +77,7 @@ class Login extends Component {
                         </Row>
                         <Row className=" align-items-center justify-content-center">
                             <Col className="align-item text-center" md="4">
-                                <Button className="m-3" variant="primary" onClick={() =>this.onLogin()}>
+                                <Button className="m-3" variant="success" onClick={() =>this.onLogin()}>
                                     Login
                                 </Button>
                             </Col>

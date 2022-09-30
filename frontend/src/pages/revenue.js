@@ -174,7 +174,7 @@ class Revenue extends Component {
                 </Form.Group>
             </MDBCol>
             <MDBCol md="2">
-              <MDBBtn outline rounded  color='primary' onClick={() =>this.submit()}>SUBMIT</MDBBtn>
+              <MDBBtn outline rounded  color='success' onClick={() =>this.submit()}>SUBMIT</MDBBtn>
             </MDBCol>
           </MDBRow>
           <MDBRow className='mt-2'>   
