@@ -46,6 +46,7 @@ class Total extends Component {
         name: "Date",
         center:true,
         wrap:true,
+        sortable:true,
         selector: (row) => row.date,
       }
       // ,{
@@ -155,7 +156,7 @@ class Total extends Component {
       //   totalDatas.push(row);
       // }
       
-      let thour = Object.values(hours).reduce((a,b) => a+b,0);
+      // let thour = Object.values(hours).reduce((a,b) => a+b,0);
       
       let total = {
         date:'Total',

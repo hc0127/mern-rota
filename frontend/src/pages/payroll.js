@@ -239,7 +239,6 @@ class PayRoll extends Component {
           rotas.map(rota =>{
             if(rota.date.startsWith(selYear)){
               let month = monthNumbers[[rota.date.slice(5,7)]];
-              console.log(month,selMonth);
               if(monthNames[month] == selMonth){workeddays.push(rota.date);totalhoursworked += rota.hour;}
               
               if(rotaPerMonth[month] == undefined){
@@ -311,7 +310,6 @@ class PayRoll extends Component {
                 if(monthNames[loopMonth] < joined.slice(5,7)){
                   payrollPerMonth[loopMonth] = 0;
                 }else if(monthNames[loopMonth] == joined.slice(5,7)){
-                  console.log(reducePerDay);
                   payrollPerMonth[loopMonth] = salary - parseInt(reducePerDay*(parseInt(joined.slice(8,10)-1)));
                 }
               }else if(selYear < parseInt(nurse.date.slice(0,4))){
@@ -335,7 +333,6 @@ class PayRoll extends Component {
           if(selMonth == "00"){
             row.total = 0;
             for(let month in monthNames){
-              console.log("a:",month,payrollPerMonth);
               if(selYear == new Date().getFullYear()){
                 if(parseInt(monthNames[month]) <= new Date().getMonth()+1){
                   row[month] = payrollPerMonth[month];
@@ -355,7 +352,6 @@ class PayRoll extends Component {
           }else{
             workeddays = [...new Set(workeddays)];
 
-            console.log(workeddays);
             row.code = nurse.code;
             row.name = nurse.name;
             row.designation = nurse.level==0?"Registered":"Assistant";
@@ -368,7 +364,6 @@ class PayRoll extends Component {
             row.normalovertime = parseInt(normalovertime);  
             row.holidayovertime = parseInt(holidayovertime);
             row.total = totalsalary;
-            console.log("b",row);
 
             payrollDatas.push(row);
           }
