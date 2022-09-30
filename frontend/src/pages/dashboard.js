@@ -145,7 +145,7 @@ class DashBoard extends Component {
     });
     //get sundays per month
     let sundaysPerMonth = [];
-    let date = selYear+selMonth+'-01';
+    let date = selYear+'-'+selMonth+'-01';
     let firstDate = new Date(date).getDay();
     if(firstDate == 0){firstDate = 7}
     for(let selDay = firstDate;selDay < daysInMonth;selDay+=7){
