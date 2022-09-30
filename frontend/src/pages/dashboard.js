@@ -32,7 +32,7 @@ class DashBoard extends Component {
 
       let date = new Date();
       let year = date.getFullYear();
-      let month = date.getMonth()+1;
+      let month = date.getMonth()+1>9?date.getMonth()+1:'0'+(date.getMonth()+1);
       
       this.state = {
         selYear:year,
@@ -122,16 +122,24 @@ class DashBoard extends Component {
       utilization:0
     }];
 
+    let monthNames = basic.monthNames;
+    
+    let Mon = Object.keys(monthNames);
+    let NoMon = Object.values(monthNames);
+    
+    const MonthSelect = Mon.map((month,index) =>
+      <option value={NoMon[index]}>{month}</option>
+    );
+
     let daysInMonth = new Date(selYear, selMonth, 0). getDate();
-    let month = selMonth<10?+'0'+String(selMonth):selMonth;
-    let from = selYear+'-'+month+'-01';
-    let to = selYear+'-'+month+'-'+daysInMonth;
+    let from = selYear+'-'+selMonth+'-01';
+    let to = selYear+'-'+selMonth+'-'+daysInMonth;
 
     //get holidays per month
     let holidays = basic.holidays;
     let holidaysPerMonth = [];
     holidays.map(holiday =>{
-      if(parseInt(holiday.slice(0,2)) == 1){
+      if(parseInt(holiday.slice(0,2)) == selMonth){
         holidaysPerMonth.push(selYear+'-'+holiday);
       }
     });
@@ -140,7 +148,7 @@ class DashBoard extends Component {
     let date = selYear+selMonth+'-01';
     let firstDate = new Date(date).getDay();
     if(firstDate == 0){firstDate = 7}
-    for(let selDay = 7- firstDate;selDay < daysInMonth;selDay+=7){
+    for(let selDay = firstDate;selDay < daysInMonth;selDay+=7){
       let day = selDay > 9?selDay:'0'+selDay;
       sundaysPerMonth.push(selYear+'-'+selMonth+'-'+day);
     }
@@ -258,9 +266,13 @@ class DashBoard extends Component {
               </Form.Group>
             </MDBCol>
             <MDBCol md="2">
-              <Form.Group>
-                <Form.Control type="number" value={selMonth} placeholder="Month" min={1} max={12}  onChange = {(e) =>this.onChangeMonth(e)}/>
-              </Form.Group>
+                <Form.Group>
+                  <Form.Select aria-label="select" value={selMonth} onChange = {(e) =>this.onChangeMonth(e)}>
+                    {
+                      MonthSelect
+                    }
+                  </Form.Select>
+                </Form.Group>
             </MDBCol>
           </MDBRow>
           <MDBRow className='mt-2'>   

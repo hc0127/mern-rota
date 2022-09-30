@@ -55,7 +55,7 @@ class Sidebar extends Component{
   };
   menuLinkClick = () => {
     this.setState({
-      menuCollapse:false
+      menuCollapse:true
     });
   };
 
