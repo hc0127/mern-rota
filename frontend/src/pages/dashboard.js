@@ -174,11 +174,11 @@ class DashBoard extends Component {
           }
         }
 
-        let workingdays = [...leavedaysPerMonth,...holidaysPerMonth,...sundaysPerMonth];
-        console.log(nurse.level,workingdays.length);
-        workingdays = [...new Set(workingdays)];
-        nurseDatas[nurseLevel].available += (daysInMonth-workingdays.length)*8;
-        nurseDatas[2].available += (daysInMonth-workingdays.length)*8;
+        let offdays = [...leavedaysPerMonth,...holidaysPerMonth,...sundaysPerMonth];
+        console.log(nurse.level,offdays.length,offdays);
+        offdays = [...new Set(offdays)];
+        nurseDatas[nurseLevel].available += (daysInMonth-offdays.length)*8;
+        nurseDatas[2].available += (daysInMonth-offdays.length)*8;
     });
     nurseDatas.map((nurseData) =>{
         nurseData.overtime = nurseData.assigned*1 - nurseData.available*1;
