@@ -250,6 +250,7 @@ class PNL extends Component {
             }
 
             payrollPerMonth[loopMonth] += salary;
+            console.log(monthNames[loopMonth],selMonth,payrollHourly[nurse._id]);
             if(monthNames[loopMonth] == selMonth){
               payrollHourly[nurse._id] = parseFloat(salary/rotaPerMonth[loopMonth]);
               console.log(payrollHourly[nurse._id]);
@@ -271,12 +272,12 @@ class PNL extends Component {
             revenueTotal += revenue;
           }
         }
-        console.log("patinedata:"+payrollPerPatient[patient._id]);
+        console.log("patientdata:"+payrollPerPatient);
         if(payrollPerPatient[patient._id] == undefined){
           payroll = 0;
         }else{
           for(let loopNurse in payrollPerPatient[patient._id]){
-            console.log("hourly"+payrollHourly[loopNurse]);
+            console.log(loopNurse+":hourly"+payrollHourly[loopNurse]);
             payroll += parseFloat(payrollPerPatient[patient._id][loopNurse] * payrollHourly[loopNurse]);
           }
           payrollTotal += payroll;

@@ -605,7 +605,7 @@ class Basic extends Component {
                             <DataTable
                               id="nurseTable"
                               columns={nurseColumns} 
-                              data={basic.nurses} 
+                              data={basic.nurses}
                               fixedHeader
                               fixedHeaderScrollHeight={'65vh'}          
                               defaultPageSize={100}
@@ -713,7 +713,7 @@ class Basic extends Component {
                         controlId="DateInput" 
                         label="Joining Date"
                       >
-                        <Form.Control type="date" value={nurse.modal.date} onChange={(e) => this.nurseModalChange('date',e)} placeholder="Joining Date" />
+                        <Form.Control type="date" value={nurse.modal.date?nurse.modal.date.slice(0,10):''} onChange={(e) => this.nurseModalChange('date',e)} placeholder="Joining Date" />
                       </FloatingLabel>
                     </MDBCol>
                     <MDBCol md="5">
