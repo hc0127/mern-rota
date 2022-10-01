@@ -115,9 +115,6 @@ class PNL extends Component {
       selector: (row) => row.pnl?row.pnl.toLocaleString('en'):0,
     });
 
-
-
-
       //get holidays per month
       let holidays = basic.holidays;
       let holidaysPerMonth = [];
@@ -249,17 +246,23 @@ class PNL extends Component {
               salary = 0;
             }
 
-            payrollPerMonth[loopMonth] += salary;
-            console.log(monthNames[loopMonth],selMonth,payrollHourly[nurse._id]);
-            if(monthNames[loopMonth] == selMonth){
+          console.log("a",monthNames[loopMonth],selMonth,salary,payrollHourly,payrollPerMonth,payrollPerPatient);
+          
+          payrollPerMonth[loopMonth] += salary;
+          
+          console.log(monthNames[loopMonth],selMonth,salary,payrollHourly,payrollPerMonth,payrollPerPatient);
+          
+          if(monthNames[loopMonth] == selMonth){
               payrollHourly[nurse._id] = parseFloat(salary/rotaPerMonth[loopMonth]);
-              console.log(payrollHourly[nurse._id]);
+              console.log(nurse.name,payrollHourly[nurse._id]);
             }
           }
+          console.log("b",monthNames[loopMonth],selMonth,salary,payrollHourly,payrollPerMonth,payrollPerPatient);
         }
       });
 
     if(perPatient){
+      console.log("c",selMonth,payrollHourly,payrollPerMonth,payrollPerPatient);
       let revenueTotal = 0;
       let payrollTotal = 0;
       basic.patients.map(patient =>{
