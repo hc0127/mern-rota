@@ -50,6 +50,9 @@ let Nurse = new Schema({
     other_allowances: {
         type: Number
     },
+    joined:{
+        type:String
+    }
 });
 
 module.exports = mongoose.model('Nurse', Nurse);

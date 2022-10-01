@@ -3,7 +3,6 @@ const router = express.Router();
 
 const Nurse = require('../../models/nurse.model');
 const Patient = require('../../models/patient.model');
-const Level = require('../../models/level.model');
 const User = require('../../models/user.model');
 const Holiday = require('../../models/holiday.model');
 
@@ -12,25 +11,20 @@ router.route("/list").get(function(req,res){
         if(!err){
             Patient.find({},function(err,patientData){
                 if(!err){
-                    Level.find({},function(err,levelData){
-                        if(!err){
-                            Holiday.find({},function(err,holidayData){
-                                let holidays;
-                                console.log(holidayData);
-                                if(holidayData == null || holidayData.length == 0){
-                                    holidays = [];
-                                }else{
-                                    holidays = holidayData[0].holiday
-                                }
-                                res.send({
-                                    state:'success',
-                                    nurse:nurseData,
-                                    patient:patientData,
-                                    level:levelData,
-                                    holiday:holidays
-                                });
-                            });
+                    Holiday.find({},function(err,holidayData){
+                        let holidays;
+                        console.log(holidayData);
+                        if(holidayData == null || holidayData.length == 0){
+                            holidays = [];
+                        }else{
+                            holidays = holidayData[0].holiday
                         }
+                        res.send({
+                            state:'success',
+                            nurse:nurseData,
+                            patient:patientData,
+                            holiday:holidays
+                        });
                     });
                 }
             });
@@ -46,16 +40,11 @@ router.route('/login').post(function(req,res){
                     Nurse.find({},function(err,nurseData){
                         Patient.find({},function(err,patientData){
                             if(!err){
-                                Level.find({},function(err,levelData){
-                                    if(!err){
-                                        res.send({
-                                            state:'success',
-                                            token:data.token,
-                                            nurse:nurseData,
-                                            patient:patientData,
-                                            level:levelData
-                                        });
-                                    }
+                                res.send({
+                                    state:'success',
+                                    token:data.token,
+                                    nurse:nurseData,
+                                    patient:patientData,
                                 });
                             }
                         });
@@ -70,16 +59,11 @@ router.route('/login').post(function(req,res){
                     if(!err){
                         Patient.find({},function(err,patientData){
                             if(!err){
-                                Level.find({},function(err,levelData){
-                                    if(!err){
-                                        res.send({
-                                            state:'success',
-                                            token:data.token,
-                                            nurse:nurseData,
-                                            patient:patientData,
-                                            level:levelData
-                                        });
-                                    }
+                                res.send({
+                                    state:'success',
+                                    token:data.token,
+                                    nurse:nurseData,
+                                    patient:patientData,
                                 });
                             }
                         });
