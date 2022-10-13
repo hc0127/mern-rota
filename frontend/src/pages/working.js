@@ -4,6 +4,8 @@ import DataTable from 'react-data-table-component';
 import {
   MDBCol,MDBContainer,MDBRow
 } from 'mdb-react-ui-kit';
+import {IoMdDownload} from 'react-icons/io'
+import { CSVLink } from "react-csv";
 import {Form} from 'react-bootstrap';
 
 class WorkingDays extends Component {
@@ -14,19 +16,9 @@ class WorkingDays extends Component {
       let year = date.getFullYear();
       
       this.state = {
-        // selNurse:0,
         selYear:year
       };
   }
-  componentDidMount() {
-  }
-
-  // onChangeNurse = (e) =>{
-  //   this.setState({
-  //     ...this.state,
-  //     selNurse:e.target.value,
-  //   });
-  // }
   onChangeYear = (e) =>{
     this.setState({
       ...this.state,
@@ -43,12 +35,12 @@ class WorkingDays extends Component {
   
   render() {
     const {
-      // selNurse,
       selYear
     } = this.state;
     const {basic} =this.props;
-  
+ 
     const workingColumns = [
+     
       {
         name: "Month",
         center:true,
@@ -75,12 +67,6 @@ class WorkingDays extends Component {
         width:'100px',
         selector: (row) => row.holidays,
       },
-      // {
-      //   name: "Leave Days",
-      //   center:true,
-      //   wrap:true,
-      //   selector: (row) => row.leavedays,
-      // },
       {
         name: "Net Working Days",
         center:true,
@@ -106,33 +92,18 @@ class WorkingDays extends Component {
     let workingDatas = [];
 
     let holidays = basic.holidays;
-    let leaves = [];
+    let headers = [
+      { label: "Month", key: "month" },
+      { label: "Days", key: "days" },
+      { label: "Sundays", key: "sundays" },
+      { label: "Holidays", key: "holidyas" },
+      { label: "Net Working Days", key: "workingdays" },
+      { label: "daily Hours", key: "hours" },
+      { label: "Total Hours available", key: "totalhours" }
+    ];
     
     let holidaysPerMonth = [];
     let sundaysPerMonth = [];
-    let leavedaysPerMonth = [];
-    //get leavedays per month
-    // basic.nurses.map(nurse =>{
-    //   if(nurse._id == selNurse){
-    //     leaves = nurse.leave;
-    //   }
-    // });
-
-    // for(let leave of leaves){
-    //   let from = new Date(leave.from);
-    //   let to = new Date(leave.to);
-    //   for(let betweenDay = from;betweenDay <= to;){
-    //     let year = betweenDay.getFullYear();
-    //     let month = betweenDay.getMonth()+1>9?betweenDay.getMonth()+1:'0'+(betweenDay.getMonth()+1);
-    //     let day = betweenDay.getDate()>9?betweenDay.getDate():'0'+betweenDay.getDate();
-    //     if(year == selYear){
-    //       let key = monthNumbers[month];
-    //       if(leavedaysPerMonth[key] == undefined){leavedaysPerMonth[key] = [];}
-    //       leavedaysPerMonth[key].push(year+'-'+month+'-'+day);
-    //     }
-    //     betweenDay.setDate(betweenDay.getDate() + 1);
-    //   }
-    // }
     //get holidays per month
     holidays.map(holiday =>{
       let key = monthNumbers[holiday.slice(0,2)];
@@ -156,12 +127,10 @@ class WorkingDays extends Component {
     //datatable set
     for(let selMonth in monthNames){
       let daysInMonth = new Date(selYear, monthNames[selMonth], 0).getDate();
-      // if(leavedaysPerMonth[selMonth] == undefined){leavedaysPerMonth[selMonth] = [];}
       if(holidaysPerMonth[selMonth] == undefined){holidaysPerMonth[selMonth] = [];}
       if(sundaysPerMonth[selMonth] == undefined){sundaysPerMonth[selMonth] = [];}
 
       let offDays = [
-        // ...leavedaysPerMonth[selMonth],
         ...holidaysPerMonth[selMonth],
         ...sundaysPerMonth[selMonth]];
       offDays = [...new Set(offDays)];
@@ -170,7 +139,6 @@ class WorkingDays extends Component {
         days:daysInMonth,
         sundays:sundaysPerMonth[selMonth].length,
         holidays:holidaysPerMonth[selMonth].length,
-        // leavedays:leavedaysPerMonth[selMonth].length,
         workingdays:daysInMonth - offDays.length,
         hours:8,
         totalhours:8*(daysInMonth - offDays.length)
@@ -185,24 +153,24 @@ class WorkingDays extends Component {
             <h1 className="mt-3">WORKING DAYS</h1>
           </div>
           <MDBRow className=" align-items-center justify-content-center">
-            {/* <MDBCol md="2">
-              <Form.Group>
-                <Form.Select aria-label="nurse select" value={selNurse} onChange = {(e) =>this.onChangeNurse(e)}>
-                <option value="0" >Select Nurse</option>
-                {
-                  basic.nurses.map((value,index) =>{
-                    return <option key = {index} value={value._id}>{value.name}</option>
-                  })
-                }
-                </Form.Select>
-              </Form.Group>
-            </MDBCol> */}
             <MDBCol md="2">
               <Form.Group>
                 <Form.Control type="number" value={selYear} placeholder="Year"  onChange = {(e) =>this.onChangeYear(e)}/>
               </Form.Group>
             </MDBCol>
+            <MDBCol md="2" >
+              <CSVLink
+                headers={headers}
+                data={workingDatas}
+                filename={"working.csv"}
+                className="btn btn-success "
+                target="_blank"
+                >             
+                <IoMdDownload />Export 
+              </CSVLink>
+           </MDBCol>   
           </MDBRow>
+        
           <MDBRow className='mt-2 workingTable'>   
             <DataTable
                 columns={workingColumns} 

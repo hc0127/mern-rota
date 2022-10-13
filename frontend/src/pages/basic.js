@@ -4,6 +4,8 @@ import axios from '../config/server.config'
 import {
   Tab,Tabs,Modal,Form,FloatingLabel
 } from 'react-bootstrap';
+import { CSVLink } from "react-csv";
+import {IoMdDownload} from 'react-icons/io'
 import {MDBContainer,MDBRow,MDBCol,MDBBtn,MDBBtnGroup} from 'mdb-react-ui-kit'
 import DataTable from 'react-data-table-component';
 import toastr from 'toastr'
@@ -24,6 +26,7 @@ class Basic extends Component {
           action_id:'0',
           modal:{
             name:'',
+            designation:'',
             address:'',
             image:'',
             cell:'',
@@ -390,13 +393,27 @@ class Basic extends Component {
     });
   }
 
+  getDesignationArray(row) {
+    if(row.level == 0) {
+      return 'Registered';
+    } else {
+      return 'Assistant';
+    }
+  }
+
+
   componentDidMount() {
   }
 
   render() {
       const {basic} = this.props;
       const {nurse,patient,level} = this.state;
-
+      
+      // Mapping nurses array
+      basic.nurses.map((data) =>{
+        data.designation = this.getDesignationArray(data);
+      });
+  
       const nurseColumns = [
         {
           name: "Full Name",
@@ -405,6 +422,13 @@ class Basic extends Component {
           width:'150px',
           selector: (row) => row.name,
         },
+        {
+          name: "Designation",
+          center:true,
+          wrap:true,
+          selector: (row) => row.designation,
+        },
+       
         {
           name: "Address",
           center:true,
@@ -464,6 +488,21 @@ class Basic extends Component {
         }
       ];
 
+      let headers = [
+        { label: "Full Name", key: "name" },
+        { label: "Designation", key: "designation"},
+        { label: "Address", key: "address" },
+        { label: "Cell", key: "cell" },
+        { label: "Country", key: "country" },
+        { label: "Experience", key: "experience" },
+        { label: "JoinDate", key: "date" },
+        { label: "WorkExp", key: "workexp" },
+        { label: "Basic Allowances", key: "basic_allowances"},
+        { label: "Housing Allowances", key: "housing_allowances"},
+        { label: "Other Allowances", key: "other_allowances"}
+      ];
+
+   
       const patientColumns = [
         {
           name: "Full Name",
@@ -506,7 +545,13 @@ class Basic extends Component {
           ]
         }
       ];
-      
+
+      let header = [
+        { label: "Full Name", key: "name" },
+        { label: "Address", key: "address" },
+        { label: "Cell", key: "cell" }
+      ];
+
       // const levelColumns = [
       //   {
       //     name: "Level",
@@ -532,6 +577,8 @@ class Basic extends Component {
       //   }
       // ];
       
+    
+
       const holidayColumns = [];
       let holidayDatas = [];
       let holidays = basic.holidays;
@@ -586,10 +633,6 @@ class Basic extends Component {
         }
         holidayDatas.push(row);
       }
-
-      // let holidayDatas=[{
-      //   month:'Jan'
-      // }];
       
       return (
           <MDBContainer>
@@ -601,6 +644,17 @@ class Basic extends Component {
                     <Tabs id="basic_tab">
                         <Tab eventKey="nurse" key={1} title="nurse" className='p-2'>
                           <MDBBtn outline rounded  color='success' onClick={() => this.nurseModal(true,null)}>Add Nurse</MDBBtn>
+                         
+                         <CSVLink 
+                              headers={headers}
+                              data={basic.nurses}
+                              filename={"nurses.csv"}
+                              className="btn btn-success "
+                              target="_blank"
+                         >
+                            <IoMdDownload />Export 
+                         </CSVLink>
+      
                           <div className='p-2'>
                             <DataTable
                               id="nurseTable"
@@ -617,16 +671,27 @@ class Basic extends Component {
                           <MDBRow>
                             <MDBCol>
                               <MDBBtn  outline rounded  color='success' onClick={() => this.patientModal(true)}>Add Patient</MDBBtn>
+                              <CSVLink
+                              headers={header}
+                              data={basic.patients}
+                              filename={"patients.csv"}
+                              className="btn btn-success "
+                              target="_blank"
+                         >
+                            <IoMdDownload />Export 
+                         </CSVLink>
                             </MDBCol>
-                          </MDBRow>
-                          <div className='p-2'>
+                            <div className='p-2'>
                             <DataTable
                               columns={patientColumns} 
                               data={basic.patients}
                               fixedHeader
-                              fixedHeaderScrollHeight={'65vh'}
-                              pagination/>
+                              fixedHeaderScrollHeight={'65vh'}          
+                              defaultPageSize={100}
+                              pagination
+                            />
                           </div>
+                          </MDBRow>
                         </Tab>
                         {/* <Tab eventKey="level" key={3} title="level" className='p-2'>
                           <MDBBtn outline rounded  color='success' onClick={() => this.levelModal(true)}>Add Level</MDBBtn>

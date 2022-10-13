@@ -6,10 +6,10 @@ import DataTable from 'react-data-table-component';
 import {
   MDBCol,MDBContainer,MDBRow,MDBBtn,MDBBtnGroup
 } from 'mdb-react-ui-kit';
+import { CSVLink } from "react-csv";
+import {IoMdDownload} from 'react-icons/io'
 import {Form,Modal} from 'react-bootstrap';
 import { FaEdit,FaTrash } from "react-icons/fa";
-// import {Autocomplete} from "react-autocomplete";
-
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
 
@@ -31,7 +31,7 @@ class LeaveDays extends Component {
       to:year+'-'+month+'-'+day,
       selFilter:'',
       selNurse:0,
-      selType:1,
+      selType:0,
       isOpen:false,
       modal:{
         nurse_id:'',
@@ -171,12 +171,24 @@ class LeaveDays extends Component {
     });
   }
   
+  getLeaveType(row) {
+    if(row.type == 1) {
+      row.leave_type = "Annual Leave";
+    } else if(row.type == 2) {
+      row.leave_type = "Sick Leave";
+    } else if(row.type == 3) {
+      row.leave_type = "Maternity leave";
+    } else if(row.type == 4) {
+      row.leave_type = "Other Leave";
+    }
+    return row.leave_type;
+  }
+
   render() {
     const {from,to,selNurse,selType,modal,isOpen,selView,selYear,selMonth
       ,selFilter
     } = this.state;
     const {basic} =this.props;
-
     let leaveColumns = [];
     leaveColumns.push(
     {
@@ -205,6 +217,11 @@ class LeaveDays extends Component {
     });
     if(selView == 1){
       leaveColumns.push({
+          name: "Leave Type",
+          center:true,
+          selector: (row) => row.leave_type,
+        }, 
+      {
         name: "Leave Start",
         center:true,
         wrap:true,
@@ -257,6 +274,18 @@ class LeaveDays extends Component {
     }
 
     let leaveDatas = [];
+    let headers = [
+      { label: "No", key: "no" },
+      { label: "Staff ID", key: "nurse_short_id" },
+      { label: "Staff Name", key: "name" },
+      { label: "Leave Type", key: "leave_type" },
+      { label: "Leave Start", key: "leave_start" },
+      { label: "Leave End", key: "leave_end" },
+      { label: "Leave Days", key: "leave_days" },
+      { label: "Daily Hours", key: "daily_hours" },
+      { label: "Leave Hours", key: "leave_hours" }
+    ];
+
     let rowCount = 0;
     basic.nurses.map((nurse)=>{
       let total_leave_days = 0;
@@ -288,6 +317,7 @@ class LeaveDays extends Component {
               nurse_id:nurse._id,
               nurse_short_id:nurse._id.slice(20),
               name:nurse.name,
+              leave_type:this.getLeaveType(leave),
               leave_id:leave.leave_id,
               leave_start:leave.from,
               leave_end:leave.to,
@@ -316,8 +346,9 @@ class LeaveDays extends Component {
       }
     });
 
+    
+
     let monthNames = basic.monthNames;
-    // let monthNumbers = this.swap(monthNames);
     let Mon = Object.keys(monthNames);
     let NoMon = Object.values(monthNames);
     
@@ -326,42 +357,30 @@ class LeaveDays extends Component {
     );
 
     return (
+ 
       <MDBContainer>
           <div className="pt-5 text-center text-dark">
             <h1 className="mt-3">LEAVE DAYS</h1>
           </div>
           <MDBRow className=" align-items-center justify-content-center">
-            <MDBCol md="2">
-              <Form.Group>
-                <Form.Select aria-label="nurse select" value={selNurse} onChange = {(e) =>this.onChangeNurse(e)}>
+            <MDBCol md="2" >
+              <Form.Group >
+                <Form.Select 
+                aria-label="nurse select"  required  value={selNurse} onChange = {(e) =>this.onChangeNurse(e)}>
                 <option value="0" >Select Nurse</option>
+                
                 {
                   basic.nurses.map((value,index) =>{
                     return <option key = {index} value={value._id}>{value.name}</option>
                   })
                 }
                 </Form.Select>
-                {/* <Autocomplete
-                  getItemValue={(item) => item.label}
-                  items={[
-                    { label: 'apple' },
-                    { label: 'banana' },
-                    { label: 'pear' }
-                  ]}
-                  renderItem={(item, isHighlighted) =>
-                    <div style={{ background: isHighlighted ? 'lightgray' : 'white' }}>
-                      {item.label}
-                    </div>
-                  }
-                  value={selFilter}
-                  onChange={(e) => this.filterChange(e)}
-                  onSelect={(e) => this.nurseSelect(e)}
-                /> */}
               </Form.Group>
             </MDBCol>
             <MDBCol md="2">
               <Form.Group>
                 <Form.Select aria-label="nurse select" value={selType} onChange = {(e) =>this.onChangeType(e)}>
+                <option value="" >Select Here</option>
                 <option value="1" >Annual leave</option>
                 <option value="2" >sick leave</option>
                 <option value="3" >Maternity leave</option>
@@ -404,11 +423,17 @@ class LeaveDays extends Component {
                 }
               </Form.Select>
             </MDBCol>
-            {/* <MDBCol md="2">
-              <Form.Group>
-                <Form.Control type="text" value={selFilter} placeholder={"Search..."} onChange = {(e) =>this.onChangeView('selFilter',e)}/>
-              </Form.Group>
-            </MDBCol> */}
+            <MDBCol md="3" className="float-right" >
+              <CSVLink
+                headers={headers}
+                data={leaveDatas}
+                filename={"leavedays.csv"}
+                className="btn btn-success "
+                target="_blank"
+                >
+                <IoMdDownload />Export 
+              </CSVLink>
+           </MDBCol>
           </MDBRow>
           <MDBRow className='mt-2'>
             <DataTable

@@ -8,7 +8,7 @@ router.route("/add").post(function(req,res){
     let leave_id = today.getFullYear()*(today.getMonth()+today.getDate()+today.getDay())*(today.getHours()+today.getMinutes()+today.getSeconds()+today.getMilliseconds());
     console.log(new Date().getDate());
     Nurse.findOneAndUpdate({_id:data.nurse_id},
-        {$push:{"leave":{leave_id:leave_id,from:data.from,to:data.to}}}
+        {$push:{"leave":{leave_id:leave_id,from:data.from,to:data.to, type: data.type}}}
     ).then(function(data){
         Nurse.find({},function(err,nurses){
             res.send({NurseDatas:nurses});
@@ -25,6 +25,7 @@ router.route("/remove").post(function(req,res){
         });
     });
 });
+
 router.route("/edit").post(function(req,res){
     const data = req.body;
     Nurse.findOneAndUpdate({_id:data.nurse_id},

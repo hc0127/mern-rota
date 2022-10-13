@@ -10,7 +10,7 @@ import 'toastr/build/toastr.min.css'
 import { read, utils } from 'xlsx';
 import axios from '../config/server.config'
 import { pAllUpd } from '../store/Actions/BasicAction';
-import { FaThemeisle } from 'react-icons/fa';
+
 
 class Revenue extends Component {
   constructor(props) {

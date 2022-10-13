@@ -97,7 +97,7 @@ class Navbar extends Component{
 								</NavLink>
 							</NavItem>
 							<NavItem>
-								<NavLink aria-current='page' to='total'>
+								<NavLink aria-current='page' to='dtr'>
 								DTR
 								</NavLink>
 							</NavItem>

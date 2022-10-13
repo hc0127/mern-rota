@@ -1,53 +1,70 @@
 import React, { Component } from 'react';
 import {connect} from 'react-redux'
 import DataTable from 'react-data-table-component';
-import {
-  MDBCol,MDBContainer,MDBRow
-} from 'mdb-react-ui-kit';
+import {MDBCol,MDBContainer,MDBRow } from 'mdb-react-ui-kit';
+import { CSVLink } from "react-csv";
+import {IoMdDownload} from 'react-icons/io'
 import {Form} from 'react-bootstrap';
-import revenue from './revenue';
 
 class PNL extends Component {
   constructor(props) {
-      super(props);
+      super(props); 
 
-      let date = new Date();
-      let year = date.getFullYear();
-      let month = date.getMonth()+1>9?date.getMonth()+1:'0'+(date.getMonth()+1);
-      
-      this.state = {
-        selYear:year,
-        selMonth:month,
-        perPatient:false,
-      };
-  }
-  componentDidMount() {
-  }
+  let date = new Date();
+  let year = date.getFullYear();
+  let month = date.getMonth()+1>9?date.getMonth()+1:'0'+(date.getMonth()+1);
 
-  onChangeYear = (e) =>{
+  
+  this.state = {
+    selYear:year,
+    selMonth:month,
+    perPatient:false,
+  };     
+}
+
+onChangeYear = (e) =>{
+this.setState({
+  ...this.state,
+  selYear:e.target.value,
+});
+}
+
+levelModalChange = (e) =>{
     this.setState({
       ...this.state,
-      selYear:e.target.value,
+      selLevel:e.target.value,
     });
-  }
-  onChangeMonth = (e) =>{
-    this.setState({
-      ...this.state,
-      selMonth:e.target.value,
-    });
-  }
+
+}
+
+onChangeMonth = (e) =>{
+this.setState({
+  ...this.state,
+  selMonth:e.target.value,
+});
+}
+ 
   viewPerPatient = (e) =>{
     this.setState({
       ...this.state,
       perPatient:!this.state.perPatient
     });
   }
+
   getTotals(data, key){
     let total = 0;
     data.forEach(item => {
       total += item[key];
     });
     return total;
+  }
+  getPercentage(row) {
+    let percentage = 0;
+    if(row.netProfit>0) {
+      percentage = (row.netProfit/row.revenue)*100;
+    }
+    row.percentage = percentage.toFixed(2)+"%";
+    return row.percentage;
   }
 
   swap(json){
@@ -59,7 +76,7 @@ class PNL extends Component {
   }
   
   render() {
-    const {selYear,selMonth,perPatient} = this.state;
+    const {selYear,selMonth,perPatient, selLevel} = this.state;
     const {basic} =this.props;
 
     let monthNames = basic.monthNames;
@@ -113,7 +130,14 @@ class PNL extends Component {
       center:true,
       wrap:true,
       selector: (row) => row.pnl?row.pnl.toLocaleString('en'):0,
-    });
+    },
+    {
+      name: "Percentage",
+      center:true,
+      wrap:true,
+      selector: (row) => this.getPercentage(row),
+    }
+    );
 
       //get holidays per month
       let holidays = basic.holidays;
@@ -141,6 +165,7 @@ class PNL extends Component {
       let payrollPerMonth = []; 
       let payrollPerPatient = [];
       let payrollHourly = [];
+      let headers = [];
 
       basic.nurses.map((nurse) =>{
         let salary = nurse.basic_allowances+nurse.housing_allowances+nurse.other_allowances;
@@ -175,7 +200,7 @@ class PNL extends Component {
             }else{
               rotaPerMonth[month] += rota.hour;
             }
-            if(holidaysPerMonth[month].includes(rota.date)){
+            if(holidaysPerMonth[month] && holidaysPerMonth[month].includes(rota.date)){
               if(rotaHolidayPerMonth[month] == undefined){
                 rotaHolidayPerMonth[month] = rota.hour;
               }else{
@@ -244,12 +269,16 @@ class PNL extends Component {
               }
             }else if(selYear < parseInt(nurse.date.slice(0,4))){
               salary = 0;
-            }         
-            payrollPerMonth[loopMonth] += salary;                      
-            if(monthNames[loopMonth] == selMonth){
-                payrollHourly[nurse._id] = parseFloat(salary/rotaPerMonth[loopMonth]);
             }
+
+          
+          payrollPerMonth[loopMonth] += salary;
+          
+          
+          if(monthNames[loopMonth] == selMonth){
+              payrollHourly[nurse._id] = parseFloat(salary/rotaPerMonth[loopMonth]);
           }
+        }
         }
       });
 
@@ -259,6 +288,13 @@ class PNL extends Component {
       basic.patients.map(patient =>{
         let revenue = 0;
         let payroll = 0;
+        headers = [
+          { label: "Patient", key: "patient" },
+          { label: "Level", key: "level" },
+          { label: "Revenue", key: "revenue" },
+          { label: "Payroll", key: "payroll" },
+          { label: "Profit/Loss", key: "pnl" },
+        ];
 
         for(let month in patient.revenue){
           if(month.slice(4,6) == selYear%100 && monthNames[month.slice(0,3)] == selMonth){
@@ -269,6 +305,7 @@ class PNL extends Component {
         if(payrollPerPatient[patient._id] == undefined){
           payroll = 0;
         }else{
+  
           for(let loopNurse in payrollPerPatient[patient._id]){
             payroll += parseFloat(payrollPerPatient[patient._id][loopNurse] * payrollHourly[loopNurse]);
           }
@@ -293,6 +330,12 @@ class PNL extends Component {
       };
       pnlDatas.push(row);
     }else{
+      headers = [
+        { label: "Month", key: "month" },
+        { label: "Revenue", key: "revenue" },
+        { label: "Payroll", key: "payroll" },
+        { label: "Profit/Loss", key: "pnl" },
+      ];
       let revenue = [];
       basic.patients.map(patient =>{
           for(let month in patient.revenue){
@@ -359,8 +402,8 @@ class PNL extends Component {
                     }
                   </Form.Select>
                 </Form.Group>
-            </MDBCol>
-            }
+                </MDBCol>
+                }          
             <MDBCol md="2" className='pt-3'>
               <Form.Check 
                 checked ={perPatient}
@@ -369,9 +412,21 @@ class PNL extends Component {
                 label="Per Patient"
                 onChange = {(e) => this.viewPerPatient(e)}
               />
+           
             </MDBCol>
+             <MDBCol md="2" className="float-right" >
+              <CSVLink 
+                headers={headers}
+                data={pnlDatas}
+                filename={"pnl.csv"}
+                className="btn btn-success "
+                target="_blank"
+                >
+                <IoMdDownload />Export 
+              </CSVLink>
+           </MDBCol>
           </MDBRow>
-          <MDBRow className='mt-2'>   
+        <MDBRow className='mt-2'>  
             <DataTable
                 columns={pnlColumns} 
                 data={pnlDatas}
@@ -382,8 +437,12 @@ class PNL extends Component {
                 fixedHeaderScrollHeight={'60vh'}
                 // pagination
             />
+
+                  
           </MDBRow>
+    
       </MDBContainer>
+       
     );
   };
 }

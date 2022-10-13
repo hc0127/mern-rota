@@ -4,7 +4,9 @@ import DataTable from 'react-data-table-component';
 import {
   MDBCol,MDBContainer,MDBRow
 } from 'mdb-react-ui-kit';
-import {Button, Form,OverlayTrigger,Tooltip} from 'react-bootstrap';
+import {IoMdDownload} from 'react-icons/io'
+import { CSVLink } from "react-csv";
+import {Form,OverlayTrigger,Tooltip} from 'react-bootstrap';
 
 class PayRoll extends Component {
   constructor(props) {
@@ -40,6 +42,13 @@ class PayRoll extends Component {
       selDesignation:e.target.value,
     });
   }
+  swap(json){
+    let ret = [];
+    for(var key in json){
+      ret[json[key]] = key;
+    }
+    return ret;
+  }
   
   getTotals(data, key){
     let total = 0;
@@ -47,14 +56,6 @@ class PayRoll extends Component {
       total += item[key];
     });
     return total;
-  }
-
-  swap(json){
-    let ret = [];
-    for(var key in json){
-      ret[json[key]] = key;
-    }
-    return ret;
   }
 
   render() {
@@ -68,7 +69,7 @@ class PayRoll extends Component {
     const MonthSelect = Mon.map((month,index) =>
       <option value={NoMon[index]}>{month}</option>
     );
-
+     
     let payrollColumns = [];
 
     if(selMonth != "00"){
@@ -76,67 +77,67 @@ class PayRoll extends Component {
         name: "ID",
         center:true,
         wrap:true,
-        width:'70px',
+        width:'80px',
         selector: (row) => row['code'],
       },{
         name: "Name",
         center:true,
         wrap:true,
-        width:'100px',
+        width:'120px',
         selector: (row) => row['name'],
       },{
         name: "Designation",
         center:true,
         wrap:true,
-        width:'100px',
+        width:'120px',
         selector: (row) => row['designation'],
       },{
         name: "Month(d)",
         center:true,
         wrap:true,
-        width:'70px',
+        width:'80px',
         selector: (row) => row['monthdays'],
       },{
         name: "Worked(d)",
         center:true,
         wrap:true,
-        width:'70px',
+        width:'80px',
         selector: (row) => row['workeddays'],
       },{
         name: "Worked(h)",
         center:true,
         wrap:true,
-        width:'70px',
+        width:'80px',
         selector: (row) => row['totalhoursworked'],
       },{
         name: "NormalOver(h)",
         center:true,
         wrap:true,
-        width:'100px',
+        width:'120px',
         selector: (row) => row['normalovertimehours'],
       },{
         name: "HolidayOver(h)",
         center:true,
         wrap:true,
-        width:'100px',
+        width:'120px',
         selector: (row) => row['holidayovertimehours'],
       },{
         name: "GrossSalary",
         center:true,
         wrap:true,
-        width:'100px',
+        width:'120px',
         selector: (row) => row['grosssalary'],
       },{
         name: "NormalOvertime",
         center:true,
         wrap:true,
-        width:'100px',
+        width:'120px',
         selector: (row) => row['normalovertime'],
       },{
         name: "HolidayOvertime",
         center:true,
         wrap:true,
-        width:'100px',
+        width:'150px',
         selector: (row) => row['holidayovertime'],
       });
     }else{
@@ -146,8 +147,13 @@ class PayRoll extends Component {
         wrap:true,
         selector: (row) => row['nurse'],
       });
-
-      for(let month in monthNames){
+      payrollColumns.push({
+        name: "Designation",
+        center:true,
+        wrap:true,
+        selector: (row) => row['designation'],
+      });
+      for(let month in monthNames){      
         payrollColumns.push({
           name:month,
           center:true,
@@ -168,7 +174,7 @@ class PayRoll extends Component {
         });
       }
     }
-    
+
     payrollColumns.push({
       name: "Total",
       center:true,
@@ -178,6 +184,7 @@ class PayRoll extends Component {
     });
 
     let payrollDatas = [];
+    let headers = [];
     //get holidays per month
     let holidays = basic.holidays;
     let holidaysPerMonth = [];
@@ -234,7 +241,7 @@ class PayRoll extends Component {
           let rotas = nurse.rota;
           let rotaPerMonth = [],rotaHolidayPerMonth = [];
           let workeddays = [],totalhoursworked = 0;
-
+         
           //rota calculate
           rotas.map(rota =>{
             if(rota.date.startsWith(selYear)){
@@ -246,7 +253,7 @@ class PayRoll extends Component {
               }else{
                 rotaPerMonth[month] += rota.hour;
               }
-              if(holidaysPerMonth[month].includes(rota.date)){
+              if(holidaysPerMonth[month] && holidaysPerMonth[month].includes(rota.date)){
                 if(rotaHolidayPerMonth[month] == undefined){
                   rotaHolidayPerMonth[month] = rota.hour;
                 }else{
@@ -255,12 +262,12 @@ class PayRoll extends Component {
               }
             }
           });
-
+       
           //datatable set
           let payrollPerMonth = [],payrollCommentPerMonth = [],offDaysPerMonth = [],dutyHoursPerMonth = [];
           let monthdays,normalovertimehours,holidayovertimehours,grosssalary,normalovertime,holidayovertime,totalsalary;
 
-          for(let loopMonth in monthNames){
+          for(let loopMonth in monthNames){         
             let daysInMonth = new Date(selYear, monthNames[loopMonth], 0).getDate();
             if(monthNames[loopMonth] == selMonth){monthdays = daysInMonth;}
 
@@ -325,28 +332,30 @@ class PayRoll extends Component {
                 totalsalary = payrollPerMonth[loopMonth];
               }
             }
-          }
-
+          }   
+          
           let row = {};
           row.nurse = nurse.name;
+          row.designation = nurse.level==0?"Registered":"Assistant";
           //all data
-          if(selMonth == "00"){
-            row.total = 0;
+          if(selMonth == "00"){           
+            let grandTotal = 0;
             for(let month in monthNames){
               if(selYear == new Date().getFullYear()){
                 if(parseInt(monthNames[month]) <= new Date().getMonth()+1){
                   row[month] = payrollPerMonth[month];
                   row[month+'comment'] = payrollCommentPerMonth[month];
-                  row.total += row[month];
+                  grandTotal += row[month];
                 }else{
                   row[month] = 0;
                 }
               }else if(selYear < new Date().getFullYear()){
                 row[month] = payrollPerMonth[month];
                 row[month+'comment'] = payrollCommentPerMonth[month];
-                row.total += row[month];
+                grandTotal += row[month];
               }
             }
+            row.total = grandTotal;
             payrollDatas.push(row);
           //detail month data
           }else{
@@ -364,32 +373,66 @@ class PayRoll extends Component {
             row.normalovertime = parseInt(normalovertime);  
             row.holidayovertime = parseInt(holidayovertime);
             row.total = totalsalary;
-
+            
             payrollDatas.push(row);
           }
         }
       });
-  
       let total = {
         nurse:'Total',
         code:'Total',
       }
-      for(let month in monthNames){
-        total[month] = this.getTotals(payrollDatas,month);
+      // payrollDatas.push(total);
+      if(selMonth != "00"){    headers = [
+        { label: "ID", key: "code" },
+        { label: "Name", key: "name" },
+        { label: "Designation", key: "designation" },
+        { label: "Worked Days", key: "workeddays" },
+        { label: "Worked Hours", key: "totalhoursworked" },
+        { label: "NormalOver(h)", key: "normalovertimehours" },
+        { label: "HolidayOver(h)", key: "holidayovertimehours" },
+        { label: "GrossSalary", key: "grosssalary" },
+        { label: "NormalOvertime", key: "normalovertime" },
+        { label: "HolidayOvertime", key: "holidayovertime" },
+        { label: "Total", key: "total" }
+      ];
+        for(let month in monthNames){      
+        }
+      } else {    
+        for(let month in monthNames){   
+          total[month] = this.getTotals(payrollDatas,month); 
+          total['total'] = this.getTotals(payrollDatas,'total'); 
+          headers = [
+            { label: "Nurse", key: "nurse" },
+            { label: "Designation", key: "designation" },
+            { label: "Jan", key: "Jan" },
+            { label: "Feb", key: "Feb" },
+            { label: "Mar", key: "Mar" },
+            { label: "Apr", key: "Apr" },
+            { label: "May", key: "May" },
+            { label: "Jun", key: "Jun" },
+            { label: "Jul", key: "Jul" },
+            { label: "Aug", key: "Aug" },
+            { label: "Sep", key: "Sep" },
+            { label: "Oct", key: "Oct" },
+            { label: "Nov", key: "Nov" },
+            { label: "Dec", key: "Dec" },
+            { label: "Total", key: "total" }
+          ];
+          
+        }
       }
-      total['total'] = this.getTotals(payrollDatas,'total');
-      payrollDatas.push(total);
     }
-
+    
     const conditionalRowStyles = [
       {
         when: (row) => row.designation == 'Total',
         style: row => ({
-          backgroundColor: 'rgb(160,160,160)',
+          backgroundColor: 'rgb(160,160,160)',         
         }),
       }
     ];
-
+  
     return (
       <MDBContainer>
           <div className="pt-5 text-center text-dark">
@@ -410,12 +453,23 @@ class PayRoll extends Component {
             </MDBCol>
             <MDBCol md="2">
               <Form.Select aria-label="select" value={selMonth} onChange = {(e) =>this.onChangeMonth(e)}>
-                <option value="00">Total</option>
+                <option value="00">Month</option>
                 {
                   MonthSelect
                 }
               </Form.Select>
-            </MDBCol>
+              </MDBCol>
+              <MDBCol md="2" >
+              <CSVLink
+                data={payrollDatas}
+                headers={headers}
+                filename={"payroll.csv"}
+                className="btn btn-success "
+                target="_blank"
+                >
+                <IoMdDownload />Export 
+              </CSVLink>
+           </MDBCol>         
           </MDBRow>
           <MDBRow className='mt-2'>   
             <DataTable

@@ -1,5 +1,4 @@
 import React, { Component } from 'react';
-
 import axios from 'axios'
 import {Form} from 'react-bootstrap';
 import { MDBContainer,MDBBtn,MDBBtnGroup,MDBRow,MDBCol } from 'mdb-react-ui-kit';
@@ -7,6 +6,8 @@ import DataTable from 'react-data-table-component';
 import {connect} from 'react-redux'
 import {confirmAlert} from 'react-confirm-alert'
 import TimePicker from 'react-bootstrap-time-picker';
+import {IoMdDownload} from 'react-icons/io'
+import { CSVLink } from "react-csv";
 
 import { FaPlus,FaMinus } from "react-icons/fa";
 
@@ -448,9 +449,15 @@ class Roaster extends Component {
 
     let monthNames = basic.monthNames;
     let monthNumbers = this.swap(monthNames);
-
-    // console.log(monthNames);
-    // let monthObject = {...monthNames};
+    let headers=[
+      { label: "Date", key: "date" },
+      { label: "Emp ID", key: "nurse_short_id" },
+      { label: "Emp Name", key: "nurse_name" },
+      { label: "Designation", key: "designation" },
+      { label: "Duty Start", key: "duty_start" },
+      { label: "Duty End", key: "duty_end" },
+      { label: " Hour", key: "hour" }
+    ]
     
     let Mon = Object.keys(monthNames);
     let NoMon = Object.values(monthNames);
@@ -485,12 +492,6 @@ class Roaster extends Component {
           wrap:true,
           selector: (row) => row.date,
         },
-        // {
-        //   name: "Rotation No",
-        //   center:true,
-        //   wrap:true,
-        //   selector: (row) => row.rotation,
-        // },
         {
           name: "Emp ID",
           center:true,
@@ -595,8 +596,8 @@ class Roaster extends Component {
               :
               <MDBBtn outline floating  color='success'  size="sm" onClick={(e) =>this.multiRemove(e,row)}><FaMinus /></MDBBtn>
         },
-      ];
-
+      
+      ]; 
       assignDatas = assigns;
       assignPerDayDatas = assignPerDay;
     }else{
@@ -607,12 +608,6 @@ class Roaster extends Component {
           wrap:true,
           selector: (row) => row.date,
         },
-        // {
-        //   name: "Rotation No",
-        //   center:true,
-        //   wrap:true,
-        //   selector: (row) => row.rotation,
-        // },
         {
           name: "Emp ID",
           center:true,
@@ -750,6 +745,17 @@ class Roaster extends Component {
           <MDBCol md="2">
             <MDBBtn  outline rounded color='success' type="button" onClick={() =>this.save()}>{isEditable?'save':'edit'}</MDBBtn>
           </MDBCol>
+          <MDBCol md="2" >
+              <CSVLink
+                data={assignDatas}
+                headers={headers}
+                filename={"roaster.csv"}
+                className="btn btn-success "
+                target="_blank"
+                >                
+                <IoMdDownload />Export 
+              </CSVLink>
+           </MDBCol>  
         </MDBRow>
         <MDBRow className='p-2'>
           <DataTable 
