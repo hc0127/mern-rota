@@ -1,24 +1,28 @@
-import React from 'react';
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import React from 'react'
 
-import Basic from './pages/basic';
-import Rota from './pages/rota';
-import Report from './pages/report';
-import Total from './pages/total';
+const DashBoard = React.lazy(() => import('./pages/dashboard'))
+const Basic = React.lazy(() => import('./pages/basic'))
+const WorkingDays = React.lazy(() => import('./pages/working'))
+const LeaveDays = React.lazy(() => import('./pages/leave'))
+const Roaster = React.lazy(() => import('./pages/roaster'))
+const Total = React.lazy(() => import('./pages/total'))
+const PayRoll = React.lazy(() => import('./pages/payroll'))
+const Revenue = React.lazy(() => import('./pages/revenue'))
+const PNL = React.lazy(() => import('./pages/pnl'))
+const NotFound = React.lazy(() => import('./pages/404page'))
 
-function Routers(){
-    return(
-        <div className='wrapper'>
-            <BrowserRouter>
-                <Routes >
-                    <Route path='basic' element={<Basic />} />
-                    <Route path='rota' element={<Rota />} />
-                    <Route path='report' element={<Report />} />
-                    <Route path='total' element={<Total />} />
-                </Routes>
-            </BrowserRouter>
-        </div>
-    );
-}
+const routes = [
+  { path: '/', exact: true, name: 'Home' },
+  { path: '/dashboard', name: 'Dashboard', element: DashBoard },
+  { path: '/basic', name: 'Basic', element: Basic },
+  { path: '/working', name: 'WorkingDays', element: WorkingDays },
+  { path: '/leave', name: 'LeaveDays', element: LeaveDays },
+  { path: '/roaster', name: 'Roaster', element: Roaster },
+  { path: '/total', name: 'Total', element: Total },
+  { path: '/payroll', name: 'PayRoll', element: PayRoll },
+  { path: '/revenue', name: 'Revenue', element: Revenue },
+  { path: '/pnl', name: 'PNL', element: PNL },
+  { path: '*', name: 'NotFound', element: NotFound },
+]
 
-export default Routers;
+export default routes

@@ -19,7 +19,7 @@ import { NavLink as Link } from 'react-router-dom';
 import {connect} from 'react-redux'
 import {
   logOut
-} from './../../store/Actions/BasicAction';
+} from '../store/Actions/BasicAction';
 
 //import sidebar css from react-pro-sidebar module and our custom css 
 import "react-pro-sidebar/dist/css/styles.css";

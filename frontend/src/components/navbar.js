@@ -4,8 +4,8 @@ import styled from 'styled-components';
 
 import React, { Component } from 'react';
 import {connect} from 'react-redux'
-import {getAllDatas} from '../../store/Actions/BasicAction';
-import axios from '../../config/server.config'
+import {getAllDatas} from '../store/Actions/BasicAction';
+import axios from '../config/server.config'
 import ReactLoading from 'react-loading';
 import {
 	MDBNavbar,MDBContainer,MDBNavbarBrand,MDBNavbarToggler,MDBIcon,MDBCollapse,showNavColor,MDBNavbarNav,MDBNavbarItem,MDBNavbarLink

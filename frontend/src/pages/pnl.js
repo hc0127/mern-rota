@@ -244,16 +244,12 @@ class PNL extends Component {
               }
             }else if(selYear < parseInt(nurse.date.slice(0,4))){
               salary = 0;
+            }         
+            payrollPerMonth[loopMonth] += salary;                      
+            if(monthNames[loopMonth] == selMonth){
+                payrollHourly[nurse._id] = parseFloat(salary/rotaPerMonth[loopMonth]);
             }
-
-          
-          payrollPerMonth[loopMonth] += salary;
-          
-          
-          if(monthNames[loopMonth] == selMonth){
-              payrollHourly[nurse._id] = parseFloat(salary/rotaPerMonth[loopMonth]);
           }
-        }
         }
       });
 
