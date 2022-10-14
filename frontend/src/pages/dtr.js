@@ -1,11 +1,11 @@
 import React, { Component } from 'react';
 import {Form} from 'react-bootstrap';
-import { MDBContainer } from 'mdb-react-ui-kit';
+import { MDBContainer,MDBRow,MDBCol,MDBBtn,MDBBtnGroup } from 'mdb-react-ui-kit';
 import {IoMdDownload} from 'react-icons/io'
 import { CSVLink } from "react-csv";
 import {connect} from 'react-redux'
 import DataTable from 'react-data-table-component';
-import AutoComplete from 'react-autocomplete';
+import Autocomplete from 'react-autocomplete';
 
 class DTR extends Component {
   constructor(props) {
@@ -19,7 +19,9 @@ class DTR extends Component {
         type:0,
         from:year+'-'+month+'-'+'01',
         to:year+'-'+month+'-'+day,
-        selNurse:0
+        selNurse:0,
+        selPatient:0,
+        selPatientValue:'',
       };
   }
   setDate = (target,e) =>{
@@ -34,12 +36,30 @@ class DTR extends Component {
       selNurse:e.target.value
     });
   }
+
+  onChangePatient = (e) =>{
+    // console.log(e.target);
+    this.setState({
+      ...this.state,
+      selPatient:0,
+      selPatientValue:e.target.value
+    })
+  }
+
+  onSelectPatient = (val,item) =>{
+    this.setState({
+      ...this.state,
+      selPatient:item.key,
+      selPatientValue:val
+    })
+  }
+
   componentDidMount() {
   }
   
   render() {
     const {basic} = this.props;
-    const {from,to,selNurse} = this.state;
+    const {from,to,selNurse,selPatient,selPatientValue} = this.state;
 
     let totalColumns = [];
     let totalDatas = [];
@@ -94,8 +114,16 @@ class DTR extends Component {
       }
     
     let patientList = [];
+    let patientAutoList = [];
+
     basic.patients.map((patient) =>{
       patientList[patient._id] = patient.name;
+      if(patient.name.includes(selPatientValue)){
+        patientAutoList.push({
+          label:patient.name,
+          key:patient._id
+        });
+      }
     });
 
     let leavedays = [];
@@ -126,15 +154,29 @@ class DTR extends Component {
 
         nurse.rota.map((rota)=>{
           if(rota.date >= from && rota.date <= to){
-            thour += rota.hour;
-            let row = {
-              date:rota.date,
-              patient:patientList[rota.patient_id],
-              duty_start:rota.duty_start,
-              duty_end:rota.duty_end,
-              hour:rota.hour,
+            if(selPatient == 0){
+              thour += rota.hour;
+              let row = {
+                date:rota.date,
+                patient:patientList[rota.patient_id],
+                duty_start:rota.duty_start,
+                duty_end:rota.duty_end,
+                hour:rota.hour,
+              }
+              totalDatas.push(row);
+            }else{
+              if(rota.patient_id == selPatient){
+                thour += rota.hour;
+                let row = {
+                  date:rota.date,
+                  patient:patientList[rota.patient_id],
+                  duty_start:rota.duty_start,
+                  duty_end:rota.duty_end,
+                  hour:rota.hour,
+                }
+                totalDatas.push(row);
+              }
             }
-            totalDatas.push(row);
           }
         });
       }
@@ -154,10 +196,10 @@ class DTR extends Component {
         <div className="pt-5 text-center text-dark">
           <h1 className="mt-3">DAILY TIME RECORD (DTR)</h1>
         </div>
-        <div className='row'>
-          <div className='col'>
+        <MDBRow>
+          <MDBCol>
               <div className="row lex align-items-center justify-content-center">
-                <div className='col-md-3'>
+                <MDBCol>
                   <Form.Group>
                     <Form.Select aria-label="patient select" value={selNurse} onChange = {(e) =>this.onChangeNurse(e)}>
                       <option value="0" >Select Nurse</option>
@@ -168,29 +210,43 @@ class DTR extends Component {
                       }
                     </Form.Select>
                   </Form.Group>
-                </div>
-                <div className='col-md-3'>
+                </MDBCol>
+                <MDBCol className='autocomplete'>
+                  <Autocomplete
+                    getItemValue={(item) => item.label}
+                    items={patientAutoList}
+                    renderItem={(item, isHighlighted) =>
+                      <div style={{ background: isHighlighted ? 'lightgray' : 'white' }}>
+                        {item.label}
+                      </div>
+                    }
+                    value={selPatientValue}
+                    onChange={(e) => this.onChangePatient(e)}
+                    onSelect={(val,item) =>this.onSelectPatient(val,item)}
+                  />
+                </MDBCol>
+                <MDBCol>
                   <Form.Group>
                     <Form.Control type="date" value={from} max={to}  onChange = {(e) =>this.setDate('from',e)} />
                   </Form.Group>
-                </div>
-                <div className='col-md-3'>
+                </MDBCol>
+                <MDBCol>
                   <Form.Group>
                     <Form.Control type="date" value={to} min={from}  onChange = {(e) =>this.setDate('to',e)}/>
                   </Form.Group>
-                </div>
-                <div className='col-md-3'>
-              <CSVLink
-                headers={headers}
-                data={totalDatas}
-                filename={"dtr.csv"}
-                className="btn btn-success "
-                target="_blank"
-                >
-                <IoMdDownload />Export 
-              </CSVLink>
-           </div>
-           </div>
+                </MDBCol>
+                <MDBCol>
+                  <CSVLink
+                    headers={headers}
+                    data={totalDatas}
+                    filename={"dtr.csv"}
+                    className="btn btn-success "
+                    target="_blank"
+                    >
+                    <IoMdDownload />Export 
+                  </CSVLink>
+              </MDBCol>
+            </div>
             <div className='p-2'>
               <DataTable 
                 columns={totalColumns} 
@@ -200,8 +256,8 @@ class DTR extends Component {
                 fixedHeaderScrollHeight={'60vh'}
                 />
             </div>
-          </div>
-        </div>
+          </MDBCol>
+        </MDBRow>
       </MDBContainer>
     );
   };

@@ -631,7 +631,7 @@ class DashBoard extends Component {
             </MDBCol>
           </MDBRow>
           <CChart
-            type="line" 
+            type="bar" 
             data={{
               labels: days,
               datasets: [
