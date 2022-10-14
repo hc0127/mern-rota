@@ -196,7 +196,7 @@ class DashBoard extends Component {
               }
             }
 
-            if(holidaysPerMonth[month].includes(rota.date)){
+            if(holidaysPerMonth[month] && holidaysPerMonth[month].includes(rota.date)){
               if(rotaHolidayPerMonth[month] == undefined){
                 rotaHolidayPerMonth[month] = rota.hour;
               }else{
