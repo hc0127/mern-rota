@@ -36,6 +36,9 @@ function App() {
     <div className="App">
       <header className="App-header">
         <Routes history={history}>
+          {
+            token && <Route path='/login' element={<Login />} />
+          }
           <Route path="*" element={<Layout />} />
         </Routes>
       </header>

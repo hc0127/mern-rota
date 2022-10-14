@@ -22,6 +22,7 @@
     "mdb-react-ui-kit": "^4.1.0",
     "nodemon": "^2.0.19",
     "react": "^18.2.0",
+    "react-autocomplete": "^1.8.1",
     "react-bootstrap": "^2.5.0",
     "react-bootstrap-time-picker": "^2.0.1",
     "react-confirm-alert": "^3.0.6",

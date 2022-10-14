@@ -16,7 +16,7 @@ h1{
   }
 }
 .login-wrapper{
-  background:url('../img/background.jpg') no-repeat fixed; 
+  background:url('../../public/background.jpg') no-repeat fixed; 
   -webkit-background-size: cover;
   -moz-background-size: cover;
   -o-background-size: cover;

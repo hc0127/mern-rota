@@ -5,6 +5,7 @@ import {IoMdDownload} from 'react-icons/io'
 import { CSVLink } from "react-csv";
 import {connect} from 'react-redux'
 import DataTable from 'react-data-table-component';
+import AutoComplete from 'react-autocomplete';
 
 class DTR extends Component {
   constructor(props) {

@@ -1,6 +1,6 @@
 import React,{Component} from 'react';
 import './../css/App.css';
-import {Row,Col,FloatingLabel,Form,Button} from 'react-bootstrap'
+import {Row,Col,Container,Form,Button} from 'react-bootstrap'
 import axios from './../config/server.config';
 import {
   setToken
@@ -8,7 +8,7 @@ import {
 import {connect} from 'react-redux'
 import toastr from 'toastr'
 import 'toastr/build/toastr.min.css'
-import { MDBContainer } from 'mdb-react-ui-kit';
+import { MDBContainer,  MDBCard,MDBCardBody,MDBCardImage,MDBRow,MDBCol,MDBIcon,MDBInput,MDBBtn } from 'mdb-react-ui-kit';
 
 
 class Login extends Component {
@@ -58,32 +58,28 @@ class Login extends Component {
 
     render(){
         return(
-            <div className="login-wrapper">
-                <MDBContainer>
-                        <h1 className='m-5 text-center'>Please Login</h1>
-                        <Row className=" align-items-center justify-content-center">
-                            <Col md="4">
-                                <Form.Group className="m-3" controlId="formBasicEmail">
-                                    <Form.Control type="email" placeholder="Enter email" value={this.state.email} onChange={(e) => this.onChangeValue('email',e)} />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                        <Row className=" align-items-center justify-content-center">
-                            <Col md="4">
-                                <Form.Group className="m-3" controlId="formBasicPassword">
-                                    <Form.Control type="password" placeholder="Password" value={this.state.password} onKeyUpCapture={(e) =>this.keypress(e)} onChange={(e) => this.onChangeValue('password',e)} />
-                                </Form.Group>
-                            </Col>
-                        </Row>
-                        <Row className=" align-items-center justify-content-center">
-                            <Col className="align-item text-center" md="4">
-                                <Button className="m-3" variant="success" onClick={() =>this.onLogin()}>
-                                    Login
-                                </Button>
-                            </Col>
-                        </Row>
-                </MDBContainer>
-            </div>
+					<div className="login-wrapper">
+							<MDBContainer className='m-auto'>
+								<MDBCard background='success' >
+										<MDBRow className='g-0'>
+												<MDBCol md='6'>
+													<MDBCardImage src='login.png' className=' rounded-start w-100 h-100'/>
+												</MDBCol>
+												<MDBCol md='6'>
+														<MDBCardBody className='d-flex flex-column'>
+																<div className='d-flex flex-row mt-2'>
+																		<MDBCardImage src='logo-rated.png' className='h-10'></MDBCardImage>
+																</div>
+																<h5 className="fw-normal my-4 pb-3" style={{letterSpacing: '1px'}}>Sign into your account</h5>
+																<MDBInput wrapperClass='mb-4' label='Email address' id='formControlLg' type='email' size="lg" value={this.state.email} onChange={(e) => this.onChangeValue('email',e)}/>
+																<MDBInput wrapperClass='mb-4' type="password" label='Password' id='formControlLg' size="lg" value={this.state.password} onKeyUpCapture={(e) =>this.keypress(e)} onChange={(e) => this.onChangeValue('password',e)}/>
+																<MDBBtn className="mb-4 px-5" color="primary" size='lg' onClick={() =>this.onLogin()}>Login</MDBBtn>
+														</MDBCardBody>
+												</MDBCol>
+										</MDBRow>
+								</MDBCard>
+						</MDBContainer>
+					</div>
         )
     }
   }

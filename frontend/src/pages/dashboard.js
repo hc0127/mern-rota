@@ -508,7 +508,7 @@ class DashBoard extends Component {
           <MDBRow className='mt-2'>
             <MDBCol>
               <MDBProgress height='15'>
-                <MDBProgressBar bgColor='primary' width='100' valuemin={0} valuemax={100}>Total</MDBProgressBar>
+                <MDBProgressBar bgColor='primary' width='100' valuemin={0} valuemax={100}>Total/Average</MDBProgressBar>
               </MDBProgress>
             </MDBCol>
             <MDBCol>
@@ -530,7 +530,7 @@ class DashBoard extends Component {
                   labels: Mon,
                   datasets: [
                     {
-                      label: "Total",
+                      label: "Average",
                       backgroundColor: "#00f",
                       borderColor: "#00f",
                       pointBackgroundColor: "#00f",
@@ -559,7 +559,7 @@ class DashBoard extends Component {
                   maintainAspectRatio: true,
                   plugins: {
                     legend: {
-                      display: false,
+                      display: true,
                     },
                   },
                   elements: {
@@ -612,7 +612,7 @@ class DashBoard extends Component {
                   maintainAspectRatio: true,
                   plugins: {
                     legend: {
-                      display: false,
+                      display: true,
                     },
                   },
                   elements: {
@@ -636,7 +636,7 @@ class DashBoard extends Component {
               labels: days,
               datasets: [
                 {
-                  label: "Total",
+                  label: "Average",
                   backgroundColor: "#00f",
                   borderColor: "#00f",
                   pointBackgroundColor: "#00f",
@@ -665,7 +665,7 @@ class DashBoard extends Component {
               maintainAspectRatio: true,
               plugins: {
                 legend: {
-                  display: false,
+                  display: true,
                 },
               },
               elements: {
