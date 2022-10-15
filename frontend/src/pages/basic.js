@@ -624,7 +624,7 @@ class Basic extends Component {
 
           let day = j>9?j:'0'+j;
 
-          if(holidays.includes(month+'-'+day)){
+          if(holidays && holidays.includes(month+'-'+day)){
             row[j]['checked'] = true;
           }
           if(j > daysInMonth){
