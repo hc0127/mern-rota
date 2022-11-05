@@ -10,6 +10,9 @@ let User = new Schema({
     },
     token:{
         type:String
+    },
+    role:{
+        type:Number
     }
 });
 

@@ -1,9 +1,11 @@
+import { FaBars } from "react-icons/fa";
 import { NavLink as Link } from "react-router-dom";
 import styled from "styled-components";
+
 import React, { Component } from "react";
 import { connect } from "react-redux";
-import { getAllDatas } from "../store/Actions/BasicAction";
-import axios from "../config/server.config";
+import { getAllDatas } from "../../store/Actions/BasicAction";
+import axios from "../../config/server.config";
 import ReactLoading from "react-loading";
 import {
   MDBNavbar,
@@ -12,8 +14,10 @@ import {
   MDBNavbarToggler,
   MDBIcon,
   MDBCollapse,
+  showNavColor,
   MDBNavbarNav,
   MDBNavbarItem,
+  MDBNavbarLink,
 } from "mdb-react-ui-kit";
 
 export const NavLink = styled(Link)`
@@ -58,12 +62,12 @@ class Navbar extends Component {
         });
         this.props.initialData(response.data);
       })
-      .catch(function (error) {});
+      .catch(function (error) {
+        console.log(error);
+      });
   }
   render() {
     const { isLoading } = this.state;
-    const {user} = this.props.basic;
-
     return (
       <MDBNavbar expand="lg" fixed="top" bgColor="success">
         <ReactLoading
@@ -104,6 +108,7 @@ class Navbar extends Component {
                   Working Days
                 </NavLink>
               </NavItem>
+
               <NavItem>
                 <NavLink aria-current="page" to="leave">
                   Leave Days
@@ -114,38 +119,31 @@ class Navbar extends Component {
                   Roaster
                 </NavLink>
               </NavItem>
+              {/* <NavItem>
+								<NavLink aria-current='page' to='fte'>
+								Full Time Equivalent
+								</NavLink>
+							</NavItem> */}
               <NavItem>
                 <NavLink aria-current="page" to="dtr">
                   DTR
                 </NavLink>
               </NavItem>
               <NavItem>
-                <NavLink aria-current="page" to="fte">
-                  FTE
+                <NavLink aria-current="page" to="payroll">
+                  PayRoll
                 </NavLink>
               </NavItem>
-              {
-                (user.role && user.role !== 0) ?
-                <>
-                  <NavItem>
-                    <NavLink aria-current="page" to="payroll">
-                      PayRoll
-                    </NavLink>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink aria-current="page" to="revenue">
-                      Revenue
-                    </NavLink>
-                  </NavItem>
-                  <NavItem>
-                    <NavLink aria-current="page" to="pnl">
-                      PNL
-                    </NavLink>
-                  </NavItem>
-                </>
-                :
-                <></>
-              }
+              <NavItem>
+                <NavLink aria-current="page" to="revenue">
+                  Revenue
+                </NavLink>
+              </NavItem>
+              <NavItem>
+                <NavLink aria-current="page" to="pnl">
+                  PNL
+                </NavLink>
+              </NavItem>
             </MDBNavbarNav>
           </MDBCollapse>
         </MDBContainer>
@@ -158,8 +156,4 @@ const mapDispatchToProps = (dispatch) => ({
   initialData: (data) => dispatch(getAllDatas(data)),
 });
 
-const mapStateToProps = (BasicData) => ({
-  basic:BasicData.BasicData
-});
-
-export default connect(mapStateToProps,mapDispatchToProps)(Navbar)
+export default connect(null, mapDispatchToProps)(Navbar);

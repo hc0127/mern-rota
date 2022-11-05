@@ -13,7 +13,6 @@ router.route("/list").get(function(req,res){
                 if(!err){
                     Holiday.find({},function(err,holidayData){
                         let holidays;
-                        console.log(holidayData);
                         if(holidayData == null || holidayData.length == 0){
                             holidays = [];
                         }else{
@@ -32,46 +31,30 @@ router.route("/list").get(function(req,res){
     });
 });
 router.route('/login').post(function(req,res){
-    User.findOne({user:"admin@gmail.com",token:'token123'},function(err,data){
-        console.log(data);
-        if(data == null){
-            User.findOneAndUpdate({user:"admin@gmail.com"},{token:'token123'},function(err,data){
-                if(data.password == req.body.password){
-                    Nurse.find({},function(err,nurseData){
-                        Patient.find({},function(err,patientData){
-                            if(!err){
-                                res.send({
-                                    state:'success',
-                                    token:data.token,
-                                    nurse:nurseData,
-                                    patient:patientData,
-                                });
-                            }
-                        });
-                    });
-                }else{
-                    res.send({state:'wrong'});
-                }
-            });
-        }else{
-            if(data.password == req.body.password){
-                Nurse.find({},function(err,nurseData){
-                    if(!err){
-                        Patient.find({},function(err,patientData){
-                            if(!err){
-                                res.send({
-                                    state:'success',
-                                    token:data.token,
-                                    nurse:nurseData,
-                                    patient:patientData,
-                                });
-                            }
-                        });
-                    }
+    const user = req.body;
+    User.findOne({user:user.email},function(err,data){
+        if(!err){
+            if(data == null){
+                res.send({
+                    state:'nouser',
                 });
             }else{
-                res.send({state:'wrong'});
-            }    
+                if(data.password == user.password){
+                    if(!err){
+                        res.send({
+                            state:'success',
+                            token:data.token,
+                            role:data.role
+                        });
+                    }
+                }else{
+                    res.send({state:'wrongpwd'});
+                }
+            }
+        }else{
+            res.send({
+                state:"error"
+            });
         }
     });
 });

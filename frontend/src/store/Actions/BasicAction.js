@@ -1,116 +1,99 @@
 import {
-  INITIAL,TOKENCHECK,HSET,
-  NINSERT,NUPDATE,NDELETE,NAUPDATE,
-  PINSERT,PUPDATE,LDELETE,PAUPDATE,
-  LINSERT,LUPDATE,PDELETE,
-} from '../Types';
-import { createBrowserHistory  } from 'history';
+  INITIAL,
+  TOKENCHECK,
+  HSET,
+  NINSERT,
+  NUPDATE,
+  NDELETE,
+  NAUPDATE,
+  PINSERT,
+  PUPDATE,
+  PAUPDATE,
+  PDELETE,
+} from "../Types";
+import history from "./../../history"
 
 export const getAllDatas = (data) => {
-  return ({
+  const user = JSON.parse(sessionStorage.getItem("data"));
+  return {
     type: INITIAL,
-    data:{
-      nurses: data.nurse, 
-      patients: data.patient, 
-      levels: data.level, 
-      holidays: data.holiday, 
-    }
-  });
-}
+    data: {
+      nurses: data.nurse,
+      patients: data.patient,
+      holidays: data.holiday,
+      user:user,
+    },
+  };
+};
 
 export const nIns = (data) => {
-  return ({
+  return {
     type: NINSERT,
     nurse: data,
-  });
+  };
 };
 export const nUpd = (data) => {
-  return ({
+  return {
     type: NUPDATE,
     nurse: data,
-  });
+  };
 };
 export const nDel = (_id) => {
-  return ({
+  return {
     type: NDELETE,
-    _id: _id
-  });
+    _id: _id,
+  };
 };
 export const pIns = (data) => {
-  return ({
+  return {
     type: PINSERT,
     patient: data,
-  });
+  };
 };
 export const pUpd = (data) => {
-  return ({
+  return {
     type: PUPDATE,
     patient: data,
-  });
+  };
 };
 export const pDel = (_id) => {
-  return ({
+  return {
     type: PDELETE,
-    _id: _id
-  });
+    _id: _id,
+  };
 };
 
-export const nAllUpd = (data) =>{
-  return({
-    type:NAUPDATE,
-    nurses:data.NurseDatas,
-  });
-}
-
-export const pAllUpd = (data) =>{
-  return({
-    type:PAUPDATE,
-    patients:data.patients,
-  });
-}
-
-export const lIns = (data) => {
-  return ({
-    type: LINSERT,
-    level: data,
-  });
+export const nAllUpd = (data) => {
+  return {
+    type: NAUPDATE,
+    nurses: data.NurseDatas,
+  };
 };
-export const lUpd = (data) => {
-  return ({
-    type: LUPDATE,
-    level: data,
-  });
-};
-export const lDel = (_id) => {
-  return ({
-    type: LDELETE,
-    _id: _id
-  });
+
+export const pAllUpd = (data) => {
+  return {
+    type: PAUPDATE,
+    patients: data.patients,
+  };
 };
 
 export const hSet = (data) =>{
-  return({
+  return{
     type:HSET,
     holidays:data.holiday,
-  });
+  };
 }
 
-export const setToken = (data) =>{
-  const history = createBrowserHistory();
-  history.push('/');
-  history.go('/');
-  sessionStorage.setItem('token',JSON.stringify(data.token));
-  return ({
-    type:TOKENCHECK,
-    data:data,
-  });
+export const setToken = (user) =>{
+  history.push("/");
+  history.go("/");
+  sessionStorage.setItem("data", JSON.stringify(user));
+  return {};
 };
 
 export const logOut = () =>{
-  const history = createBrowserHistory();
-  history.push('/login');
-  history.go('/login');
-  sessionStorage.removeItem('token');
-  return ({
-  });
+  history.push("/login");
+  history.go("/login");
+  sessionStorage.removeItem("data");
+  return {};
 };

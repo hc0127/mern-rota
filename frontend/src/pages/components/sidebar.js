@@ -1,5 +1,5 @@
 //import useState hook to create menu collapse state
-import React, { Component } from "react";
+import React, { Component, useState } from "react";
 
 //import react pro sidebar components
 import {
@@ -28,7 +28,7 @@ import {
 } from "react-icons/fi";
 import { NavLink as Link } from "react-router-dom";
 import { connect } from "react-redux";
-import { logOut } from "../store/Actions/BasicAction";
+import { logOut } from "./../../store/Actions/BasicAction";
 
 //import sidebar css from react-pro-sidebar module and our custom css
 import "react-pro-sidebar/dist/css/styles.css";
@@ -69,7 +69,6 @@ class Sidebar extends Component {
   };
 
   render() {
-    const{user} = this.props.basic;
     return (
       <>
         <div id="sidebar">
@@ -111,24 +110,17 @@ class Sidebar extends Component {
                     Roaster
                   </NavLink>
                 </MenuItem>
+                {/* <MenuItem icon={<FaClock className="text-success"  />}><NavLink to='fte' onClick={this.menuLinkClick}>FTE</NavLink></MenuItem> */}
                 <MenuItem icon={<FaBookMedical className="text-success" />}>
                   <NavLink to="dtr" onClick={this.menuLinkClick}>
                     DTR
                   </NavLink>
                 </MenuItem>
-                <MenuItem icon={<FaBookMedical className="text-success" />}>
-                  <NavLink to="fte" onClick={this.menuLinkClick}>
-                    FTE
+                <MenuItem icon={<FaRegMoneyBillAlt className="text-success" />}>
+                  <NavLink to="payroll" onClick={this.menuLinkClick}>
+                    PayRoll
                   </NavLink>
                 </MenuItem>
-                {
-                  (user.role && user.role !== 0) &&
-                    <MenuItem icon={<FaRegMoneyBillAlt className="text-success" />}>
-                      <NavLink to="payroll" onClick={this.menuLinkClick}>
-                        PayRoll
-                      </NavLink>
-                    </MenuItem>
-                }
               </Menu>
             </SidebarContent>
             <SidebarFooter>
@@ -152,8 +144,4 @@ const mapDispatchToProps = (dispatch) => ({
   logOut: () => dispatch(logOut()),
 });
 
-const mapStateToProps = (BasicData) => ({
-  basic:BasicData.BasicData
-});
-
-export default connect(mapStateToProps,mapDispatchToProps)(Sidebar)
+export default connect(null, mapDispatchToProps)(Sidebar);

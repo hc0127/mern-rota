@@ -1,15 +1,21 @@
-import React,{ Suspense } from 'react'
-import { Route, Routes,Navigate } from 'react-router-dom';
+import React, { Suspense } from "react";
+import { Route, Routes, Navigate } from "react-router-dom";
 
-import { Navbar,Sidebar } from '../components/index'
-import routes from '../routes'
+import { Navbar, Sidebar } from "../components/index";
+import routes from "../routes";
 
-import {MDBContainer,MDBRow,MDBCol,MDBBtn,MDBBtnGroup} from 'mdb-react-ui-kit'
+import {
+  MDBContainer,
+  MDBRow,
+  MDBCol,
+  MDBBtn,
+  MDBBtnGroup,
+} from "mdb-react-ui-kit";
 
 const Layout = () => {
   return (
     <MDBRow>
-        <Sidebar />
+      <Sidebar />
       <div className="main">
         <Navbar />
         <Suspense>
@@ -25,14 +31,14 @@ const Layout = () => {
                     element={<route.element />}
                   />
                 )
-              )
+              );
             })}
             <Route path="/" element={<Navigate to="dashboard" replace />} />
           </Routes>
         </Suspense>
       </div>
     </MDBRow>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;

@@ -1,62 +1,75 @@
-import React, { Component } from 'react';
-import './../css/App.css';
-import axios from 'axios'
-import {DropdownButton,Dropdown,Button,Form,Row,Col,FloatingLabel} from 'react-bootstrap';
-import DataTable from 'react-data-table-component';
+import React, { Component } from "react";
+import "./../css/App.css";
+import axios from "axios";
+import {
+  DropdownButton,
+  Dropdown,
+  Button,
+  Form,
+  Row,
+  Col,
+  FloatingLabel,
+} from "react-bootstrap";
+import DataTable from "react-data-table-component";
 
 const rotaColumns = [
   {
     name: "Date",
-    center:true,
-    wrap:true,
+    center: true,
+    wrap: true,
     selector: (row) => row.date,
   },
   {
     name: "Nurse",
-    center:true,
-    wrap:true,
+    center: true,
+    wrap: true,
     selector: (row) => row.nurse,
   },
   {
     name: "Patient",
-    center:true,
-    wrap:true,
+    center: true,
+    wrap: true,
     selector: (row) => row.patient,
   },
   {
     name: "Action",
-    center:true,
-    wrap:true,
+    center: true,
+    wrap: true,
     sortable: false,
     selector: "null",
     cell: (d) => [
-      <DropdownButton id="dropdown-basic-button" title="Action" style={{width:'100px'}}>
-        <Dropdown.Item href={"edit/"+d.full_name}>edit</Dropdown.Item>
-        <Dropdown.Item href={"delete/"+d.full_name}>delete</Dropdown.Item>
-      </DropdownButton>
-    ]
-  }
+      <DropdownButton
+        id="dropdown-basic-button"
+        title="Action"
+        style={{ width: "100px" }}
+      >
+        <Dropdown.Item href={"edit/" + d.full_name}>edit</Dropdown.Item>
+        <Dropdown.Item href={"delete/" + d.full_name}>delete</Dropdown.Item>
+      </DropdownButton>,
+    ],
+  },
 ];
 
 export default class Report extends Component {
   constructor(props) {
-      super(props);
-      this.state = {rotas: []};
+    super(props);
+    this.state = { rotas: [] };
   }
 
   componentDidMount() {
-      axios.get('nurse/list')
-          .then(response => {
-            console.log(response.data);
-              this.setState({ rotas: response.data });
-          })
-          .catch(function (error){
-              console.log(error);
-          })
+    axios
+      .get("nurse/list")
+      .then((response) => {
+        console.log(response.data);
+        this.setState({ rotas: response.data });
+      })
+      .catch(function (error) {
+        console.log(error);
+      });
   }
 
   render() {
-    const {rotas} = this.state;
+    const { rotas } = this.state;
 
     return (
       <div className="wrapper">
@@ -91,22 +104,25 @@ export default class Report extends Component {
           <Col>
             <Form.Group className="mb-3">
               <Form.Label>Report Content</Form.Label>
-              <Form.Control  as="textarea" rows={3}/>
+              <Form.Control as="textarea" rows={3} />
             </Form.Group>
           </Col>
           <Col>
-            <Button variant="success" className='mb-3 float-right'>Assign</Button>
+            <Button variant="success" className="mb-3 float-right">
+              Assign
+            </Button>
           </Col>
         </Row>
-        <div className='p-2'>
-          <DataTable 
-            columns={rotaColumns} 
+        <div className="p-2">
+          <DataTable
+            columns={rotaColumns}
             data={rotas}
             fixedHeader
             fixedHeaderScrollHeight={300}
-            pagination />
+            pagination
+          />
         </div>
       </div>
     );
-  };
+  }
 }
