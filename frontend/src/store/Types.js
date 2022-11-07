@@ -15,5 +15,9 @@ export const LUPDATE = 'LEVEL UPDATE';
 export const LDELETE = 'LEVEL UPDATE';
 
 
+export const RADD = "REQUEST ADD";
+export const RSTATUSCHANGE = "REQUEST STATUS CHANGE";
+
+
 export const HSET = "HOLIDAY SET";
 export const TOKENCHECK = 'TOKEN CHECK';

@@ -5,11 +5,7 @@ import { Navbar, Sidebar } from "../components/index";
 import routes from "../routes";
 
 import {
-  MDBContainer,
   MDBRow,
-  MDBCol,
-  MDBBtn,
-  MDBBtnGroup,
 } from "mdb-react-ui-kit";
 
 const Layout = () => {

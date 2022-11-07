@@ -1,7 +1,6 @@
 import React, { Component } from "react";
 import "./../css/App.css";
-import { Row, Col, Container, Form, Button } from "react-bootstrap";
-import axios from "./../config/server.config";
+import axios,{socket} from "./../config/server.config";
 import { setToken } from "./../store/Actions/BasicAction";
 import { connect } from "react-redux";
 import toastr from "toastr";
@@ -13,7 +12,6 @@ import {
   MDBCardImage,
   MDBRow,
   MDBCol,
-  MDBIcon,
   MDBInput,
   MDBBtn,
 } from "mdb-react-ui-kit";

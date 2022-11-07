@@ -103,7 +103,6 @@ class LeaveDays extends Component {
   };
 
   addLeave = () => {
-    var _self = this;
     const { selNurse, selType, from, to } = this.state;
     if (selNurse == 0) {
       toastr.info("Please select nurse!");
@@ -120,8 +119,11 @@ class LeaveDays extends Component {
           to: to,
         })
         .then(function (response) {
-          toastr.info("Add LeaveDays Success!");
-          _self.props.getLeave(response.data);
+          const res = response.data;
+          if(res.state == "error"){
+            toastr.clear();
+            setTimeout(() => toastr.info("holiday setting error!"), 3000);
+          }
         })
         .catch(function (error) {});
     }
@@ -149,7 +151,6 @@ class LeaveDays extends Component {
   };
 
   editConfirmLeave = () => {
-    var _self = this;
     this.setState({
       isOpen: false,
     });
@@ -159,22 +160,27 @@ class LeaveDays extends Component {
         ...this.state.modal,
       })
       .then(function (response) {
-        toastr.info("Modify LeaveDays Success!");
-        _self.props.getLeave(response.data);
+        const res = response.data;
+        if(res.state == "error"){
+          toastr.clear();
+          setTimeout(() => toastr.info("holiday setting error!"), 3000);
+        }
       })
       .catch(function (error) {});
   };
 
   removeLeave = (row) => {
-    var _self = this;
     axios
       .post("leave/remove", {
         nurse_id: row.nurse_id,
         leave_id: row.leave_id,
       })
       .then(function (response) {
-        toastr.info("Remove LeaveDays Success!");
-        _self.props.getLeave(response.data);
+        const res = response.data;
+        if(res.state == "error"){
+          toastr.clear();
+          setTimeout(() => toastr.info("holiday setting error!"), 3000);
+        }
       })
       .catch(function (error) {});
   };
@@ -207,6 +213,7 @@ class LeaveDays extends Component {
       selFilter,
     } = this.state;
     const { basic } = this.props;
+    const { user } = this.props.basic;
     let leaveColumns = [];
     leaveColumns.push(
       {
@@ -284,7 +291,7 @@ class LeaveDays extends Component {
         selector: (row) => row.leave_hours,
       }
     );
-    if (selView == 1) {
+    if (selView == 1 && user.hasOwnProperty("role") && user.role !== 1) {
       leaveColumns.push({
         name: "Action",
         center: true,
@@ -427,6 +434,7 @@ class LeaveDays extends Component {
         <div className="pt-5 text-center text-dark">
           <h1 className="mt-3">LEAVE DAYS</h1>
         </div>
+        {user.hasOwnProperty("role") && user.role !== 1 &&
         <MDBRow className=" align-items-center justify-content-center ">
           <MDBCol className=" autocomplete col-md-2 ncard">
             <Autocomplete
@@ -500,6 +508,7 @@ class LeaveDays extends Component {
             </MDBBtn>
           </MDBCol>
         </MDBRow>
+        }
         <MDBRow className="mt-3 align-items-center justify-content-center">
           <MDBCol md="2">
             <Form.Group>

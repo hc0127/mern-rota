@@ -15,7 +15,6 @@ import DataTable from "react-data-table-component";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import { FaEdit, FaTrash } from "react-icons/fa";
-
 import {
   nIns,
   nUpd,
@@ -26,6 +25,12 @@ import {
   hSet,
 } from "./../store/Actions/BasicAction";
 import { connect } from "react-redux";
+
+toastr.options = {
+  positionClass: "toast-top-full-width",
+  hideDuration: 3000,
+  timeOut: 3000,
+};
 
 class Basic extends Component {
   constructor(props) {
@@ -61,14 +66,6 @@ class Basic extends Component {
           image: "",
           cell: "",
           leve: "",
-        },
-      },
-      level: {
-        open: false,
-        action_id: "0",
-        modal: {
-          level: "",
-          rate: "",
         },
       },
       holiday: {
@@ -109,8 +106,11 @@ class Basic extends Component {
         _id: data._id,
       })
       .then(function (response) {
-        const _id = response.data._id;
-        _self.props.nurseRemove(_id);
+        let res = response.data;
+        if(res.state == "error"){
+          toastr.clear();
+          setTimeout(() => toastr.info("nurse remove request error!"), 3000);
+        }
       })
       .catch(function (error) {
         console.log(error);
@@ -119,13 +119,9 @@ class Basic extends Component {
   nurseConfirm = () => {
     const _self = this;
     const { nurse } = this.state;
+    const { user } = this.props.basic;
     const values = Object.values(nurse.modal).filter((e) => e).length;
     if (values < 13) {
-      toastr.options = {
-        positionClass: "toast-top-full-width",
-        hideDuration: 300,
-        timeOut: 3000,
-      };
       toastr.clear();
       setTimeout(() => toastr.info("please input correct!"), 300);
     } else {
@@ -144,12 +140,10 @@ class Basic extends Component {
           id: this.state.nurse.action_id,
         })
         .then(function (response) {
-          const res = response.data;
-          const data = res.data;
-          if (res.state === "insert") {
-            _self.props.nurseInsert(data);
-          } else {
-            _self.props.nurseUpdate(data);
+          let res = response.data;
+          if (res.state === "error") {
+            toastr.clear();
+            setTimeout(() => toastr.info("nurse remove request error!"), 3000);
           }
         })
         .catch(function (error) {
@@ -218,8 +212,11 @@ class Basic extends Component {
         _id: data._id,
       })
       .then(function (response) {
-        const _id = response.data._id;
-        _self.props.patientRemove(_id);
+        let res = response.data;
+        if(res.state == "error"){
+          toastr.clear();
+          setTimeout(() => toastr.info("nurse remove request error!"), 3000);
+        }
       })
       .catch(function (error) {
         console.log(error);
@@ -230,11 +227,6 @@ class Basic extends Component {
     const { patient } = this.state;
     const values = Object.values(patient.modal).filter((e) => e).length;
     if (values < 5) {
-      toastr.options = {
-        positionClass: "toast-top-full-width",
-        hideDuration: 300,
-        timeOut: 3000,
-      };
       toastr.clear();
       setTimeout(() => toastr.info("please input correct!"), 300);
     } else {
@@ -253,12 +245,10 @@ class Basic extends Component {
           id: this.state.patient.action_id,
         })
         .then(function (response) {
-          const res = response.data;
-          const data = res.data;
-          if (res.state === "insert") {
-            _self.props.patientInsert(data);
-          } else {
-            _self.props.patientUpdate(data);
+          let res = response.data;
+          if (res.state === "error") {
+            toastr.clear();
+            setTimeout(() => toastr.info("nurse remove request error!"), 3000);
           }
         })
         .catch(function (error) {
@@ -309,12 +299,11 @@ class Basic extends Component {
         date: date,
       })
       .then(function (response) {
-        if (row[i].checked == false) {
-          toastr.info("Holiday Added");
-        } else {
-          toastr.info("Holiday Removed");
+        const res = response.data;
+        if(res.state == "error"){
+          toastr.clear();
+          setTimeout(() => toastr.info("holiday setting error!"), 3000);
         }
-        _self.props.holidaySet(response.data);
       })
       .catch(function (error) {
         console.log(error);
@@ -333,14 +322,15 @@ class Basic extends Component {
 
   render() {
     const { basic } = this.props;
-    const { nurse, patient, level } = this.state;
+    const { user, holidays, nurses, patients } = this.props.basic;
+    const { nurse, patient } = this.state;
 
     // Mapping nurses array
-    basic.nurses.map((data) => {
+    nurses.map((data) => {
       data.designation = this.getDesignationArray(data);
     });
 
-    const nurseColumns = [
+    let nurseColumns = [
       {
         name: "Full Name",
         center: true,
@@ -402,36 +392,41 @@ class Basic extends Component {
         wrap: true,
         selector: (row) => row.workexp,
       },
-      {
-        name: "Action",
-        center: true,
-        wrap: true,
-        sortable: false,
-        cell: (d) => [
-          <MDBBtnGroup key={d._id}>
-            <MDBBtn
-              outline
-              color="success"
-              className="my-1 ms-1"
-              size="sm"
-              onClick={() => this.nurseModal(true, d)}
-            >
-              <FaEdit />
-            </MDBBtn>
-            <MDBBtn
-              outline
-              color="success"
-              className="my-1 me-1"
-              size="sm"
-              onClick={() => this.removeNurse(d)}
-            >
-              <FaTrash />
-            </MDBBtn>
-          </MDBBtnGroup>,
-        ],
-      },
     ];
-    basic.nurses.sort((a, b) =>
+    if(user.hasOwnProperty("role") && user.role !== 1){
+      nurseColumns = [...nurseColumns,
+        {
+          name: "Action",
+          center: true,
+          wrap: true,
+          sortable: false,
+          cell: (d) => [
+            <MDBBtnGroup key={d._id}>
+              <MDBBtn
+                outline
+                color="success"
+                className="my-1 ms-1"
+                size="sm"
+                onClick={() => this.nurseModal(true, d)}
+              >
+                <FaEdit />
+              </MDBBtn>
+              <MDBBtn
+                outline
+                color="success"
+                className="my-1 me-1"
+                size="sm"
+                onClick={() => this.removeNurse(d)}
+              >
+                <FaTrash />
+              </MDBBtn>
+            </MDBBtnGroup>,
+          ],
+        },
+      ]
+    }
+
+    nurses.sort((a, b) =>
       a.date > b.date ? 1 : b.date > a.date ? -1 : 0
     );
 
@@ -449,7 +444,7 @@ class Basic extends Component {
       { label: "Other Allowances", key: "other_allowances" },
     ];
 
-    const patientColumns = [
+    let patientColumns = [
       {
         name: "Full Name",
         center: true,
@@ -480,36 +475,42 @@ class Basic extends Component {
         selector: (row) => row.cell,
         sortable: true,
       },
-      {
-        name: "Action",
-        center: true,
-        wrap: true,
-        sortable: false,
-        cell: (d) => [
-          <MDBBtnGroup key={d._id}>
-            <MDBBtn
-              outline
-              color="success"
-              className="my-1 ms-1"
-              size="sm"
-              onClick={() => this.patientModal(true, d)}
-            >
-              <FaEdit />
-            </MDBBtn>
-            <MDBBtn
-              outline
-              color="success"
-              className="my-1 me-1"
-              size="sm"
-              onClick={() => this.removePatient(d)}
-            >
-              <FaTrash />
-            </MDBBtn>
-          </MDBBtnGroup>,
-        ],
-      },
     ];
-    basic.patients.sort((a, b) =>
+
+    if(user.hasOwnProperty("role") && user.role !== 1){
+      patientColumns = [...patientColumns,
+        {
+          name: "Action",
+          center: true,
+          wrap: true,
+          sortable: false,
+          cell: (d) => [
+            <MDBBtnGroup key={d._id}>
+              <MDBBtn
+                outline
+                color="success"
+                className="my-1 ms-1"
+                size="sm"
+                onClick={() => this.patientModal(true, d)}
+              >
+                <FaEdit />
+              </MDBBtn>
+              <MDBBtn
+                outline
+                color="success"
+                className="my-1 me-1"
+                size="sm"
+                onClick={() => this.removePatient(d)}
+              >
+                <FaTrash />
+              </MDBBtn>
+            </MDBBtnGroup>,
+          ],
+        },
+      ]
+    }
+
+    patients.sort((a, b) =>
       a.name > b.name ? 1 : b.name > a.name ? -1 : 0
     );
 
@@ -519,34 +520,8 @@ class Basic extends Component {
       { label: "Cell", key: "cell" },
     ];
 
-    // const levelColumns = [
-    //   {
-    //     name: "Level",
-    //     center:true,
-    //     wrap:true,
-    //     selector: (row) => row.level,
-    //   },
-    //   {
-    //     name: "Rate",
-    //     center:true,
-    //     wrap:true,
-    //     selector: (row) => row.rate,
-    //   },
-    //   {
-    //     name: "Action",
-    //     center:true,
-    //     cell: (d) => [
-    //       <MDBBtnGroup key={d._id}>
-    //         <MDBBtn outline color="success" className='my-1 ms-1' size="sm" onClick={() =>this.levelModal(true,d)}><FaEdit /></MDBBtn>
-    //         <MDBBtn outline  color="success" className='my-1 me-1' size="sm" onClick={() =>this.removeLevel(d)}><FaTrash /></MDBBtn>
-    //       </MDBBtnGroup>
-    //     ]
-    //   }
-    // ];
-
     const holidayColumns = [];
     let holidayDatas = [];
-    let holidays = basic.holidays;
 
     holidayColumns.push({
       name: "Month",
@@ -564,10 +539,11 @@ class Basic extends Component {
         wrap: true,
         cell: (row) => (
           <Form.Check
-            disabled={row[i]["disabled"]}
+            disabled={(user.hasOwnProperty("role") && user.role === 1) ? true : false}
             checked={row[i]["checked"]}
             type="checkbox"
             isValid={true}
+            style = {{display:row[i]["disabled"]}}
             onChange={() => this.onChangeHoliday(i, row)}
           />
         ),
@@ -586,7 +562,7 @@ class Basic extends Component {
       for (let j = 1; j <= 31; j++) {
         row[j] = [];
         row[j]["checked"] = false;
-        row[j]["disabled"] = false;
+        row[j]["disabled"] = "block";
 
         let day = j > 9 ? j : "0" + j;
 
@@ -594,7 +570,7 @@ class Basic extends Component {
           row[j]["checked"] = true;
         }
         if (j > daysInMonth) {
-          row[j]["disabled"] = true;
+          row[j]["disabled"] = "none";
         }
       }
       holidayDatas.push(row);
@@ -609,18 +585,20 @@ class Basic extends Component {
           <MDBCol>
             <Tabs id="basic_tab">
               <Tab eventKey="nurse" key={1} title="nurse" className="p-2">
-                <MDBBtn
-                  outline
-                  rounded
-                  color="success"
-                  onClick={() => this.nurseModal(true, null)}
-                >
-                  Add Nurse
-                </MDBBtn>
+                {user.hasOwnProperty("role") && user.role !== 1 &&
+                  <MDBBtn
+                    outline
+                    rounded
+                    color="success"
+                    onClick={() => this.nurseModal(true, null)}
+                  >
+                    Add Nurse
+                  </MDBBtn>
+                }
 
                 <CSVLink
                   headers={headers}
-                  data={basic.nurses}
+                  data={nurses}
                   filename={"nurses.csv"}
                   className="btn btn-success "
                   target="_blank"
@@ -633,7 +611,7 @@ class Basic extends Component {
                   <DataTable
                     id="nurseTable"
                     columns={nurseColumns}
-                    data={basic.nurses}
+                    data={nurses}
                     fixedHeader
                     fixedHeaderScrollHeight={"65vh"}
                     defaultPageSize={100}
@@ -644,6 +622,7 @@ class Basic extends Component {
               <Tab eventKey="patient" key={2} title="patient" className="p-2">
                 <MDBRow>
                   <MDBCol>
+                  {user.hasOwnProperty("role") && user.role !== 1 &&
                     <MDBBtn
                       outline
                       rounded
@@ -652,9 +631,10 @@ class Basic extends Component {
                     >
                       Add Patient
                     </MDBBtn>
+                  }
                     <CSVLink
                       headers={header}
-                      data={basic.patients}
+                      data={patients}
                       filename={"patients.csv"}
                       className="btn btn-success "
                       target="_blank"
@@ -666,7 +646,7 @@ class Basic extends Component {
                   <div className="p-2">
                     <DataTable
                       columns={patientColumns}
-                      data={basic.patients}
+                      data={patients}
                       fixedHeader
                       fixedHeaderScrollHeight={"65vh"}
                       defaultPageSize={100}
@@ -675,17 +655,6 @@ class Basic extends Component {
                   </div>
                 </MDBRow>
               </Tab>
-              {/* <Tab eventKey="level" key={3} title="level" className='p-2'>
-                          <MDBBtn outline rounded  color='success' onClick={() => this.levelModal(true)}>Add Level</MDBBtn>
-                          <div className='p-2'>
-                            <DataTable 
-                              columns={levelColumns} 
-                              data={basic.levels}
-                              fixedHeader
-                              fixedHeaderScrollHeight={'65vh'}
-                              pagination />
-                          </div>
-                        </Tab> */}
               <Tab eventKey="holiday" key={3} title="holiday" className="p-2">
                 <MDBRow>
                   <DataTable
@@ -1009,62 +978,6 @@ class Basic extends Component {
               Close
             </MDBBtn>
             <MDBBtn variant="success" onClick={() => this.patientConfirm()}>
-              Save
-            </MDBBtn>
-          </Modal.Footer>
-        </Modal>
-
-        <Modal
-          show={level.open}
-          size="sm"
-          aria-labelledby="contained-modal-title-vcenter"
-          centered
-          onHide={() => this.levelModal(false)}
-        >
-          <Modal.Header closeButton>
-            <Modal.Title>
-              Level {level.action_id == "0" ? "Insert" : "Edit"}
-            </Modal.Title>
-          </Modal.Header>
-          <Modal.Body>
-            <MDBRow>
-              <MDBCol>
-                <FloatingLabel
-                  controlId="LevelInput"
-                  label="Level"
-                  className="mb-3"
-                >
-                  <Form.Control
-                    type="text"
-                    value={level.modal.level}
-                    onChange={(e) => this.levelModalChange("level", e)}
-                    placeholder="Level"
-                  />
-                </FloatingLabel>
-              </MDBCol>
-            </MDBRow>
-            <MDBRow>
-              <MDBCol>
-                <FloatingLabel
-                  controlId="RateInput"
-                  label="Rate"
-                  className="mb-3"
-                >
-                  <Form.Control
-                    type="text"
-                    value={level.modal.rate}
-                    onChange={(e) => this.levelModalChange("rate", e)}
-                    placeholder="Rat"
-                  />
-                </FloatingLabel>
-              </MDBCol>
-            </MDBRow>
-          </Modal.Body>
-          <Modal.Footer>
-            <MDBBtn variant="secondary" onClick={() => this.levelModal(false)}>
-              Close
-            </MDBBtn>
-            <MDBBtn variant="success" onClick={() => this.levelConfirm()}>
               Save
             </MDBBtn>
           </Modal.Footer>

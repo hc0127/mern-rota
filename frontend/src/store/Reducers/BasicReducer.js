@@ -9,6 +9,8 @@ import {
   PUPDATE,
   PDELETE,
   PAUPDATE,
+  RADD,
+  RSTATUSCHANGE,
 } from "../Types";
 
 const monthNames = [];
@@ -25,12 +27,31 @@ monthNames["Oct"] = "10";
 monthNames["Nov"] = "11";
 monthNames["Dec"] = "12";
 
+const requestTitles = [];
+requestTitles["/nurse/add"] = "nurse add/edit";
+requestTitles["/nurse/remove"] = "nurse remove";
+requestTitles["/patient/add"] = "patient add/edit";
+requestTitles["/patient/remove"] = "patient remove";
+requestTitles["/basic/holiday/get"] = "holiday setting";
+requestTitles["/leave/add"] = "leave add";
+requestTitles["/leave/edit"] = "leave edit";
+requestTitles["/leave/remove"] = "leave remove";
+requestTitles["/rota/assign"] = "";
+
+const requestStatus = [];
+requestStatus[1] = " request";
+requestStatus[2] = " approved";
+requestStatus[3] = " rejected";
+
 const initialState = {
   nurses: [],
   patients: [],
   holidays: [],
+  requests: [],
   user:{},
   monthNames:monthNames,
+  requestTitles:requestTitles,
+  requestStatus:requestStatus,
   };
 
 export default function BasicReducer(state = initialState, action) {
@@ -42,14 +63,26 @@ export default function BasicReducer(state = initialState, action) {
         nurses: action.data.nurses,
         patients: action.data.patients,
         holidays: action.data.holidays,
+        requests: action.data.requests,
         user: action.data.user,
       };
+    case RADD:
+      return {
+        ...state,
+        requests: [...state.requests,action.request]
+      }
+    case RSTATUSCHANGE:
+      return {
+        ...state,
+        // requests: [...state.requests,action.request]
+      }
     case NINSERT:
       return {
         ...state,
         nurses: [...state.nurses, { ...action.nurse }],
       };
     case NUPDATE:
+      console.log(action.nurse._id);
       state.nurses.map((nurse, index) => {
         if (nurse._id == action.nurse._id) {
           key = index;

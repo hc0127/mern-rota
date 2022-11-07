@@ -84,7 +84,11 @@ class Roaster extends Component {
           assignData: assigns,
         })
         .then(function (response) {
-          _self.props.getRoaster(response.data);
+          let res = response.data;
+          if(res.state == "error"){
+            toastr.clear();
+            setTimeout(() => toastr.info("roaster edit request error!"), 3000);
+          }
         })
         .catch(function (error) {});
     } else {
@@ -536,6 +540,7 @@ class Roaster extends Component {
 
   render() {
     const { basic } = this.props;
+    const {user} = this.props.basic;
     const {
       selPatient,
       selPatientValue,
@@ -974,6 +979,7 @@ class Roaster extends Component {
               {MonthSelect}
             </Form.Select>
           </MDBCol>
+          {user.hasOwnProperty("role") && user.role !== 1 &&
           <MDBCol md="2">
             <MDBBtn
               outline
@@ -985,6 +991,7 @@ class Roaster extends Component {
               {isEditable ? "save" : "edit"}
             </MDBBtn>
           </MDBCol>
+          }
         </MDBRow>
         <MDBRow className="p-2">
           <DataTable

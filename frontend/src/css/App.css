@@ -8,6 +8,7 @@
   height: 40vmin;
   pointer-events: none;
 }
+
 h1 {
   font-family: "Source Code Pro rev=1";
 }
@@ -17,6 +18,7 @@ h1 {
     animation: App-logo-spin infinite 20s linear;
   }
 }
+
 .login-wrapper {
   background: url("../../public/background.jpg") no-repeat fixed;
   -webkit-background-size: cover;
@@ -33,10 +35,10 @@ h1 {
   display: flex;
   flex-direction: column;
   font-size: calc(10px + 2vmin);
-  /* color: white; */
 }
 
 .main {
+  /* height:100vh; */
   position: absolute;
   display: flex;
 }
@@ -53,6 +55,10 @@ div.chartjs-tooltip {
   transition: all 0.15s ease;
   transform: translate(-50%);
   border-radius: 0.25rem;
+}
+
+.btn-group{
+  box-shadow: none !important;
 }
 
 .autocomplete input {
@@ -92,12 +98,18 @@ li a:hover {
   display: none;
 }
 
+.toast-container>:not(:last-child) {
+  margin-bottom: 10px !important;
+}
+.toast {
+  width: 250px !important;
+}
+
 div#toast-container {
   margin-top: 1rem;
   left: revert;
   right: 12px;
 }
-
 #toast-container.toast-top-full-width > .toast {
   max-width: 300px;
   float: right;
@@ -166,6 +178,9 @@ div#toast-container {
 }
 .form-check-input:before {
   content: none !important;
+}
+.btn-group .btn {
+  margin: 0px;
 }
 .btn {
   margin: 15px;
