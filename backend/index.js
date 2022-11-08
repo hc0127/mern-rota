@@ -22,7 +22,7 @@ const server = http.createServer(app);
 
 let io = socketIo(server, {
   cors: {
-      origin: "http://localhost:3000",
+      origin: "http://servemirates.com",
       methods: ["GET", "POST"],
       transports: ['websocket', 'polling'],
       credentials: true
