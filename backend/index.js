@@ -31,12 +31,12 @@ let io = socketIo(server, {
   allowEIO4: true
 });
 
-mongoose.connect(
-  "mongodb+srv://shahiddgk:2llbsPlUaTIsb48H@cluster0.rxm2atp.mongodb.net/?retryWrites=true&w=majority",
-  { useNewUrlParser: true }
-);
+// mongoose.connect(
+//   "mongodb+srv://shahiddgk:2llbsPlUaTIsb48H@cluster0.rxm2atp.mongodb.net/?retryWrites=true&w=majority",
+//   { useNewUrlParser: true }
+// );
 
-// mongoose.connect("mongodb://127.0.0.1:27017", { useNewUrlParser: true });
+mongoose.connect("mongodb://127.0.0.1:27017", { useNewUrlParser: true });
 const connection = mongoose.connection;
 
 connection.once("open", function () {
