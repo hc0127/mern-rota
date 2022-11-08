@@ -76,6 +76,13 @@ class Roaster extends Component {
         isEditable: false,
       });
 
+      const { requestblocks } = this.props.basic;
+      console.log(requestblocks);
+      if(requestblocks.length !== 0){
+        toastr.clear();
+        setTimeout(() => toastr.warning("This item cannot be requested! Please wait until approver approve the transfer request."), 300);
+        return;
+      }
       axios
         .post("rota/assign", {
           patient_id: selPatient,

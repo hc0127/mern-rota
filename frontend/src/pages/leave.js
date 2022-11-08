@@ -111,6 +111,13 @@ class LeaveDays extends Component {
         selNurse: 0,
       });
 
+      const { requestblocks } = this.props.basic;
+      if(requestblocks.includes(selNurse) || requestblocks.includes("roaster")){
+        toastr.clear();
+        setTimeout(() => toastr.warning("This item cannot be requested! Please wait until approver approve the transfer request."), 300);
+        return;
+      }
+
       axios
         .post("leave/add", {
           nurse_id: selNurse,
@@ -155,6 +162,13 @@ class LeaveDays extends Component {
       isOpen: false,
     });
 
+    const { requestblocks } = this.props.basic;
+    if(requestblocks.includes(this.state.modal.nurse_id) || requestblocks.includes("roaster")){
+      toastr.clear();
+      setTimeout(() => toastr.warning("This item cannot be requested! Please wait until approver approve the transfer request."), 300);
+      return;
+    }
+
     axios
       .post("leave/edit", {
         ...this.state.modal,
@@ -170,6 +184,12 @@ class LeaveDays extends Component {
   };
 
   removeLeave = (row) => {
+    const { requestblocks } = this.props.basic;
+    if(requestblocks.includes(row.nurse_id) || requestblocks.includes("roaster")){
+      toastr.clear();
+      setTimeout(() => toastr.warning("This item cannot be requested! Please wait until approver approve the transfer request."), 300);
+      return;
+    }
     axios
       .post("leave/remove", {
         nurse_id: row.nurse_id,

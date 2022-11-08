@@ -69,10 +69,10 @@ export const getAllDatas = (data,dispatch) => {
         blockId = 'roaster';
       break; 
     }
-    console.log(blockId);
     dispatch({
         type: RADD,
         request:data,
+        blockId:blockId,
     });
   });
   socket.on("approve", data => {
@@ -80,6 +80,7 @@ export const getAllDatas = (data,dispatch) => {
     switch(data.request){
       case "/nurse/add":
         setTimeout(() => toastr.info("nurse add/edit approved!"), 300);
+        blockId = data.data._id;
         if(data.insert == true){
           dispatch(nIns(data.data));
         }else{
@@ -88,10 +89,12 @@ export const getAllDatas = (data,dispatch) => {
       break; 
       case "/nurse/remove":
         setTimeout(() => toastr.info("nurse remove approved!"), 300);
+        blockId = data.data._id;
         dispatch(nDel(data.data._id));
       break; 
       case "/patient/add":
         setTimeout(() => toastr.info("patient add/edit approved!"), 300);
+        blockId = data.data._id;
         if(data.insert == true){
           dispatch(pIns(data.data));
         }else{
@@ -100,34 +103,39 @@ export const getAllDatas = (data,dispatch) => {
       break; 
       case "/patient/remove":
         setTimeout(() => toastr.info("patient remove approved!"), 300);
+        blockId = data.data._id;
         dispatch(pDel(data.data._id));
       break; 
       case "/basic/holiday/get":
         setTimeout(() => toastr.info("holiday setting approved!"), 300);
+        blockId = data.data.date;
         dispatch(hSet(data));
       break; 
       case "/leave/add":
         setTimeout(() => toastr.info("leave add approved!"), 300);
+        blockId = data.data.nurse_id;
         dispatch(nAllUpd(data));
       break; 
       case "/leave/edit":
         setTimeout(() => toastr.info("leave edit approved!"), 300);
-        console.log(data);
+        blockId = data.data.nurse_id;
         dispatch(nAllUpd(data));
       break; 
       case "/leave/remove":
         setTimeout(() => toastr.info("leave remove approved!"), 300);
+        blockId = data.data.nurse_id;
         dispatch(nAllUpd(data));
       break; 
       case "/rota/assign":
         setTimeout(() => toastr.info("approved!"), 300);
+        blockId = "roaster";
         dispatch(nAllUpd(data));
       break; 
     }
-    console.log(data);
     dispatch({
         type: RSTATUSCHANGE,
         request:data,
+        blockId:blockId,
     });
   });
   socket.on("reject", data => {
@@ -135,35 +143,45 @@ export const getAllDatas = (data,dispatch) => {
     switch(data.request){
       case "/nurse/add":
         setTimeout(() => toastr.info("nurse add/edit rejected!"), 300);
+        blockId = data.data._id;
       break; 
       case "/nurse/remove":
         setTimeout(() => toastr.info("nurse remove rejected!"), 300);
+        blockId = data.data._id;
       break; 
       case "/patient/add":
         setTimeout(() => toastr.info("patient add/edit rejected!"), 300);
+        blockId = data.data._id;
       break; 
       case "/patient/remove":
         setTimeout(() => toastr.info("patient remove rejected!"), 300);
+        blockId = data.data._id;
       break; 
       case "/basic/holiday/get":
         setTimeout(() => toastr.info("holiday setting rejected!"), 300);
+        blockId = data.data.date;
       break; 
       case "/leave/add":
         setTimeout(() => toastr.info("leave add rejected!"), 300);
+        blockId = data.data.nuse_id;
       break; 
       case "/leave/edit":
         setTimeout(() => toastr.info("leave edit rejected!"), 300);
+        blockId = data.data.nuse_id;
       break; 
       case "/leave/remove":
         setTimeout(() => toastr.info("leave remove rejected!"), 300);
+        blockId = data.data.nuse_id;
       break; 
       case "/rota/assign":
         setTimeout(() => toastr.info("rejected!"), 300);
+        blockId = "roaster";
       break; 
     }
     dispatch({
         type: RSTATUSCHANGE,
         request:data,
+        blockId:blockId,
     });
   });
   socket.on("adminedit", data => {

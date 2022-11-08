@@ -100,7 +100,13 @@ class Basic extends Component {
     }
   };
   removeNurse = (data) => {
-    const _self = this;
+    const { requestblocks } = this.props.basic;
+    if(requestblocks.includes(data._id) || requestblocks.includes("roaster")){
+      toastr.clear();
+      setTimeout(() => toastr.warning("This item cannot be requested! Please wait until approver approve the transfer request."), 300);
+      return;
+    }
+
     axios
       .post("nurse/remove", {
         _id: data._id,
@@ -117,9 +123,7 @@ class Basic extends Component {
       });
   };
   nurseConfirm = () => {
-    const _self = this;
     const { nurse } = this.state;
-    const { user } = this.props.basic;
     const values = Object.values(nurse.modal).filter((e) => e).length;
     if (values < 13) {
       toastr.clear();
@@ -133,6 +137,13 @@ class Basic extends Component {
           modal: {},
         },
       });
+
+      const { requestblocks } = this.props.basic;
+      if(requestblocks.includes(this.state.nurse.modal._id) || requestblocks.includes("roaster")){
+        toastr.clear();
+        setTimeout(() => toastr.warning("This item cannot be requested! Please wait until approver approve the transfer request."), 300);
+        return;
+      }
 
       axios
         .post("nurse/add", {
@@ -206,7 +217,13 @@ class Basic extends Component {
     }
   };
   removePatient = (data) => {
-    const _self = this;
+    const { requestblocks } = this.props.basic;
+    if(requestblocks.includes(data._id) || requestblocks.includes("roaster")){
+      toastr.clear();
+      setTimeout(() => toastr.warning("This item cannot be requested! Please wait until approver approve the transfer request."), 300);
+      return;
+    }
+
     axios
       .post("patient/remove", {
         _id: data._id,
@@ -238,6 +255,13 @@ class Basic extends Component {
           modal: {},
         },
       });
+
+      const { requestblocks } = this.props.basic;
+      if(requestblocks.includes(this.state.patient.modal._id) || requestblocks.includes("roaster")){
+        toastr.clear();
+        setTimeout(() => toastr.warning("This item cannot be requested! Please wait until approver approve the transfer request."), 300);
+        return;
+      }
 
       axios
         .post("patient/add", {
@@ -293,6 +317,13 @@ class Basic extends Component {
     const day = i > 9 ? "-" + i : "-0" + i;
     const date = basic.monthNames[row.month] + day;
 
+    const { requestblocks } = this.props.basic;
+    if(requestblocks.includes(date) || requestblocks.includes("roaster")){
+      toastr.clear();
+      setTimeout(() => toastr.warning("This item cannot be requested! Please wait until approver approve the transfer request."), 300);
+      return;
+    }
+
     axios
       .post("basic/holiday/get", {
         state: row[i].checked,
@@ -324,7 +355,6 @@ class Basic extends Component {
     const { basic } = this.props;
     const { user, holidays, nurses, patients } = this.props.basic;
     const { nurse, patient } = this.state;
-
     // Mapping nurses array
     nurses.map((data) => {
       data.designation = this.getDesignationArray(data);

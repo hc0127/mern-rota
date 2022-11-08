@@ -40,7 +40,7 @@ requestTitles["/basic/holiday/get"] = "holiday setting";
 requestTitles["/leave/add"] = "leave add";
 requestTitles["/leave/edit"] = "leave edit";
 requestTitles["/leave/remove"] = "leave remove";
-requestTitles["/rota/assign"] = "";
+requestTitles["/rota/assign"] = "duty roaster assign";
 
 const requestStatus = [];
 requestStatus[1] = " request";
@@ -52,7 +52,6 @@ const initialState = {
   patients: [],
   holidays: [],
   requests: [],
-  requestlevel: 0,
   requestblocks: [],
   user:{},
   monthNames:monthNames,
@@ -74,11 +73,21 @@ export default function BasicReducer(state = initialState, action) {
       };
 
     case RADD:
+      if(action.blockId != undefined){
+        state.requestblocks = [...state.requestblocks,action.blockId];
+      }
       return {
         ...state,
-        requests: [...state.requests,action.request]
+        requests: [...state.requests,action.request],
+        requestblocks:[...state.requestblocks],
       }
     case RSTATUSCHANGE:
+      state.requestblocks.map((block, index) => {
+        if (block == action.blockId) {
+          key = index;
+        }
+      });
+      state.requestblocks.splice(key, 1);
       state.requests.map((request, index) => {
         if (request._id == action.request._id) {
           state.requests[index].status = action.request.status;
@@ -86,7 +95,8 @@ export default function BasicReducer(state = initialState, action) {
       });
       return {
         ...state,
-        requests: [...state.requests]
+        requests: [...state.requests],
+        requestblocks:[...state.requestblocks],
       }
     case RDELETE:
       state.requests.map((request, index) => {
@@ -97,12 +107,7 @@ export default function BasicReducer(state = initialState, action) {
       state.requests.splice(key, 1);
       return {
         ...state,
-        requests: [...state.requests]
-      }
-    case RSTATUSCHANGE:
-      return {
-        ...state,
-        // requests: [...state.requests,action.request]
+        requests: [...state.requests],
       }
 
     case NINSERT:

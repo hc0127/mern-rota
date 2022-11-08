@@ -154,9 +154,9 @@ class Navbar extends Component {
                 {requestTitles[request.request] + requestStatus[request.status]}
               </h6>
               <MDBBtnGroup size="sm">
-                {user.hasOwnProperty("role") && request.status === 1 &&
-                  <MDBBtn outline color = "primary">Detail</MDBBtn>
-                }
+                {/* {user.hasOwnProperty("role") && request.status === 1 &&
+                  <MDBBtn outline color = "primary" onClick = {() => this.detail(request)}>Detail</MDBBtn>
+                } */}
                 {user.hasOwnProperty("role") && user.role === 1 && request.status === 1 &&
                 <>
                   <MDBBtn outline color = "success" onClick = {() => this.approve(request)}>Approve</MDBBtn>
