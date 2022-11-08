@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 
-const Nurse = require('../../models/nurse.model');
+const Nurse = require('../../models/nurse.model'); 
 const Realtime = require('../../models/realtime.model');
 
 module.exports = function(socket) {
@@ -91,11 +91,11 @@ module.exports = function(socket) {
             },function(err,data){
                 if(!err){
                     res.send({state:"success"});
-                    socket.emit("request",data);
+                    socket.emit("request",data); 
                     socket.broadcast.emit("request",data);
                 }
             });
-        }else if(req.role == 1){//approver
+        }else if(req.role == 1){//approver 
             if(req.body.status == 2){//approve
                 Realtime.findOneAndUpdate({_id:req.body._id},{status:2},{new:true,upsert:true},function(err,data){
                     if(!err){

@@ -10,7 +10,7 @@ import {
   MDBContainer,
   MDBNavbarBrand,
   MDBNavbarToggler,
-  MDBIcon,
+  MDBBadge,
   MDBCollapse,
   MDBNavbarNav,
   MDBNavbarItem,
@@ -25,6 +25,9 @@ import {
 //import icons from react icons
 import {
   FaBell,
+  FaEyeSlash,
+  FaCheck,
+  FaUndo,
 } from "react-icons/fa";
 
 import Toast from 'react-bootstrap/Toast';
@@ -117,47 +120,77 @@ class Navbar extends Component {
         console.log(error);
       });
   }
+  close = (request) => {
+    axios
+     .post('basic/request/close',{
+        ...request
+     }).then(function(response){
+      let res = response.data;
+      if(res.state == "error"){
+        toastr.clear();
+        setTimeout(() => toastr.info("request close error!"), 3000);
+      }
+     });
+  }
   render() {
     const { isLoading } = this.state;
     const {user,requests,requestTitles,requestStatus} = this.props.basic;
+    let cnt = 0;
+    const Notifications = requests
+      .filter(request => 
+        (user.hasOwnProperty("role") && user.role == 1 && request.status == 1) || user.role == 0 || request.status == 1
+      ).map((request,index) => {
+        cnt++;
+        return(
+          <Toast 
+            key = {index}
+          >
+            <Toast.Header>
+              {request.status === 1 ? <FaEyeSlash color="grey"/> : request.status === 2 ? <FaCheck color="green"/> : <FaUndo color="red"/>}
+              <strong className="me-auto">{requestStatus[request.status]}</strong>
+            </Toast.Header>
+            <Toast.Body>
+              <h6>
+                {requestTitles[request.request] + requestStatus[request.status]}
+              </h6>
+              <MDBBtnGroup size="sm">
+                {user.hasOwnProperty("role") && request.status === 1 &&
+                  <MDBBtn outline color = "primary">Detail</MDBBtn>
+                }
+                {user.hasOwnProperty("role") && user.role === 1 && request.status === 1 &&
+                <>
+                  <MDBBtn outline color = "success" onClick = {() => this.approve(request)}>Approve</MDBBtn>
+                  <MDBBtn outline color = "danger"onClick = {() => this.reject(request)}>Reject</MDBBtn>
+                </>
+                }
+                {user.hasOwnProperty("role") && user.role === 0 && request.status !== 1 &&
+                  <MDBBtn outline color = "success" onClick = {() => this.close(request)}>Close</MDBBtn>
+                }
+              </MDBBtnGroup>
+            </Toast.Body>
+          </Toast>
+        );
+      })
+
     return (
       <>
         <div id="sidebar_notification">
           <div className="closemenu" onClick={this.menuIconClick}>
-            <FaBell />
+            <MDBBtn>
+              <FaBell />
+              {cnt !== 0 &&
+                <MDBBadge className='ms-2' color='danger'>
+                  {cnt}
+                </MDBBadge>
+              }
+            </MDBBtn>
           </div>
           <ProSidebar collapsed={this.state.menuCollapse}>
-            {requests.length !== 0 &&
-              <ToastContainer className="p-3 mt-5">
+              <ToastContainer className="p-3 mt-5" closeButton={false}>
               {
-              requests.map((request,index) => {
-                return(
-                  <Toast 
-                    key = {index}
-                  >
-                    <Toast.Header>
-                      <strong className="me-auto">Request</strong>
-                    </Toast.Header>
-                    <Toast.Body>
-                      <h6>
-                        {requestTitles[request.request] + requestStatus[request.status]}
-                      </h6>
-                      <MDBBtnGroup size="sm">
-                        <MDBBtn outline color = "primary">Detail</MDBBtn>
-                        {user.hasOwnProperty("role") && user.role === 1 && 
-                        <>
-                          <MDBBtn outline color = "success" onClick = {() => this.approve(request)}>Approve</MDBBtn>
-                          <MDBBtn outline color = "danger"onClick = {() => this.reject(request)}>Reject</MDBBtn>
-                        </>
-                        }
-                      </MDBBtnGroup>
-                    </Toast.Body>
-                  </Toast>
-                );
-              })
+                Notifications
               }
               </ToastContainer>
-            }
           </ProSidebar>
         </div>
         <MDBNavbar expand="lg" fixed="top" bgColor="success">
@@ -185,7 +218,6 @@ class Navbar extends Component {
               aria-expanded="false"
               aria-label="Toggle navigation"
             >
-              <MDBIcon icon="bars" fas />
             </MDBNavbarToggler>
             <MDBCollapse navbar>
               <MDBNavbarNav className="me-auto mb-2 mb-lg-0">

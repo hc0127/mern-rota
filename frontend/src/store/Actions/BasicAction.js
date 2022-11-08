@@ -10,6 +10,7 @@ import {
   PAUPDATE,
   PDELETE,
   RADD,
+  RDELETE,
   RSTATUSCHANGE,
 } from "../Types";
 import history from "./../../history";
@@ -26,38 +27,49 @@ toastr.options = {
 
 export const getAllDatas = (data,dispatch) => {
   const user = JSON.parse(sessionStorage.getItem("data"));
+  let blockId;
   
   socket.on("request", data => {
     toastr.clear();
     switch(data.request){
       case "/nurse/add":
         setTimeout(() => toastr.info("nurse add/edit request!"), 300);
+        blockId = data.data._id;
       break; 
       case "/nurse/remove":
         setTimeout(() => toastr.info("nurse remove request!"), 300);
+        blockId = data.data._id;
       break; 
       case "/patient/add":
         setTimeout(() => toastr.info("patient add/edit request!"), 300);
+        blockId = data.data._id;
       break; 
       case "/patient/remove":
         setTimeout(() => toastr.info("patient remove request!"), 300);
+        blockId = data.data._id;
       break; 
       case "/basic/holiday/get":
         setTimeout(() => toastr.info("holiday setting request!"), 300);
+        blockId = data.data.date;
       break; 
       case "/leave/add":
         setTimeout(() => toastr.info("leave add request!"), 300);
+        blockId = data.data.nurse_id;
       break; 
       case "/leave/edit":
         setTimeout(() => toastr.info("leave edit request!"), 300);
+        blockId = data.data.nurse_id;
       break; 
       case "/leave/remove":
         setTimeout(() => toastr.info("leave remove request!"), 300);
+        blockId = data.data.nurse_id;
       break; 
       case "/rota/assign":
         setTimeout(() => toastr.info("request!"), 300);
+        blockId = 'roaster';
       break; 
     }
+    console.log(blockId);
     dispatch({
         type: RADD,
         request:data,
@@ -112,6 +124,7 @@ export const getAllDatas = (data,dispatch) => {
         dispatch(nAllUpd(data));
       break; 
     }
+    console.log(data);
     dispatch({
         type: RSTATUSCHANGE,
         request:data,
@@ -148,6 +161,10 @@ export const getAllDatas = (data,dispatch) => {
         setTimeout(() => toastr.info("rejected!"), 300);
       break; 
     }
+    dispatch({
+        type: RSTATUSCHANGE,
+        request:data,
+    });
   });
   socket.on("adminedit", data => {
     toastr.clear();
@@ -195,6 +212,12 @@ export const getAllDatas = (data,dispatch) => {
       break; 
     }
   });
+  socket.on("close",request => {
+    dispatch({
+      type:RDELETE,
+      _id:request._id,
+    })
+  })
 
   return {
     type: INITIAL,

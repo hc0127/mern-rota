@@ -16,6 +16,7 @@ export const LDELETE = 'LEVEL UPDATE';
 
 
 export const RADD = "REQUEST ADD";
+export const RDELETE = "REQUEST DELETE";
 export const RSTATUSCHANGE = "REQUEST STATUS CHANGE";
 
 

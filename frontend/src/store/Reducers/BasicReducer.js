@@ -1,15 +1,19 @@
 import {
   INITIAL,
   HSET,
+  
   NINSERT,
   NUPDATE,
   NDELETE,
   NAUPDATE,
+
   PINSERT,
   PUPDATE,
   PDELETE,
   PAUPDATE,
+  
   RADD,
+  RDELETE,
   RSTATUSCHANGE,
 } from "../Types";
 
@@ -48,6 +52,8 @@ const initialState = {
   patients: [],
   holidays: [],
   requests: [],
+  requestlevel: 0,
+  requestblocks: [],
   user:{},
   monthNames:monthNames,
   requestTitles:requestTitles,
@@ -66,23 +72,45 @@ export default function BasicReducer(state = initialState, action) {
         requests: action.data.requests,
         user: action.data.user,
       };
+
     case RADD:
       return {
         ...state,
         requests: [...state.requests,action.request]
       }
     case RSTATUSCHANGE:
+      state.requests.map((request, index) => {
+        if (request._id == action.request._id) {
+          state.requests[index].status = action.request.status;
+        }
+      });
+      return {
+        ...state,
+        requests: [...state.requests]
+      }
+    case RDELETE:
+      state.requests.map((request, index) => {
+        if (request._id == action._id) {
+          key = index;
+        }
+      });
+      state.requests.splice(key, 1);
+      return {
+        ...state,
+        requests: [...state.requests]
+      }
+    case RSTATUSCHANGE:
       return {
         ...state,
         // requests: [...state.requests,action.request]
       }
+
     case NINSERT:
       return {
         ...state,
         nurses: [...state.nurses, { ...action.nurse }],
       };
     case NUPDATE:
-      console.log(action.nurse._id);
       state.nurses.map((nurse, index) => {
         if (nurse._id == action.nurse._id) {
           key = index;
@@ -110,6 +138,7 @@ export default function BasicReducer(state = initialState, action) {
         ...state,
         nurses: [...state.nurses],
       };
+
     case PINSERT:
       return {
         ...state,
@@ -143,6 +172,7 @@ export default function BasicReducer(state = initialState, action) {
         ...state,
         patients: [...state.patients],
       };
+
     case HSET:
       return {
         ...state,

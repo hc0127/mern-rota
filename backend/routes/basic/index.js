@@ -192,6 +192,13 @@ module.exports = function(socket) {
             });
         }
     });
+    router.route('/request/close').post(function(req,res){
+        Realtime.findOneAndRemove({_id:req.body._id},function(){
+            socket.emit("close",req.body);
+            socket.broadcast.emit("close",req.body);
+            res.send({state:"success"});
+        });
+    });
 
     return router;
 }
