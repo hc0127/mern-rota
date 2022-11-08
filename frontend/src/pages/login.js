@@ -60,6 +60,7 @@ class Login extends Component {
   };
 
   render() {
+    console.log("login");
     return (
       <div className="login-wrapper">
         <MDBContainer className="m-auto">
