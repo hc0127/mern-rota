@@ -23,7 +23,6 @@ module.exports = function(socket) {
                                         holidays = holidayData[0].holiday
                                     }
                                     res.send({
-                                        state:'success',
                                         nurse:nurseData,
                                         patient:patientData,
                                         holiday:holidays,
