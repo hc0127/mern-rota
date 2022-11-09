@@ -10,11 +10,8 @@ import { createBrowserHistory } from "history";
 import Layout from "./layout";
 
 function getToken(){
-  console.log("gettoken");
   const tokenString = sessionStorage.getItem('data');
-  console.log("tokenString",tokenString);
   const user = JSON.parse(tokenString);
-  console.log("user",user);
   if(user){
     if(user.token == 'undefined'){
       return false;
@@ -30,9 +27,7 @@ function App() {
   const token = getToken();
   const history = createBrowserHistory();
 
-  console.log(token);
   if (!token) {
-    console.log("pass",token);
     history.push("login");
     return <Login />;
   }
