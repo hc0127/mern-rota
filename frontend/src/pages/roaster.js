@@ -64,25 +64,21 @@ class Roaster extends Component {
       isEditable,
       selPatient,
       selYear,
-      perPatient,
-      selPatientValue,
       selMonth,
       assigns,
     } = this.state;
     if (isEditable) {
-      const _self = this;
       this.setState({
         ...this.state,
         isEditable: false,
       });
-
       const { requestblocks } = this.props.basic;
-      console.log(requestblocks);
       if(requestblocks.length !== 0){
         toastr.clear();
         setTimeout(() => toastr.warning("This item cannot be requested! Please wait until approver approve the transfer request."), 300);
         return;
       }
+      console.log(assigns);
       axios
         .post("rota/assign", {
           patient_id: selPatient,
@@ -110,8 +106,8 @@ class Roaster extends Component {
           assignPerDay[i + 1] = 0;
         }
 
-        basic.nurses.map((nurse, nurseIndex) => {
-          nurse.rota.map((rota, rotaIndex) => {
+        basic.nurses.map((nurse) => {
+          nurse.rota.map((rota) => {
             if (rota.patient_id == selPatient && rota.date.includes(month)) {
               let day = rota.date.slice(8) * 1;
               assignPerDay[day]++;
@@ -205,6 +201,7 @@ class Roaster extends Component {
       n += assignPerDay[i];
     }
     assigns.splice(n - 1, 0, newAssign);
+    assigns.splice(-1);
 
     this.setState({
       ...this.state,
@@ -229,6 +226,7 @@ class Roaster extends Component {
       assigns[n].duty_start = "NA";
       assigns[n].duty_end = "NA";
       assigns[n].hour = "NA";
+      assigns.splice(-1);
       this.setState({
         ...this.state,
         assigns: [...assigns],
@@ -243,6 +241,7 @@ class Roaster extends Component {
       }
       assignPerDay[selMultiDay]--;
 
+      assigns.splice(-1);
       this.setState({
         ...this.state,
         assigns: [...assigns],
@@ -293,7 +292,7 @@ class Roaster extends Component {
 
     assigns.map((assign, assignIndex) => {
       if (assign.day == row.day && assign.rotation == row.rotation) {
-        basic.nurses.map((nurse, index) => {
+        basic.nurses.map((nurse) => {
           if (nurse._id == e.target.value) {
             assigns[assignIndex].nurse_name = nurse.name;
             assigns[assignIndex].nurse_id = nurse._id;
@@ -305,6 +304,7 @@ class Roaster extends Component {
       }
     });
 
+    assigns.splice(-1);
     this.setState({
       ...this.state,
       assigns: [...assigns],
@@ -415,6 +415,7 @@ class Roaster extends Component {
             }
           });
 
+          assigns.splice(-1);
           _self.setState({
             ..._self.state,
             assigns: [...assigns],
@@ -527,6 +528,7 @@ class Roaster extends Component {
             }
           });
 
+          assigns.splice(-1);
           _self.setState({
             ..._self.state,
             assigns: [...assigns],
@@ -553,7 +555,6 @@ class Roaster extends Component {
       selPatientValue,
       selYear,
       selMonth,
-      perPatient,
       isEditable,
       assigns,
       assignPerDay,
@@ -567,7 +568,6 @@ class Roaster extends Component {
     let daysInMonth = new Date(selYear, selMonth, 0).getDate();
 
     let monthNames = basic.monthNames;
-    let monthNumbers = this.swap(monthNames);
 
     // console.log(monthNames);
     // let monthObject = {...monthNames};
@@ -627,7 +627,7 @@ class Roaster extends Component {
           center: true,
           wrap: true,
           width: "200px",
-          cell: (row) => (
+          cell: (row) => (row.date !== "Total"&&
             <Form.Select
               aria-label="patient select"
               value={row._nurse_id}
@@ -711,7 +711,7 @@ class Roaster extends Component {
           center: true,
           wrap: true,
           width: "140px",
-          cell: (row) => (
+          cell: (row) => (row.date !== "Total"&&
             <TimePicker
               step={30}
               value={row.duty_start == "NA" ? "12:00" : row.duty_start}
@@ -725,7 +725,7 @@ class Roaster extends Component {
           center: true,
           wrap: true,
           width: "140px",
-          selector: (row) => (
+          selector: (row) => (row.date !== "Total"&&
             <TimePicker
               start={row.duty_start == "NA" ? "00:00" : row.duty_start}
               step={30}
@@ -839,8 +839,8 @@ class Roaster extends Component {
           assignPerDayDatas[i + 1] = 0;
         }
 
-        basic.nurses.map((nurse, nurseIndex) => {
-          nurse.rota.map((rota, rotaIndex) => {
+        basic.nurses.map((nurse) => {
+          nurse.rota.map((rota) => {
             if (rota.patient_id == selPatient && rota.date.includes(month)) {
               thour += rota.hour;
               let day = rota.date.slice(8) * 1;

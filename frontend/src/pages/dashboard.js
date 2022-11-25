@@ -86,6 +86,7 @@ class DashBoard extends Component {
 
     let monthNames = basic.monthNames;
     let monthNumbers = this.swap(monthNames);
+    const monthName = monthNumbers[selMonth];
 
     let Mon = Object.keys(monthNames);
     let NoMon = Object.values(monthNames);
@@ -103,7 +104,7 @@ class DashBoard extends Component {
     let holidaysInMonth = [];
     let holidaysPerMonth = [];
 
-    holidays.map((holiday) => {
+    holidays.map((holiday) => {//holiday loop
       let key = monthNumbers[holiday.slice(0, 2)];
       if (holidaysPerMonth[key] == undefined) {
         holidaysPerMonth[key] = [];
@@ -115,22 +116,9 @@ class DashBoard extends Component {
       }
     });
 
-    //get sundays in month
-    let SundaysInMonth = [];
-
-    let date = selYear + "-" + selMonth + "-01";
-    let firstDate = new Date(date).getDay();
-    if (firstDate == 0) {
-      firstDate = 7;
-    }
-    for (let selDay = firstDate; selDay < daysInMonth; selDay += 7) {
-      let day = selDay > 9 ? selDay : "0" + selDay;
-      SundaysInMonth.push(selYear + "-" + selMonth + "-" + day);
-    }
-
     //get sundays per month
     let sundaysPerMonth = [];
-    for (let loopMonth in monthNumbers) {
+    for (let loopMonth in monthNumbers) {//12*4
       let daysInMonth = new Date(selYear, loopMonth, 0).getDate();
       let date = selYear + "-" + loopMonth + "-01";
       let firstDate = new Date(date).getDay();
@@ -139,7 +127,7 @@ class DashBoard extends Component {
       } else {
         firstDate = 7 - firstDate + 1;
       }
-      for (let selDay = firstDate; selDay < daysInMonth; selDay += 7) {
+      for (let selDay = firstDate; selDay < daysInMonth; selDay += 7) {//4
         let day = selDay > 9 ? selDay : "0" + selDay;
         let key = monthNumbers[loopMonth];
         if (sundaysPerMonth[key] == undefined) {
@@ -165,7 +153,7 @@ class DashBoard extends Component {
     rotaHourPerDay[1] = [];
     rotaHourPerDay[2] = [];
 
-    basic.nurses.map((nurse) => {
+    basic.nurses.map((nurse) => {//nurse count * rota count
       let salary =
         nurse.basic_allowances +
         nurse.housing_allowances +
@@ -179,7 +167,11 @@ class DashBoard extends Component {
       let rotaPerMonth = [];
       let rotaHolidayPerMonth = [];
 
-      rotas.map((rota) => {
+      rotas = rotas.filter(rota => 
+        (rota.date >= from && rota.date <= to ) || rota.date.startsWith(selYear)
+      );
+
+      rotas.map((rota) => {//rota count
         if (rota.date >= from && rota.date <= to) {
           nurseDatas[nurseLevel].assigned += rota.hour * 1;
           nurseDatas[2].assigned += rota.hour * 1;
@@ -241,7 +233,7 @@ class DashBoard extends Component {
           }
         }
       });
-
+      
       //get leavedays per month
       let leaves = nurse.leave;
       let leavedaysPerMonth = [];
@@ -277,7 +269,7 @@ class DashBoard extends Component {
       let offdays = [
         ...leavedaysPerMonth,
         ...holidaysInMonth,
-        ...SundaysInMonth,
+        ...sundaysPerMonth[monthName],
       ];
       offdays = [...new Set(offdays)];
       nurseDatas[nurseLevel].available += (daysInMonth - offdays.length) * 8;
@@ -380,7 +372,7 @@ class DashBoard extends Component {
     });
 
     let revenue = [];
-    basic.patients.map((patient) => {
+    basic.patients.map((patient) => {//patient count * revenue
       for (let month in patient.revenue) {
         if (month.slice(4, 6) == selYear % 100) {
           let m = month.slice(0, 3);
@@ -394,7 +386,7 @@ class DashBoard extends Component {
     let pnlDatas = [],
       revenueDatas = [],
       payrollDatas = [];
-    for (let month in monthNames) {
+    for (let month in monthNames) {//12
       if (revenue[month] == undefined) {
         revenue[month] = 0;
       }
@@ -408,7 +400,7 @@ class DashBoard extends Component {
     }
 
     let days = [];
-    for (let j = 0; j < 3; j++) {
+    for (let j = 0; j < 3; j++) {//3 * 30
       for (let i = 1; i <= daysInMonth; i++) {
         if (j == 0) {
           days.push(i);
@@ -464,7 +456,7 @@ class DashBoard extends Component {
           <MDBCol>
             <MDBCard>
               <MDBCardImage
-                src="https://884863.smushcdn.com/2024606/wp-content/uploads/2006/10/outfit_nurse_clothes_attire_work.jpg?lossy=1&strip=1&webp=1"
+                src="1.webp"
                 alt="..."
                 position="top"
               />
@@ -507,7 +499,7 @@ class DashBoard extends Component {
           <MDBCol>
             <MDBCard>
               <MDBCardImage
-                src="https://upload.wikimedia.org/wikipedia/commons/c/cd/180726-time-al-1252.webp"
+                src="2.webp"
                 alt="..."
                 position="top"
               />
@@ -552,7 +544,7 @@ class DashBoard extends Component {
           <MDBCol>
             <MDBCard>
               <MDBCardImage
-                src="https://www.gannett-cdn.com/authoring/2019/02/08/NOKL/ghnewsok-OK-5622432-19aacf4d.jpeg?width=649&height=432&fit=crop&format=pjpg&auto=webp"
+                src="3.webp"
                 alt="..."
                 position="top"
               />
@@ -597,7 +589,7 @@ class DashBoard extends Component {
           <MDBCol>
             <MDBCard>
               <MDBCardImage
-                src="https://blog.axcethr.com/hubfs/flsa-overtime-basics-for-employers%20(1).webp"
+                src="4.webp"
                 alt="..."
                 position="top"
               />
@@ -642,7 +634,7 @@ class DashBoard extends Component {
           <MDBCol>
             <MDBCard>
               <MDBCardImage
-                src="https://russianvagabond.com/wp-content/uploads/2020/03/Webp.net-resizeimage-207.jpg"
+                src="5.jpg"
                 alt="..."
                 position="top"
               />
@@ -885,76 +877,6 @@ class DashBoard extends Component {
             },
           }}
         /> */}
-        {/* <CWidgetStatsB
-              className="mb-3"
-              color="primary"
-              inverse
-              progress={{ color: 'white',value: 75 }}
-              text="Widget helper text"
-              title="Widget title"
-              value="89.9%"
-            /> */}
-
-        {/* <MDBRow className='mt-2'>
-            <MDBCol>
-              <MDBCard background='primary' className='text-white text-center mb-3'>
-                <MDBCardBody className='m-auto'>
-                  <NavLink to="basic">Registeration</NavLink>
-                </MDBCardBody>
-              </MDBCard>
-            </MDBCol>
-            <MDBCol>
-              <MDBCard background='success' className='text-white mb-3'>
-                <MDBCardBody className='m-auto'>
-                  <NavLink to="working">Working Days</NavLink>
-                </MDBCardBody>
-              </MDBCard>
-            </MDBCol>
-            <MDBCol>
-              <MDBCard background='success' className='text-white mb-3'>
-                <MDBCardBody className='m-auto'>
-                  <NavLink to="leave">Leave Days</NavLink>
-                </MDBCardBody>
-              </MDBCard>
-            </MDBCol>
-            <MDBCol>
-              <MDBCard background='danger' className='text-white mb-3'>
-                <MDBCardBody className='m-auto'>
-                  <NavLink to="roaster">Duty Roaster</NavLink>
-                </MDBCardBody>
-              </MDBCard>
-            </MDBCol>
-          </MDBRow>
-          <MDBRow className="mt-2">
-            <MDBCol>
-              <MDBCard background='primary' className='text-white mb-3'>
-                <MDBCardBody className='m-auto'>
-                  <NavLink to="total">Daily Time Record</NavLink>
-                </MDBCardBody>
-              </MDBCard>
-            </MDBCol>
-            <MDBCol>
-              <MDBCard background='warning' className='text-white mb-3'>
-                <MDBCardBody className='m-auto'>
-                  <NavLink to="payroll">Payroll</NavLink>
-                </MDBCardBody>
-              </MDBCard>
-            </MDBCol>
-            <MDBCol>
-              <MDBCard background='warning' className='text-white mb-3'>
-                <MDBCardBody className='m-auto'>
-                  <NavLink to="revenue">Revenue</NavLink>
-                </MDBCardBody>
-              </MDBCard>
-            </MDBCol>
-            <MDBCol>
-              <MDBCard background='danger' className='text-white text-center mb-3'>
-                <MDBCardBody className='m-auto'>
-                  <NavLink to="pnl">PNL</NavLink>
-                </MDBCardBody>
-              </MDBCard>
-            </MDBCol>
-          </MDBRow> */}
       </MDBContainer>
     );
   }
