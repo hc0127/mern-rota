@@ -2,8 +2,3 @@
 
 # dependencies
 /node_modules
-/build
-
-# production
-.env.development
-.env.production

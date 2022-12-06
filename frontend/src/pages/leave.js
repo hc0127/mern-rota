@@ -18,6 +18,10 @@ import toastr from "toastr";
 import "toastr/build/toastr.min.css";
 import Autocomplete from "react-autocomplete";
 import { nAllUpd } from "../store/Actions/BasicAction";
+import autoTable from "jspdf-autotable";
+import jsPDF from "jspdf";
+import { FaRegFilePdf } from "react-icons/fa";
+import { Object } from "core-js";
 
 class LeaveDays extends Component {
   constructor(props) {
@@ -33,7 +37,6 @@ class LeaveDays extends Component {
       selView: 1,
       selYear: year,
       selMonth: month,
-
       from: year + "-" + month + "-" + day,
       to: year + "-" + month + "-" + day,
       selFilter: "",
@@ -234,6 +237,7 @@ class LeaveDays extends Component {
     } = this.state;
     const { basic } = this.props;
     const { user } = this.props.basic;
+    
     let leaveColumns = [];
     leaveColumns.push(
       {
@@ -261,6 +265,12 @@ class LeaveDays extends Component {
         name: "Staff Name",
         center: true,
         selector: (row) => row.name,
+      },
+      {
+        name: "Staff Designation",
+        center: true,
+        width: "120px",
+        selector: (row) => row.designation,
       }
     );
     if (selView == 1) {
@@ -346,7 +356,7 @@ class LeaveDays extends Component {
 
     basic.nurses.map((nurse) => {
       nurseList[nurse._id] = nurse.name;
-      if (nurse.name.includes(selNurseValue)) {
+      if (nurse.name && nurse.name.includes(selNurseValue)) {
         nurseAutoList.push({
           label: nurse.name,
           key: nurse._id,
@@ -359,6 +369,7 @@ class LeaveDays extends Component {
       { label: "No", key: "no" },
       { label: "Staff ID", key: "nurse_short_id" },
       { label: "Staff Name", key: "name" },
+      { label: "Staff Designation", key: "designation" },
       { label: "Leave Type", key: "leave_type" },
       { label: "Leave Start", key: "leave_start" },
       { label: "Leave End", key: "leave_end" },
@@ -380,8 +391,8 @@ class LeaveDays extends Component {
           let leave_days = Math.ceil((to - from) / (1000 * 60 * 60 * 24)) + 1;
           if (selView == 2) {
             if (!leave.from.startsWith(month)) {
-              leave_days = parseInt(leave.to.slice(8, 10));
-              leave_periods.push("(1~" + parseInt(leave.to.slice(8)) + ")");
+              leave_days = parseInt(leave.to?.slice(8, 10));
+              leave_periods.push("(1~" + parseInt(leave.to?.slice(8)) + ")");
             } else if (!leave.to.startsWith(month)) {
               leave_days =
                 Math.ceil(
@@ -390,14 +401,14 @@ class LeaveDays extends Component {
                     (1000 * 60 * 60 * 24)
                 ) + 1;
               leave_periods.push(
-                "(" + parseInt(leave.from.slice(8)) + "~" + daysInMonth + ")"
+                "(" + parseInt(leave.from?.slice(8)) + "~" + daysInMonth + ")"
               );
             } else {
               leave_periods.push(
                 "(" +
-                  parseInt(leave.from.slice(8)) +
+                  parseInt(leave.from?.slice(8)) +
                   "~" +
-                  parseInt(leave.to.slice(8)) +
+                  parseInt(leave.to?.slice(8)) +
                   ")"
               );
             }
@@ -409,8 +420,9 @@ class LeaveDays extends Component {
               no: rowCount,
               image: nurse.image,
               nurse_id: nurse._id,
-              nurse_short_id: nurse._id.slice(20),
+              nurse_short_id: nurse._id?.slice(20),
               name: nurse.name,
+              designation: nurse.level == 0 ? "Registered" : "Assistant",
               leave_type: this.getLeaveType(leave),
               leave_id: leave.leave_id,
               leave_start: leave.from,
@@ -431,6 +443,7 @@ class LeaveDays extends Component {
             nurse_id: nurse._id,
             nurse_short_id: nurse._id.slice(20),
             name: nurse.name,
+            designation: nurse.level == 0 ? "Registered" : "Assistant",
             leave_periods: leave_periods.join(","),
             leave_days: total_leave_days,
             daily_hours: 8,
@@ -448,6 +461,64 @@ class LeaveDays extends Component {
       <option key={index} value={NoMon[index]}>{month}</option>
     ));
     leaveDatas.sort((a, b) => (a.name > b.name ? 1 : b.name > a.name ? -1 : 0));
+
+    function generate() {
+      const doc = new jsPDF("a4", "pt", "letter");
+
+      var img = new Image();
+      var src = "https://i.postimg.cc/wMgr6Tr0/converted.jpg";
+      img.src = src;
+
+      const rows = [];
+
+      const columns = [];
+      headers.map((key) => columns.push({ header: key.label }));
+
+      leaveDatas.map((key) =>
+        rows.push(
+          Object.values([
+            key.no,
+            key.nurse_short_id,
+            key.name,
+            key.designation,
+            key.leave_type,
+            key.leave_start,
+            key.leave_end,
+            key.leave_days,
+            key.daily_hours,
+            key.leave_hours,
+          ])
+        )
+      );
+
+      doc.setFontSize(20);
+      doc.addImage(img, "JPEG", 420, 15, 160, 30);
+      doc.text(247, 80, "Leave Days");
+
+      doc.autoTable(columns, rows, {
+        margin: { top: 100, left: 30, right: 30, bottom: 50 },
+        theme: "grid",
+      });
+      leaveDatas.sort((a, b) =>
+        a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+      );
+      doc.setFontSize(10);
+      const pageCount = doc.internal.getNumberOfPages();
+
+      for (var i = 1; i <= pageCount; i++) {
+        // Go to page i
+        doc.setPage(i);
+        doc.text(
+          String(i) + "/" + String(pageCount),
+          325 - 20,
+          805 - 30,
+          null,
+          null,
+          "center"
+        );
+      }
+      doc.save("leave.pdf");
+    }
 
     return (
       <MDBContainer>
@@ -561,17 +632,26 @@ class LeaveDays extends Component {
               {MonthSelect}
             </Form.Select>
           </MDBCol>
-          <MDBCol md="3" className="float-right">
+          <MDBCol md="2">
             <CSVLink
               headers={headers}
               data={leaveDatas}
               filename={"leavedays.csv"}
-              className="btn btn-success "
+              className="btn btn-success Pbtn-success1 "
               target="_blank"
             >
               <IoMdDownload />
               Export
             </CSVLink>
+          </MDBCol>
+          <MDBCol md="2">
+            <button
+              className="btn btn-success Pbtn-success2 "
+              target="_blank"
+              onClick={() => generate()}
+            >
+              <FaRegFilePdf /> PDF
+            </button>
           </MDBCol>
         </MDBRow>
         <MDBRow className="mt-2">

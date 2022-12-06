@@ -2,6 +2,7 @@ const express = require("express");
 const User = require('./models/user.model');
 
 module.exports = function(req,res,next) {
+    console.log('middleware',req.url);
     if(req.url == "/basic/login"){
         next();
     }else{

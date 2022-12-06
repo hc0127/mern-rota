@@ -4,6 +4,9 @@ import axios from "../config/server.config";
 import { Tab, Tabs, Modal, Form, FloatingLabel } from "react-bootstrap";
 import { CSVLink } from "react-csv";
 import { IoMdDownload } from "react-icons/io";
+import { FaRegFilePdf } from "react-icons/fa";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 import {
   MDBContainer,
   MDBRow,
@@ -11,6 +14,7 @@ import {
   MDBBtn,
   MDBBtnGroup,
 } from "mdb-react-ui-kit";
+
 import DataTable from "react-data-table-component";
 import toastr from "toastr";
 import "toastr/build/toastr.min.css";
@@ -25,6 +29,7 @@ import {
   hSet,
 } from "./../store/Actions/BasicAction";
 import { connect } from "react-redux";
+import { Object } from "core-js";
 
 toastr.options = {
   positionClass: "toast-top-full-width",
@@ -413,7 +418,7 @@ class Basic extends Component {
         name: "JoinDate",
         center: true,
         wrap: true,
-        selector: (row) => row.date.slice(0, 10),
+        selector: (row) => row.date?row.date.slice(0, 10):"",
         sortable: true,
       },
       {
@@ -423,6 +428,7 @@ class Basic extends Component {
         selector: (row) => row.workexp,
       },
     ];
+
     if(user.hasOwnProperty("role") && user.role !== 1){
       nurseColumns = [...nurseColumns,
         {
@@ -459,7 +465,7 @@ class Basic extends Component {
     nurses.sort((a, b) =>
       a.date > b.date ? 1 : b.date > a.date ? -1 : 0
     );
-
+    
     let headers = [
       { label: "Full Name", key: "name" },
       { label: "Designation", key: "designation" },
@@ -606,6 +612,106 @@ class Basic extends Component {
       holidayDatas.push(row);
     }
 
+    function generate() {
+      const doc = new jsPDF("a4", "pt", "letter");
+
+      var img = new Image();
+      var src = "https://i.postimg.cc/wMgr6Tr0/converted.jpg";
+      img.src = src;
+
+      const columns = [];
+      //making dynamic header
+      headers.map((key) => columns.push({ header: key.label }));
+      const rows = [];
+      basic.nurses.map((key) =>
+        rows.push(
+          Object.values([
+            key.name,
+            key.level == 0 ? "Registered" : "Assistant",
+            key.address,
+            key.cell,
+            key.country,
+            key.experience,
+            key.date.slice(0, 10),
+            key.workexp,
+            key.basic_allowances,
+            key.housing_allowances,
+            key.other_allowances,
+          ])
+        )
+      );
+      basic.nurses.sort((a, b) =>
+        a.date > b.date ? 1 : b.date > a.date ? -1 : 0
+      );
+      doc.setFontSize(20);
+      doc.addImage(img, "JPEG", 420, 15, 160, 30);
+      doc.text(237, 80, "Nurse Record");
+
+      doc.autoTable(columns, rows, {
+        margin: { top: 100, left: 10, right: 10, bottom: 50 },
+        theme: "grid",
+      });
+      doc.setFontSize(10);
+      const pageCount = doc.internal.getNumberOfPages();
+
+      for (var i = 1; i <= pageCount; i++) {
+        // Go to page i
+        doc.setPage(i);
+        doc.text(
+          String(i) + "/" + String(pageCount),
+          325 - 20,
+          805 - 30,
+          null,
+          null,
+          "center"
+        );
+      }
+      doc.save("nurse.pdf");
+    }
+
+    function generated() {
+      const doc = new jsPDF("a4", "pt", "letter");
+      var img = new Image();
+      var src = "https://i.postimg.cc/wMgr6Tr0/converted.jpg";
+      img.src = src;
+
+      const rows = [];
+
+      const columns = [];
+      //making dynamic header
+      header.map((key) => columns.push({ header: key.label }));
+      basic.patients.map((key) =>
+        rows.push(Object.values([key.name, key.address, key.cell]))
+      );
+      basic.patients.sort((a, b) =>
+        a.date > b.date ? 1 : b.date > a.date ? -1 : 0
+      );
+      doc.setFontSize(20);
+      doc.addImage(img, "JPEG", 420, 15, 160, 30);
+      doc.text(237, 80, "Patient Record");
+
+      doc.autoTable(columns, rows, {
+        margin: { top: 100, left: 40, right: 40, bottom: 50 },
+        theme: "grid",
+      });
+      doc.setFontSize(10);
+      const pageCount = doc.internal.getNumberOfPages();
+
+      for (var i = 1; i <= pageCount; i++) {
+        // Go to page i
+        doc.setPage(i);
+        doc.text(
+          String(i) + "/" + String(pageCount),
+          325 - 20,
+          805 - 30,
+          null,
+          null,
+          "center"
+        );
+      }
+      doc.save("patient.pdf");
+    }
+
     return (
       <MDBContainer>
         <div className="pt-5 text-center text-dark">
@@ -631,12 +737,23 @@ class Basic extends Component {
                   data={nurses}
                   filename={"nurses.csv"}
                   className="btn btn-success "
-                  target="_blank"
+                  outline
+                  rounded
+                  color="success"
                 >
                   <IoMdDownload />
                   Export
                 </CSVLink>
 
+                <button
+                  className="btn btn-success "
+                  outline
+                  rounded
+                  color="success"
+                  onClick={() => generate()}
+                >
+                  <FaRegFilePdf /> PDF
+                </button>
                 <div className="p-2">
                   <DataTable
                     id="nurseTable"
@@ -649,6 +766,7 @@ class Basic extends Component {
                   />
                 </div>
               </Tab>
+
               <Tab eventKey="patient" key={2} title="patient" className="p-2">
                 <MDBRow>
                   <MDBCol>
@@ -667,11 +785,24 @@ class Basic extends Component {
                       data={patients}
                       filename={"patients.csv"}
                       className="btn btn-success "
+                      outline
+                      rounded
+                      color="success"
                       target="_blank"
                     >
                       <IoMdDownload />
                       Export
                     </CSVLink>
+                    <button
+                      className="btn btn-success "
+                      outline
+                      rounded
+                      color="success"
+                      target="_blank"
+                      onClick={() => generated()}
+                    >
+                      <FaRegFilePdf /> PDF
+                    </button>
                   </MDBCol>
                   <div className="p-2">
                     <DataTable
@@ -685,6 +816,7 @@ class Basic extends Component {
                   </div>
                 </MDBRow>
               </Tab>
+              
               <Tab eventKey="holiday" key={3} title="holiday" className="p-2">
                 <MDBRow>
                   <DataTable

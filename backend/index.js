@@ -42,24 +42,22 @@ connection.once("open", function () {
   console.log("MongoDB database connection established successfully");
 });
 
-let sock;
 io.on("connection", (socket) => {
-  console.log("New client connected");
-  app.use("/",require("./middleware"));
-  
   socket.io = io;
-  sock = socket;
+  console.log("New client connected");
+
+  app.use("/",require("./middleware"));
+  app.use("/basic", require("./routes/basic")(socket));
+  app.use("/nurse", require("./routes/basic/nurse")(socket));
+  app.use("/patient", require("./routes/basic/patient")(socket));
+  app.use("/rota", require("./routes/rota")(socket));
+  app.use("/leave", require("./routes/leave")(socket));
+  
 
   socket.on("disconnect", () => {
     console.log("Client disconnected");
   });
 });
-
-app.use("/basic", require("./routes/basic")(sock));
-app.use("/nurse", require("./routes/basic/nurse")(sock));
-app.use("/patient", require("./routes/basic/patient")(sock));
-app.use("/rota", require("./routes/rota")(sock));
-app.use("/leave", require("./routes/leave")(sock));
 
 server.listen(PORT, function () {
   console.log("Server is running on Port: " + PORT);

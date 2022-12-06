@@ -7,6 +7,8 @@ const User = require('../../models/user.model');
 const Holiday = require('../../models/holiday.model');
 const Realtime = require('../../models/realtime.model');
 
+const app = express();
+
 module.exports = function(socket) {
     router.route("/list").get(function(req,res){
         Nurse.find({},function(err,nurseData){

@@ -5,6 +5,12 @@ import { MDBCol, MDBContainer, MDBRow } from "mdb-react-ui-kit";
 import { IoMdDownload } from "react-icons/io";
 import { CSVLink } from "react-csv";
 import { Form, OverlayTrigger, Tooltip } from "react-bootstrap";
+
+import { FaRegFilePdf } from "react-icons/fa";
+import autoTable from "jspdf-autotable";
+import jsPDF from "jspdf";
+import { Object } from "core-js";
+import axios from "axios";
 import history from "../history";
 
 class PayRoll extends Component {
@@ -564,6 +570,97 @@ class PayRoll extends Component {
     payrollDatas.sort((a, b) =>
       a.name > b.name ? 1 : b.name > a.name ? -1 : 0
     );
+    function generate() {
+      const doc = new jsPDF("a4", "pt", "letter");
+
+      var img = new Image();
+      var src = "https://i.postimg.cc/wMgr6Tr0/converted.jpg";
+      img.src = src;
+      doc.setFontSize(20);
+      doc.addImage(img, "JPEG", 420, 15, 160, 30);
+      doc.text(270, 80, "Pay Roll");
+      if (selMonth != "00") {
+        const rows = [];
+
+        const columns = [];
+        headers.map((key) => columns.push({ header: key.label }));
+        payrollDatas.map((key) =>
+          rows.push(
+            Object.values([
+              key.code,
+              key.name,
+              key.designation,
+              key.workeddays,
+              key.totalhoursworked,
+              key.normalovertimehours,
+              key.holidayovertimehours,
+              key.grosssalary,
+              key.normalovertime,
+              key.holidayovertime,
+              key.total,
+            ])
+          )
+        );
+        payrollDatas.sort((a, b) =>
+          a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+        );
+
+        doc.autoTable(columns, rows, {
+          margin: { top: 100, left: 10, right: 10, bottom: 50 },
+          theme: "grid",
+        });
+      } else if (selMonth == 0) {
+        const columns1 = [];
+        headers.map((key) => columns1.push({ header: key.label }));
+        const rows1 = [];
+        payrollDatas.map((key) =>
+          rows1.push(
+            Object.values([
+              key.nurse,
+              key.designation,
+              key.Jan,
+              key.Feb,
+              key.Mar,
+              key.Apr,
+              key.May,
+              key.Jun,
+              key.Jul,
+              key.Aug,
+              key.Sep,
+              key.Oct,
+              key.Nov,
+              key.Dec,
+              key.total,
+            ])
+          )
+        );
+        payrollDatas.sort((a, b) =>
+          a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+        );
+        doc.autoTable(columns1, rows1, {
+          margin: { top: 100, left: 10, right: 10, bottom: 50 },
+          theme: "grid",
+        });
+      }
+
+      doc.setFontSize(10);
+      const pageCount = doc.internal.getNumberOfPages();
+
+      for (var i = 1; i <= pageCount; i++) {
+        // Go to page i
+        doc.setPage(i);
+        doc.text(
+          String(i) + "/" + String(pageCount),
+          325 - 20,
+          805 - 30,
+          null,
+          null,
+          "center"
+        );
+      }
+      doc.save("payroll.pdf");
+    }
+
     return (
       <MDBContainer>
         <div className="pt-5 text-center text-dark">
@@ -606,12 +703,21 @@ class PayRoll extends Component {
               data={payrollDatas}
               headers={headers}
               filename={"payroll.csv"}
-              className="btn btn-success "
+              className="btn btn-success Pbtn-success1"
               target="_blank"
             >
               <IoMdDownload />
               Export
             </CSVLink>
+          </MDBCol>
+          <MDBCol md="2">
+            <button
+              className="btn btn-success Pbtn-success2"
+              target="_blank"
+              onClick={() => generate()}
+            >
+              <FaRegFilePdf /> PDF
+            </button>
           </MDBCol>
         </MDBRow>
         <MDBRow className="mt-2">

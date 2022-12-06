@@ -13,6 +13,10 @@ import { CSVLink } from "react-csv";
 import { connect } from "react-redux";
 import DataTable from "react-data-table-component";
 import Autocomplete from "react-autocomplete";
+import autoTable from "jspdf-autotable";
+import jsPDF from "jspdf";
+import { FaRegFilePdf } from "react-icons/fa";
+import { Object } from "core-js";
 
 class DTR extends Component {
   constructor(props) {
@@ -230,6 +234,60 @@ class DTR extends Component {
     }
     totalDatas.sort((a, b) => (a.date > b.date ? 1 : b.date > a.date ? -1 : 0));
 
+    function generate() {
+      const doc = new jsPDF("a4", "pt", "letter");
+
+      var img = new Image();
+      var src = "https://i.postimg.cc/wMgr6Tr0/converted.jpg";
+      img.src = src;
+
+      const rows = [];
+
+      const columns = [];
+      //making dynamic header
+      headers.map((key) => columns.push({ header: key.label }));
+
+      totalDatas.map((key) =>
+        rows.push(
+          Object.values([
+            key.date,
+            key.patient,
+            key.duty_start,
+            key.duty_end,
+            key.hour,
+          ])
+        )
+      );
+
+      doc.setFontSize(20);
+      doc.addImage(img, "JPEG", 420, 15, 160, 30);
+      doc.text(175, 80, "DAILY TIME RECORD (DTR)");
+
+      doc.autoTable(columns, rows, {
+        margin: { top: 100, left: 50, right: 50, bottom: 50 },
+        theme: "grid",
+      });
+      totalDatas.sort((a, b) =>
+        a.date > b.date ? 1 : b.date > a.date ? -1 : 0
+      );
+      doc.setFontSize(10);
+      const pageCount = doc.internal.getNumberOfPages();
+
+      for (var i = 1; i <= pageCount; i++) {
+        // Go to page i
+        doc.setPage(i);
+        doc.text(
+          String(i) + "/" + String(pageCount),
+          325 - 20,
+          805 - 30,
+          null,
+          null,
+          "center"
+        );
+      }
+      doc.save("dtr.pdf");
+    }
+
     return (
       <MDBContainer>
         <div className="pt-5 text-center text-dark">
@@ -311,12 +369,21 @@ class DTR extends Component {
                   headers={headers}
                   data={totalDatas}
                   filename={"dtr.csv"}
-                  className="btn btn-success "
+                  className="btn btn-success Pbtn-success1"
                   target="_blank"
                 >
                   <IoMdDownload />
                   Export
                 </CSVLink>
+              </MDBCol>
+              <MDBCol>
+                <button
+                  className="btn btn-success Pbtn-success2"
+                  target="_blank"
+                  onClick={() => generate()}
+                >
+                  <FaRegFilePdf /> PDF
+                </button>
               </MDBCol>
             </div>
             <div className="p-2">

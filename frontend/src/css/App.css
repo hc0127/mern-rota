@@ -185,6 +185,23 @@ div#toast-container {
 .btn {
   margin: 15px;
 }
+.Rform-control1 {
+  margin-left: 41px;
+}
+.Rbtn-success1 {
+  margin-left: 53px;
+}
+.Rbtn-success2 {
+  margin-left: -89px;
+}
+
+.Pbtn-success1 {
+  margin-left: -31px;
+}
+.Pbtn-success2 {
+  margin-left: -176px;
+}
+
 .sc-iBkjds {
   padding: 5px !important;
 }

@@ -826,7 +826,7 @@ class DashBoard extends Component {
             />
           </MDBCol>
         </MDBRow>
-        {/* <CChart
+        <CChart
           type="bar"
           data={{
             labels: days,
@@ -876,7 +876,7 @@ class DashBoard extends Component {
               },
             },
           }}
-        /> */}
+        />
       </MDBContainer>
     );
   }

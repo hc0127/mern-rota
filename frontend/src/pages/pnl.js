@@ -5,6 +5,10 @@ import { MDBCol, MDBContainer, MDBRow } from "mdb-react-ui-kit";
 import { CSVLink } from "react-csv";
 import { IoMdDownload } from "react-icons/io";
 import { Form } from "react-bootstrap";
+import { FaRegFilePdf } from "react-icons/fa";
+import autoTable from "jspdf-autotable";
+import jsPDF from "jspdf";
+import { Object } from "core-js";
 import history from "../history";
 
 class PNL extends Component {
@@ -466,6 +470,88 @@ class PNL extends Component {
       },
     ];
 
+    function generate() {
+      const doc = new jsPDF("a4", "pt", "letter");
+      var img = new Image();
+      var src = "https://i.postimg.cc/wMgr6Tr0/converted.jpg";
+      img.src = src;
+
+      doc.setFontSize(20);
+      doc.addImage(img, "JPEG", 410, 15, 160, 30);
+      doc.text(230, 80, "PROFIT & LOSS");
+      if (perPatient) {
+        const rows = [];
+
+        const columns = [];
+        headers.map((key) => columns.push({ header: key.label }));
+
+        pnlDatas.map((key) =>
+          rows.push(
+            Object.values([
+              key.patient,
+              key.level,
+              key.revenue,
+              key.payroll,
+              key.pnl,
+              key.percentage,
+            ])
+          )
+        );
+        pnlDatas.sort((a, b) =>
+          a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+        );
+
+        doc.autoTable(columns, rows, {
+          margin: { top: 100, left: 40, right: 40, bottom: 50 },
+          theme: "grid",
+        });
+      } else {
+        const columns1 = [
+          { header: "Month" },
+          { header: "Revenue" },
+          { header: "Payroll" },
+          { header: "Profit/Loss" },
+          { header: "Prcentage" },
+        ];
+        const rows1 = [];
+        pnlDatas.map((key) =>
+          rows1.push(
+            Object.values([
+              key.month,
+              key.revenue,
+              key.payroll,
+              key.pnl,
+              key.percentage,
+            ])
+          )
+        );
+        pnlDatas.sort((a, b) =>
+          a.name > b.name ? 1 : b.name > a.name ? -1 : 0
+        );
+        doc.autoTable(columns1, rows1, {
+          margin: { top: 100, left: 50, right: 50, bottom: 50 },
+          theme: "grid",
+        });
+      }
+
+      doc.setFontSize(10);
+      const pageCount = doc.internal.getNumberOfPages();
+
+      for (var i = 1; i <= pageCount; i++) {
+        // Go to page i
+        doc.setPage(i);
+        doc.text(
+          String(i) + "/" + String(pageCount),
+          325 - 20,
+          805 - 30,
+          null,
+          null,
+          "center"
+        );
+      }
+      doc.save("pnl.pdf");
+    }
+
     return (
       <MDBContainer>
         <div className="pt-5 text-center text-dark">
@@ -509,12 +595,21 @@ class PNL extends Component {
               headers={headers}
               data={pnlDatas}
               filename={"pnl.csv"}
-              className="btn btn-success "
+              className="btn btn-success Pbtn-success1"
               target="_blank"
             >
               <IoMdDownload />
               Export
             </CSVLink>
+          </MDBCol>
+          <MDBCol md="2">
+            <button
+              className="btn btn-success Pbtn-success2"
+              target="_blank"
+              onClick={() => generate()}
+            >
+              <FaRegFilePdf /> PDF
+            </button>
           </MDBCol>
         </MDBRow>
         <MDBRow className="mt-2">

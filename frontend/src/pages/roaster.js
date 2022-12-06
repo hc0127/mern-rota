@@ -23,6 +23,13 @@ import "toastr/build/toastr.min.css";
 
 import "./../css/react-confirm-alert.css";
 import Autocomplete from "react-autocomplete";
+import { FaRegFilePdf } from "react-icons/fa";
+import autoTable from "jspdf-autotable";
+import jsPDF from "jspdf";
+import "./../css/App.css";
+import { Object } from "core-js";
+import { IoMdDownload } from "react-icons/io";
+import { CSVLink } from "react-csv";
 
 class Roaster extends Component {
   constructor(props) {
@@ -132,13 +139,13 @@ class Roaster extends Component {
             newAssign.date =
               month + "-" + (i < 9 ? +"0" + String(i + 1) : i + 1);
             newAssign.day = (i + 1) * 1;
-            newAssign.nurse_name = "NA";
-            newAssign.nurse_short_id = "NA";
-            newAssign.nurse_id = "NA";
-            newAssign.designation = "NA";
-            newAssign.duty_start = "NA";
-            newAssign.duty_end = "NA";
-            newAssign.hour = "NA";
+            newAssign.nurse_name = "Off Day";
+            newAssign.nurse_short_id = "Off Day";
+            newAssign.nurse_id = "Off Day";
+            newAssign.designation = "Off Day";
+            newAssign.duty_start = "Off Day";
+            newAssign.duty_end = "Off Day";
+            newAssign.hour = "Off Day";
 
             assigns = [...assigns, { ...newAssign }];
           }
@@ -186,14 +193,14 @@ class Roaster extends Component {
       (selMultiDay < 9 ? +"0" + String(selMultiDay) : selMultiDay);
     newAssign.day = selMultiDay;
     newAssign.rotation = assignPerDay[selMultiDay] + 1;
-    newAssign.nurse_name = "NA";
-    newAssign.nurse_name = "NA";
-    newAssign.nurse_short_id = "NA";
-    newAssign.nurse_id = "NA";
-    newAssign.designation = "NA";
-    newAssign.duty_start = "NA";
-    newAssign.duty_end = "NA";
-    newAssign.hour = "NA";
+    newAssign.nurse_name = "Off Day";
+    newAssign.nurse_name = "Off Day";
+    newAssign.nurse_short_id = "Off Day";
+    newAssign.nurse_id = "Off Day";
+    newAssign.designation = "Off Day";
+    newAssign.duty_start = "Off Day";
+    newAssign.duty_end = "Off Day";
+    newAssign.hour = "Off Day";
 
     let n = 0;
     assignPerDay[selMultiDay]++;
@@ -219,14 +226,13 @@ class Roaster extends Component {
     }
 
     if (assignPerDay[selMultiDay] == 1) {
-      assigns[n].nurse_name = "NA";
-      assigns[n].nurse_short_id = "NA";
-      assigns[n].nurse_id = "NA";
-      assigns[n].designation = "NA";
-      assigns[n].duty_start = "NA";
-      assigns[n].duty_end = "NA";
-      assigns[n].hour = "NA";
-      assigns.splice(-1);
+      assigns[n].nurse_name = "Off Day";
+      assigns[n].nurse_short_id = "Off Day";
+      assigns[n].nurse_id = "Off Day";
+      assigns[n].designation = "Off Day";
+      assigns[n].duty_start = "Off Day";
+      assigns[n].duty_end = "Off Day";
+      assigns[n].hour = "Off Day";
       this.setState({
         ...this.state,
         assigns: [...assigns],
@@ -445,8 +451,8 @@ class Roaster extends Component {
           if (
             assign.rotation !== row.rotation &&
             assign.date == row.date &&
-            assign.duty_start != "NA" &&
-            assign.duty_end != "NA" &&
+            assign.duty_start != "Off Day" &&
+            assign.duty_end != "Off Day" &&
             assign.duty_start < _end &&
             assign.duty_end > row.duty_start
           ) {
@@ -589,6 +595,15 @@ class Roaster extends Component {
     });
     //get sundays per month
     let sundaysPerMonth = [];
+    let headers = [
+      { label: "Date", key: "date" },
+      { label: "Emp ID", key: "nurse_short_id" },
+      { label: "Emp Name", key: "nurse_name" },
+      { label: "Designation", key: "designation" },
+      { label: "Duty Start", key: "duty_start" },
+      { label: "Duty End", key: "duty_end" },
+      { label: "Hour", key: "hour" },
+    ];
     let date = selYear + "-" + selMonth + "-01";
     let firstDate = new Date(date).getDay();
     if (firstDate == 0) {
@@ -714,8 +729,8 @@ class Roaster extends Component {
           cell: (row) => (row.date !== "Total"&&
             <TimePicker
               step={30}
-              value={row.duty_start == "NA" ? "12:00" : row.duty_start}
-              disabled={row.nurse_id == "NA" ? "disabled" : ""}
+              value={row.duty_start == "Off Day" ? "12:00" : row.duty_start}
+              disabled={row.nurse_id == "Off Day" ? "disabled" : ""}
               onChange={(e) => this.onChangeDutyStart(e, row)}
             />
           ),
@@ -727,10 +742,10 @@ class Roaster extends Component {
           width: "140px",
           selector: (row) => (row.date !== "Total"&&
             <TimePicker
-              start={row.duty_start == "NA" ? "00:00" : row.duty_start}
+              start={row.duty_start == "Off Day" ? "00:00" : row.duty_start}
               step={30}
-              value={row.duty_end == "NA" ? "12:00" : row.duty_end}
-              disabled={row.duty_start == "NA" ? "disabled" : ""}
+              value={row.duty_end == "Off Day" ? "12:00" : row.duty_end}
+              disabled={row.duty_start == "Off Day" ? "disabled" : ""}
               onChange={(e) => this.onChangeDutyEnd(e, row)}
             />
           ),
@@ -866,13 +881,13 @@ class Roaster extends Component {
             newAssign.date =
               month + "-" + (i < 9 ? +"0" + String(i + 1) : i + 1);
             newAssign.day = (i + 1) * 1;
-            newAssign.nurse_name = "NA";
-            newAssign.nurse_short_id = "NA";
-            newAssign.nurse_id = "NA";
-            newAssign.designation = "NA";
-            newAssign.duty_start = "NA";
-            newAssign.duty_end = "NA";
-            newAssign.hour = "NA";
+            newAssign.nurse_name = "Off Day";
+            newAssign.nurse_short_id = "Off Day";
+            newAssign.nurse_id = "Off Day";
+            newAssign.designation = "Off Day";
+            newAssign.duty_start = "Off Day";
+            newAssign.duty_end = "Off Day";
+            newAssign.hour = "Off Day";
 
             assignDatas = [...assignDatas, { ...newAssign }];
           }
@@ -932,16 +947,70 @@ class Roaster extends Component {
       },
     ];
 
+    function generate() {
+      const doc = new jsPDF("a4", "pt", "letter");
+
+      var img = new Image();
+      var src = "https://i.postimg.cc/wMgr6Tr0/converted.jpg";
+      img.src = src;
+      const rows = [];
+
+      const columns = [];
+      headers.map((key) => columns.push({ header: key.label }));
+
+      assignDatas.map((key) =>
+        rows.push(
+          Object.values([
+            key.date,
+            key.nurse_short_id,
+            key.nurse_name,
+            key.designation,
+            key.duty_start,
+            key.duty_end,
+            key.hour,
+          ])
+        )
+      );
+
+      doc.setFontSize(20);
+      doc.addImage(img, "JPEG", 420, 15, 160, 30);
+      doc.text(250, 80, "Duty Roaster");
+
+      doc.autoTable(columns, rows, {
+        margin: { top: 100, left: 30, right: 30, bottom: 50 },
+        theme: "grid",
+      });
+
+      doc.setFontSize(10);
+      doc.text(30, 755, "Assigned By___________________");
+      doc.text(420, 755, "Approved by___________________");
+      const pageCount = doc.internal.getNumberOfPages();
+
+      for (var i = 1; i <= pageCount; i++) {
+        // Go to page i
+        doc.setPage(i);
+        doc.text(
+          String(i) + "/" + String(pageCount),
+          325 - 20,
+          805 - 30,
+          null,
+          null,
+          "center"
+        );
+      }
+      doc.save("roaster.pdf");
+    }
+
     return (
       <MDBContainer>
         <div className="pt-5 text-center text-dark">
           <h1 className="mt-3">DUTY ROASTER</h1>
         </div>
         <MDBRow className=" align-items-center justify-content-center">
-          <MDBCol md="4" className="pt-4"></MDBCol>
+          <MDBCol md="2" className="pt-4"></MDBCol>
         </MDBRow>
         <MDBRow className=" align-items-center justify-content-center">
-          <MDBCol className="autocomplete col-md-3 ncard">
+          <MDBCol className="autocomplete col-md-2 ncard">
             <Autocomplete
               getItemValue={(item) => item.label}
               items={patientAutoList}
@@ -986,19 +1055,42 @@ class Roaster extends Component {
               {MonthSelect}
             </Form.Select>
           </MDBCol>
-          {user.hasOwnProperty("role") && user.role !== 1 &&
-          <MDBCol md="2">
-            <MDBBtn
-              outline
-              rounded
-              color="success"
-              type="button"
-              onClick={() => this.save()}
-            >
-              {isEditable ? "save" : "edit"}
-            </MDBBtn>
+          <MDBCol md="1">
+            {user.hasOwnProperty("role") && user.role !== 1 &&
+            <MDBCol md="2">
+              <MDBBtn
+                outline
+                rounded
+                color="success"
+                type="button"
+                onClick={() => this.save()}
+              >
+                {isEditable ? "save" : "edit"}
+              </MDBBtn>
+            </MDBCol>
+            }
+            <MDBCol md="2">
+              <CSVLink
+                headers={headers}
+                data={assignDatas}
+                filename={"roaster.csv"}
+                className="btn btn-success Pbtn-success1"
+                target="_blank"
+              >
+                <IoMdDownload />
+                Export
+              </CSVLink>
+            </MDBCol>
+            <MDBCol md="2">
+              <button
+                className="btn btn-success Pbtn-success2"
+                target="_blank"
+                onClick={() => generate()}
+              >
+                <FaRegFilePdf /> PDF
+              </button>
+            </MDBCol>
           </MDBCol>
-          }
         </MDBRow>
         <MDBRow className="p-2">
           <DataTable

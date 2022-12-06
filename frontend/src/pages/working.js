@@ -5,6 +5,11 @@ import { MDBCol, MDBContainer, MDBRow } from "mdb-react-ui-kit";
 import { IoMdDownload } from "react-icons/io";
 import { CSVLink } from "react-csv";
 import { Form } from "react-bootstrap";
+import { FaRegFilePdf } from "react-icons/fa";
+import autoTable from "jspdf-autotable";
+import jsPDF from "jspdf";
+import "./../css/App.css";
+import { Object } from "core-js";
 
 class WorkingDays extends Component {
   constructor(props) {
@@ -155,6 +160,54 @@ class WorkingDays extends Component {
       workingDatas.push(row);
     }
 
+    function generate() {
+      const doc = new jsPDF("a4", "pt", "letter");
+      var img = new Image();
+      var src = "https://i.postimg.cc/wMgr6Tr0/converted.jpg";
+      img.src = src;
+      const rows = [];
+
+      const columns = [];
+      // making dynamic headers
+      headers.map((key) => columns.push({ header: key.label }));
+
+      workingDatas.map((key) =>
+        rows.push(
+          Object.values([
+            key.month,
+            key.days,
+            key.sundays,
+            key.holidays,
+            key.workingdays,
+            key.hours,
+            key.totalhours,
+          ])
+        )
+      );
+      doc.addImage(img, "JPEG", 420, 15, 160, 30);
+      doc.setFontSize(20);
+      doc.text(237, 80, "Working Days");
+      doc.autoTable(columns, rows, {
+        margin: { top: 100, left: 30, right: 30, bottom: 50 },
+        theme: "grid",
+      });
+      doc.setFontSize(10);
+      const pageCount = doc.internal.getNumberOfPages();
+
+      for (var i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.text(
+          String(i) + "/" + String(pageCount),
+          325 - 20,
+          805 - 30,
+          null,
+          null,
+          "center"
+        );
+      }
+      doc.save("working.pdf");
+    }
+
     return (
       <MDBContainer>
         <div className="pt-5 text-center text-dark">
@@ -164,6 +217,7 @@ class WorkingDays extends Component {
           <MDBCol md="2">
             <Form.Group>
               <Form.Control
+                className="Rform-control1"
                 type="number"
                 value={selYear}
                 placeholder="Year"
@@ -171,17 +225,29 @@ class WorkingDays extends Component {
               />
             </Form.Group>
           </MDBCol>
+
           <MDBCol md="2">
             <CSVLink
               headers={headers}
               data={workingDatas}
               filename={"working.csv"}
-              className="btn btn-success "
+              className="btn btn-success Rbtn-success1"
               target="_blank"
             >
               <IoMdDownload />
               Export
             </CSVLink>
+          </MDBCol>
+          <MDBCol md="2">
+            <button
+              className="btn btn-success  Rbtn-success2"
+              target="_blank"
+              onClick={() => {
+                generate();
+              }}
+            >
+              <FaRegFilePdf /> PDF
+            </button>
           </MDBCol>
         </MDBRow>
 
