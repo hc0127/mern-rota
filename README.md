@@ -19,17 +19,39 @@ Calculate total hours
 
 ## Install
 
+### Frontend
+
 ```sh
-npm install
+cd frontend & npm install
+```
+
+### Backend
+
+```sh
+cd backend & npm install
 ```
 
 ## Start Development
+
+### Frontend
+
+On frontend directory
 
 ```sh
 npm start
 ```
 
+### Backend
+
+On backend directory
+
+```sh
+node index.js
+```
+
 ## Build
+
+### Frontend
 
 ```sh
 npm run build
@@ -40,3 +62,5 @@ npm run build
 node version 16.13.2
 
 npm version 8.3.1
+
+mongoose
